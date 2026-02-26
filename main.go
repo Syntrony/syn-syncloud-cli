@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/Syntrony/syn-sycloud-cli/cmd"
+	"synctl/cmd"
 )
 
 func main() {

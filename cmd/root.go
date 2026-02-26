@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"github.com/Syntrony/syn-sycloud-cli/cmd/inspect"
-	"github.com/Syntrony/syn-sycloud-cli/cmd/install"
-	"github.com/Syntrony/syn-sycloud-cli/cmd/validate"
-	"github.com/Syntrony/syn-sycloud-cli/cmd/version"
+	"synctl/cmd/get"
+	"synctl/cmd/inspect"
+	"synctl/cmd/version"
+
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +16,5 @@ var RootCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(version.Cmd)
 	RootCmd.AddCommand(inspect.Cmd)
-	RootCmd.AddCommand(validate.Cmd)
-	RootCmd.AddCommand(install.Cmd)
+	RootCmd.AddCommand(get.Cmd)
 }
