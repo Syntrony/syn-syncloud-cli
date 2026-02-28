@@ -3,7 +3,7 @@ package inspect
 import (
 	"fmt"
 	services "synctl/internal/application/services"
-	state "synctl/internal/infrastructure/state"
+	state "synctl/internal/state"
 
 	"github.com/spf13/cobra"
 )

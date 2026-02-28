@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"synctl/internal/infrastructure/state"
+	"synctl/internal/domain/interfaces"
+	"synctl/internal/state"
 )
 
-func StateRepository() state.Repository {
+func StateRepository() interfaces.Repository {
 	return &state.StateRepository{
 		Path: "helpers/state.json",
 	}

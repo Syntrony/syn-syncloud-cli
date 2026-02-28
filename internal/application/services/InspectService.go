@@ -1,12 +1,12 @@
 package services
 
 import (
-	dto "synctl/internal/domain/Dto"
-	repository "synctl/internal/infrastructure/state"
+	dto "synctl/internal/domain/dto"
+	interfaces "synctl/internal/domain/interfaces"
 )
 
 type InspectService struct {
-	Repo repository.Repository
+	Repo interfaces.Repository
 }
 
 func (s *InspectService) Execute() (*dto.InspectDto, error) {

@@ -1,4 +1,4 @@
-package state
+package interfaces
 
 import (
 	"synctl/internal/domain"
@@ -7,4 +7,5 @@ import (
 type Repository interface {
 	Exists() (bool, error)
 	Load() (*domain.State, error)
+	Save(st *domain.State) error
 }

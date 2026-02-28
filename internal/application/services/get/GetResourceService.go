@@ -1,13 +1,13 @@
 package services
 
 import (
-	dto "synctl/internal/domain/Dto"
+	dto "synctl/internal/domain/dto"
 	filters "synctl/internal/domain/filters"
-	repository "synctl/internal/infrastructure/state"
+	interfaces "synctl/internal/domain/interfaces"
 )
 
 type GetResourceService struct {
-	Repo repository.Repository
+	Repo interfaces.Repository
 }
 
 func (s *GetResourceService) Execute(filter filters.GetResourceFilter) ([]dto.ResourceDto, error) {

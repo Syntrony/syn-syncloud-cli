@@ -3,7 +3,7 @@ package outputs
 import (
 	"fmt"
 	"os"
-	dto "synctl/internal/domain/Dto"
+	dto "synctl/internal/domain/dto"
 	"text/tabwriter"
 )
 

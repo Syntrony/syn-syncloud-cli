@@ -3,6 +3,7 @@ package state
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"synctl/internal/domain"
 )
 
@@ -32,4 +33,16 @@ func (f *StateRepository) Load() (*domain.State, error) {
 		return nil, err
 	}
 	return &state, nil
+}
+
+func (f *StateRepository) Save(st *domain.State) error {
+	os.MkdirAll(filepath.Dir(f.Path), 0755)
+
+	data, err := json.MarshalIndent(st, "", "  ")
+
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(f.Path, data, 0644)
 }
