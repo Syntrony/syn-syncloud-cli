@@ -1,8 +1,9 @@
 package k8s
 
 import (
+	"fmt"
+	"synctl/internal/application/interfaces"
 	dto "synctl/internal/domain/dto"
-	"synctl/internal/domain/interfaces"
 )
 
 type Detector struct {
@@ -16,6 +17,8 @@ func NewDetector(runner interfaces.CommandRunner) *Detector {
 }
 
 func (d *Detector) Detect() (*dto.Status, error) {
+
+	fmt.Println("Detecting Kubernetes environment...")
 	status := &dto.Status{}
 
 	_, err := d.runner.Run("kubectl", "version", "--client", "-o", "json")

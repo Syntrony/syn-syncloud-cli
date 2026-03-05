@@ -3,8 +3,8 @@ package executor
 import (
 	"bytes"
 	"os/exec"
+	"synctl/internal/application/interfaces"
 	"synctl/internal/domain/dto"
-	"synctl/internal/domain/interfaces"
 )
 
 type ExecRunner struct {

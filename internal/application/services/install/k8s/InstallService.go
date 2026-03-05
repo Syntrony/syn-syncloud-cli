@@ -1,36 +1,54 @@
 package k8s
 
 import (
+	install "synctl/internal/application/interfaces/install"
+	install_k8s "synctl/internal/application/interfaces/install/k8s"
 	"synctl/internal/domain"
-	"synctl/internal/domain/interfaces"
 )
 
 type InstallService struct {
-	detector  interfaces.Detector
-	inspector interfaces.Inspector
-	stateRepo interfaces.Repository
+	detector  install.Detector
+	inspector install.Inspector
+	installer install_k8s.K8sInstaller
 }
 
-// func NewInstallService(
-// 	detector interfaces.Detector,
-// 	inspector interfaces.Inspector,
-// 	stateRepo interfaces.Repository,
-// ) *InstallService
+func NewInstallService(
+	detector install.Detector,
+	inspector install.Inspector,
+	installer install_k8s.K8sInstaller,
+) *InstallService {
+	return &InstallService{
+		detector:  detector,
+		inspector: inspector,
+		installer: installer,
+	}
+}
 
-func (s *InstallService) Execute() (*domain.Snapshot, error) {
+func (s *InstallService) Install(mode domain.InstallMode) (*domain.Snapshot, error) {
 	status, err := s.detector.Detect()
+
 	if err != nil {
 		return nil, err
 	}
 
+	if mode == domain.Development {
+		if err := s.installer.InstallK3dCluster(); err != nil {
+			return nil, err
+		}
+		return s.inspector.Snapshot()
+	}
+
 	if !status.KubectlInstalled {
-		if err := s.InstallKubectl(); err != nil {
+		if err := s.installer.InstallKubectl(); err != nil {
 			return nil, err
 		}
 	}
 
 	if !status.ClusterReachable {
-		if err := s.InstallCluster(); err != nil {
+		if err := s.installer.InstallCluster(); err != nil {
+			return nil, err
+		}
+		if err := s.installer.ConfigureCluster(); err != nil {
 			return nil, err
 		}
 	}

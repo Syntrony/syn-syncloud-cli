@@ -1,6 +1,7 @@
 package resource
 
 type Ownership struct {
-	OwnerType string `json:"ownerType,omitempty"`
 	OwnerId   string `json:"ownerId,omitempty"`
+	OwnerKind string `json:"ownerKind,omitempty"`
+	OwnerName string `json:"ownerName,omitempty"`
 }

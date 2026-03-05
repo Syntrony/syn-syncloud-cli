@@ -12,6 +12,12 @@
             "hostname": "orion",
             "role": "control-plane",
             "ip": "192.168.0.10"
+        },
+        {
+            "id": "node-chronos",
+            "hostname": "chronos",
+            "role": "control-plane",
+            "ip": "192.168.0.11"
         }
     ],
     "resources": [

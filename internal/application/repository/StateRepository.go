@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"synctl/internal/domain/interfaces"
+	"synctl/internal/application/interfaces"
 	"synctl/internal/state"
 )
 

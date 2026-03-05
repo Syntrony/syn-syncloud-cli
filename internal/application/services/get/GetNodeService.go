@@ -1,8 +1,8 @@
 package services
 
 import (
+	interfaces "synctl/internal/application/interfaces"
 	dto "synctl/internal/domain/dto"
-	interfaces "synctl/internal/domain/interfaces"
 )
 
 type GetNodeService struct {

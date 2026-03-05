@@ -1,9 +1,9 @@
 package services
 
 import (
+	interfaces "synctl/internal/application/interfaces"
 	dto "synctl/internal/domain/dto"
 	filters "synctl/internal/domain/filters"
-	interfaces "synctl/internal/domain/interfaces"
 )
 
 type GetResourceService struct {
