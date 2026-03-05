@@ -3,9 +3,9 @@ package resources
 import (
 	"fmt"
 	"synctl/internal/application/outputs"
-	repository "synctl/internal/application/repository"
 	services "synctl/internal/application/services/get"
 	filters "synctl/internal/domain/filters"
+	"synctl/internal/domain/persistence"
 
 	"github.com/spf13/cobra"
 )
@@ -30,7 +30,9 @@ var Cmd = &cobra.Command{
 	Use:   "resources",
 	Short: "List existing resources in every node",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		repo := repository.StateRepository()
+		repo := &persistence.StateRepository{
+			Path: "helpers/state.json",
+		}
 
 		rService := services.GetResourceService{
 			Repo: repo,

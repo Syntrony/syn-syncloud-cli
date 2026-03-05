@@ -1,4 +1,4 @@
-package state
+package persistence
 
 import (
 	"encoding/json"

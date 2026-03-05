@@ -3,7 +3,7 @@ package inspect
 import (
 	"fmt"
 	services "synctl/internal/application/services"
-	state "synctl/internal/state"
+	"synctl/internal/domain/persistence"
 
 	"github.com/spf13/cobra"
 )
@@ -12,7 +12,7 @@ var Cmd = &cobra.Command{
 	Use:   "inspect",
 	Short: "Inspect existing resources on the server",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		repo := &state.StateRepository{
+		repo := &persistence.StateRepository{
 			Path: "helpers/state.json",
 		}
 
