@@ -2,108 +2,221 @@ package k8s
 
 import (
 	"fmt"
+	"os"
+	"runtime"
+
 	"synctl/internal/application/interfaces"
+	"synctl/internal/domain"
 )
 
 type Installer struct {
-	runner interfaces.CommandRunner
-	sudo   interfaces.PrivilegedRunner
+	runner  interfaces.CommandRunner
+	sudo    interfaces.PrivilegedRunner
+	runtime domain.RuntimeType
 }
 
-func NewInstaller(runner interfaces.CommandRunner, sudo interfaces.PrivilegedRunner) *Installer {
+func NewInstaller(
+	runner interfaces.CommandRunner,
+	sudo interfaces.PrivilegedRunner,
+	runtime domain.RuntimeType,
+) *Installer {
 	return &Installer{
-		runner: runner,
-		sudo:   sudo,
+		runner:  runner,
+		sudo:    sudo,
+		runtime: runtime,
 	}
 }
 
 func (i *Installer) InstallKubectl() error {
+
 	fmt.Println("Installing kubectl...")
+
+	arch := "amd64"
+
+	if runtime.GOARCH == "arm64" {
+		arch = "arm64"
+	}
+
+	url := fmt.Sprintf(
+		"https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/%s/kubectl",
+		arch,
+	)
+
 	_, err := i.runner.Run(
 		"sh",
 		"-c",
-		"curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl",
+		fmt.Sprintf("curl -LO %s", url),
 	)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("kubectl download failed: %w", err)
 	}
 
 	_, err = i.runner.Run("chmod", "+x", "kubectl")
 
 	if err != nil {
-		return err
+		return fmt.Errorf("kubectl chmod failed: %w", err)
 	}
 
 	_, err = i.sudo.Run("mv", "kubectl", "/usr/local/bin/")
 
 	if err != nil {
-		return err
+		return fmt.Errorf("kubectl install failed: %w", err)
 	}
+
+	fmt.Println("kubectl installed successfully")
 
 	return nil
 }
 
 func (i *Installer) InstallCluster() error {
-	fmt.Println("Installing k3s cluster...")
-	_, err := i.runner.Run("sh", "-c", "curl -sfL https://get.k3s.io | sh -")
 
-	if err != nil {
-		return err
+	fmt.Println("Installing cluster...")
+
+	switch i.runtime {
+
+	case domain.K3d:
+		return i.InstallK3d()
+
+	case domain.K3s:
+		return i.InstallK3s()
+
+	default:
+		return fmt.Errorf("unknown runtime: %s", i.runtime)
 	}
-
-	return nil
 }
 
 func (i *Installer) ConfigureCluster() error {
-	fmt.Println("Configuring kubectl to access k3s cluster...")
-	// For k3s, kubeconfig is typically located at /etc/rancher/k3s/k3s.yaml
-	_, err := i.runner.Run("sh", "-c", "mkdir -p $HOME/.kube")
 
-	if err != nil {
-		return err
+	switch i.runtime {
+
+	case domain.K3s:
+		return i.ConfigureK3s()
+
+	case domain.K3d:
+		return i.ConfigureK3d()
+
+	default:
+		return fmt.Errorf("unknown runtime")
 	}
+}
 
-	_, err = i.sudo.Run("sh", "-c",
-		"cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config")
+func (i *Installer) InstallK3s() error {
+
+	fmt.Println("Installing k3s cluster...")
+
+	_, err := i.runner.Run(
+		"sh",
+		"-c",
+		"curl -sfL https://get.k3s.io | sh -",
+	)
 
 	if err != nil {
-		return err
-	}
-
-	_, err = i.sudo.Run("sh", "-c",
-		"chown $(id -u):$(id -g) $HOME/.kube/config")
-
-	if err != nil {
-		return err
+		return fmt.Errorf("k3s installation failed: %w", err)
 	}
 
 	return nil
 }
 
-func (i *Installer) InstallK3dCluster() error {
-	_, err := i.runner.Run("k3d", "version")
+func (i *Installer) InstallK3d() error {
+
+	fmt.Println("Installing k3d cluster...")
+
+	_, err := i.runner.Run(
+		"sh",
+		"-c",
+		"curl -sfL https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash",
+	)
 
 	if err != nil {
-		if err := i.InstallK3dBinary(); err != nil {
-			return err
-		}
+		return fmt.Errorf("k3d install failed: %w", err)
+	}
+
+	// Check if cluster exists
+	_, err = i.runner.Run("k3d", "cluster", "get", "syncloud")
+
+	if err == nil {
+		fmt.Println("k3d cluster already exists")
+		return nil
 	}
 
 	_, err = i.runner.Run(
-		"k3d", "cluster", "create", "syncloud-dev", "--agents", "1",
+		"k3d",
+		"cluster",
+		"create",
+		"syncloud",
 	)
 
-	return err
+	if err != nil {
+		return fmt.Errorf("k3d cluster creation failed: %w", err)
+	}
+
+	fmt.Println("k3d cluster created")
+
+	return nil
 }
 
-func (i *Installer) InstallK3dBinary() error {
+func (i *Installer) ConfigureK3s() error {
 
-	_, err := i.runner.Run(
-		"bash",
-		"-c",
-		"curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash",
+	fmt.Println("Configuring kubectl for k3s...")
+
+	home := os.Getenv("HOME")
+
+	if home == "" {
+		return fmt.Errorf("HOME environment variable not found")
+	}
+
+	kubeDir := fmt.Sprintf("%s/.kube", home)
+	kubeConfig := fmt.Sprintf("%s/config", kubeDir)
+
+	_, err := i.runner.Run("mkdir", "-p", kubeDir)
+
+	if err != nil {
+		return fmt.Errorf("creating kube directory failed: %w", err)
+	}
+
+	_, err = i.sudo.Run(
+		"cp",
+		"/etc/rancher/k3s/k3s.yaml",
+		kubeConfig,
 	)
 
-	return err
+	if err != nil {
+		return fmt.Errorf("copy kubeconfig failed: %w", err)
+	}
+
+	_, err = i.sudo.Run(
+		"chown",
+		fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid()),
+		kubeConfig,
+	)
+
+	if err != nil {
+		return fmt.Errorf("chown kubeconfig failed: %w", err)
+	}
+
+	fmt.Println("kubectl configured")
+
+	return nil
+}
+
+func (i *Installer) ConfigureK3d() error {
+
+	fmt.Println("Configuring kubectl for k3d...")
+
+	_, err := i.runner.Run(
+		"k3d",
+		"kubeconfig",
+		"merge",
+		"syncloud",
+		"--kubeconfig-switch-context",
+	)
+
+	if err != nil {
+		return fmt.Errorf("k3d kubeconfig merge failed: %w", err)
+	}
+
+	fmt.Println("kubectl configured")
+
+	return nil
 }

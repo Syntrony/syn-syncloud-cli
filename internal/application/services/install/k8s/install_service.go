@@ -24,18 +24,11 @@ func NewInstallService(
 	}
 }
 
-func (s *InstallService) Install(mode domain.InstallMode) (*domain.Snapshot, error) {
+func (s *InstallService) Install() (*domain.Snapshot, error) {
 	status, err := s.detector.Detect()
 
 	if err != nil {
 		return nil, err
-	}
-
-	if mode == domain.Development {
-		if err := s.installer.InstallK3dCluster(); err != nil {
-			return nil, err
-		}
-		return s.inspector.Snapshot()
 	}
 
 	if !status.KubectlInstalled {

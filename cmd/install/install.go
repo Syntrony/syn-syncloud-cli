@@ -3,8 +3,12 @@ package install
 import (
 	"github.com/spf13/cobra"
 
-	// infrastructure
+	// domain
 	"synctl/internal/domain"
+
+	// infrastructure
+	systemsvc "synctl/internal/application/services/system"
+	"synctl/internal/domain/persistence"
 	executor "synctl/internal/executor"
 	k8sinfra "synctl/internal/infrastructure/k8s"
 	systeminfra "synctl/internal/infrastructure/system"
@@ -14,6 +18,7 @@ import (
 	installservice "synctl/internal/application/services/install"
 	k8sservice "synctl/internal/application/services/install/k8s"
 
+	interfaces "synctl/internal/application/interfaces"
 	installiface "synctl/internal/application/interfaces/install"
 )
 
@@ -21,14 +26,43 @@ var Cmd = &cobra.Command{
 	Use:   "install",
 	Short: "Install Syncloud on the cluster",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		repo := &persistence.StateRepository{
+			Path: "helpers/syncloud-state.json",
+		}
 
 		// =========================
 		// BASE
 		// =========================
 
+		envDetector := systeminfra.NewEnvironmentDetector()
 		logger := loggerinfra.NewConsoleLogger()
 		runner := executor.NewExecRunner(logger)
-		sudo := executor.NewSudoRunner(logger)
+
+		var sudo interfaces.PrivilegedRunner
+
+		var runtime domain.RuntimeType = domain.K3s
+
+		if envDetector.IsContainer() {
+			logger.Info("Container environment detected → using DEV mode (k3d)")
+			runtime = domain.K3d
+		}
+
+		if envDetector.IsRoot() {
+
+			logger.Info("Running as root -> sudo not required")
+			sudo = runner
+
+		} else {
+
+			logger.Info("Running as user -> sudo required")
+			sudoSession := &systemsvc.SudoSession{}
+
+			if err := sudoSession.Ensure(runner); err != nil {
+				return err
+			}
+
+			sudo = executor.NewSudoRunner(runner)
+		}
 
 		// =========================
 		// K8S INFRA
@@ -36,7 +70,7 @@ var Cmd = &cobra.Command{
 
 		detector := k8sinfra.NewDetector(runner)
 		inspector := k8sinfra.NewInspector(runner)
-		installer := k8sinfra.NewInstaller(runner, sudo)
+		installer := k8sinfra.NewInstaller(runner, sudo, runtime)
 
 		k8sRuntime := k8sservice.NewInstallService(
 			detector,
@@ -57,20 +91,12 @@ var Cmd = &cobra.Command{
 		// =========================
 
 		service := installservice.NewInstallService(
+			repo,
 			[]installiface.RuntimeInstaller{k8sRuntime},
 			systemInspector,
 			builder,
 		)
 
-		envDetector := systeminfra.NewEnvironmentDetector()
-
-		mode := domain.Production
-
-		if envDetector.IsContainer() {
-			logger.Info("Container environment detected → using DEV mode (k3d)")
-			mode = domain.Development
-		}
-
-		return service.Install(mode)
+		return service.Install()
 	},
 }

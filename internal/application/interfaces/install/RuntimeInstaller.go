@@ -5,5 +5,5 @@ import (
 )
 
 type RuntimeInstaller interface {
-	Install(mode domain.InstallMode) (*domain.Snapshot, error)
+	Install() (*domain.Snapshot, error)
 }

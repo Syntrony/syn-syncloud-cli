@@ -13,7 +13,7 @@ func (s *SudoSession) Ensure(runner interfaces.CommandRunner) error {
 
 	_, err := runner.Run("sudo", "-v")
 
-	if err == nil {
+	if err != nil {
 		return err
 	}
 

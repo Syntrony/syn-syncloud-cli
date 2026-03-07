@@ -1,32 +1,34 @@
 package install
 
 import (
-	"encoding/json"
-	"os"
+	"fmt"
+	"synctl/internal/application/interfaces"
 	run_install "synctl/internal/application/interfaces/install"
 	"synctl/internal/application/interfaces/system"
 	"synctl/internal/domain"
 )
 
 type InstallService struct {
+	repo          interfaces.Repository
 	runtimes      []run_install.RuntimeInstaller
 	nodeInspector system.Inspector
 	builder       *StateBuilder
 }
 
-func NewInstallService(runtimes []run_install.RuntimeInstaller, nodeInspector system.Inspector, builder *StateBuilder) *InstallService {
+func NewInstallService(repo interfaces.Repository, runtimes []run_install.RuntimeInstaller, nodeInspector system.Inspector, builder *StateBuilder) *InstallService {
 	return &InstallService{
+		repo:          repo,
 		runtimes:      runtimes,
 		nodeInspector: nodeInspector,
 		builder:       builder,
 	}
 }
 
-func (s *InstallService) Install(mode domain.InstallMode) error {
+func (s *InstallService) Install() error {
 	snapshot := &domain.Snapshot{}
 
 	for _, runtime := range s.runtimes {
-		snap, err := runtime.Install(mode)
+		snap, err := runtime.Install()
 
 		if err != nil {
 			return err
@@ -43,11 +45,7 @@ func (s *InstallService) Install(mode domain.InstallMode) error {
 
 	state := s.builder.Build(snapshot, nodes)
 
-	jsonData, err := json.MarshalIndent(state, "", "  ")
+	fmt.Println("Syncloud Platform installed successfully!!!")
 
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile("helpers/state.json", jsonData, 0644)
+	return s.repo.Save(state)
 }

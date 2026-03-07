@@ -1,0 +1,36 @@
+{
+ "version": "0.2.0",
+ "configurations": [
+  {
+   "name": "synctl install",
+   "type": "go",
+   "request": "launch",
+   "mode": "auto",
+   "program": "${workspaceFolder}",
+   "args": ["install"]
+  },
+  {
+   "name": "synctl get",
+   "type": "go",
+   "request": "launch",
+   "mode": "auto",
+   "program": "${workspaceFolder}",
+   "args": ["get"]
+  },
+  {
+   "name": "synctl inspect",
+   "type": "go",
+   "request": "launch",
+   "mode": "auto",
+   "program": "${workspaceFolder}",
+   "args": ["inspect"]
+  },
+  {
+ "name": "synctl (manual args)",
+ "type": "go",
+ "request": "launch",
+ "mode": "auto",
+ "program": "${workspaceFolder}"
+}
+ ]
+}

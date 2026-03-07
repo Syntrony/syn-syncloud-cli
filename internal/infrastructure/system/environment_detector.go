@@ -30,3 +30,7 @@ func (e *EnvironmentDetector) IsContainer() bool {
 
 	return false
 }
+
+func (e *EnvironmentDetector) IsRoot() bool {
+	return os.Geteuid() == 0
+}

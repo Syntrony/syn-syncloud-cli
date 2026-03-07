@@ -2,6 +2,7 @@ package executor
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain/dto"
@@ -37,7 +38,12 @@ func (r *ExecRunner) Run(name string, args ...string) (*dto.CommandResult, error
 
 	if err != nil {
 		result.Error = err.Error()
-		r.Logger.Error("Command execution failed: " + err.Error())
+		r.Logger.Error(fmt.Sprintf(
+			"Command failed: %s %v\nstderr: %s",
+			cmd,
+			args,
+			result.Stderr,
+		))
 		return result, err
 	}
 
