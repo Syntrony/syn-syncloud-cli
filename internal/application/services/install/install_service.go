@@ -1,7 +1,6 @@
 package install
 
 import (
-	"fmt"
 	"synctl/internal/application/interfaces"
 	run_install "synctl/internal/application/interfaces/install"
 	"synctl/internal/application/interfaces/system"
@@ -13,14 +12,22 @@ type InstallService struct {
 	runtimes      []run_install.RuntimeInstaller
 	nodeInspector system.Inspector
 	builder       *StateBuilder
+	logger        interfaces.Logger
 }
 
-func NewInstallService(repo interfaces.Repository, runtimes []run_install.RuntimeInstaller, nodeInspector system.Inspector, builder *StateBuilder) *InstallService {
+func NewInstallService(
+	repo interfaces.Repository,
+	runtimes []run_install.RuntimeInstaller,
+	nodeInspector system.Inspector,
+	builder *StateBuilder,
+	logger interfaces.Logger,
+) *InstallService {
 	return &InstallService{
 		repo:          repo,
 		runtimes:      runtimes,
 		nodeInspector: nodeInspector,
 		builder:       builder,
+		logger:        logger,
 	}
 }
 
@@ -45,7 +52,7 @@ func (s *InstallService) Install() error {
 
 	state := s.builder.Build(snapshot, nodes)
 
-	fmt.Println("Syncloud Platform installed successfully!!!")
+	s.logger.Info("Syncloud Platform installed successfully!!!")
 
 	return s.repo.Save(state)
 }

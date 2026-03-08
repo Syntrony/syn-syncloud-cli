@@ -1,10 +1,10 @@
 package nodes
 
 import (
-	"fmt"
 	outputs "synctl/internal/application/outputs"
 	services "synctl/internal/application/services/get"
 	"synctl/internal/domain/persistence"
+	loggerinfra "synctl/internal/logger"
 
 	"github.com/spf13/cobra"
 )
@@ -14,8 +14,10 @@ var Cmd = &cobra.Command{
 	Short: "List existing nodes in the system",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo := &persistence.StateRepository{
-			Path: "helpers/state.json",
+			Path: "helpers/syncloud-state.json",
 		}
+
+		logger := loggerinfra.NewConsoleLogger()
 
 		nService := services.GetNodeService{
 			Repo: repo,
@@ -27,7 +29,7 @@ var Cmd = &cobra.Command{
 		}
 
 		if len(result) == 0 {
-			fmt.Println("No nodes found in system!!!")
+			logger.Info("No nodes found in system!!!")
 			return nil
 		}
 

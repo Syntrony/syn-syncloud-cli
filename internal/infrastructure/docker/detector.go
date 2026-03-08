@@ -1,8 +1,8 @@
-package k8s
+package docker
 
 import (
 	"synctl/internal/application/interfaces"
-	dto "synctl/internal/domain/dto"
+	"synctl/internal/domain/dto"
 )
 
 type Detector struct {
@@ -18,27 +18,26 @@ func NewDetector(runner interfaces.CommandRunner, logger interfaces.Logger) *Det
 }
 
 func (d *Detector) Detect() (*dto.Status, error) {
-
-	d.logger.Info("Detecting Kubernetes environment...")
+	d.logger.Info("Detecting docker environment...")
 	status := &dto.Status{}
 
-	_, err := d.runner.Run("kubectl", "version", "--client", "-o", "json")
+	_, err := d.runner.Run("docker", "--version")
 
 	if err != nil {
-		status.KubectlInstalled = false
+		status.DockerInstalled = false
 		return status, nil
 	}
 
-	status.KubectlInstalled = true
+	status.DockerInstalled = true
 
-	_, err = d.runner.Run("kubectl", "cluster-info")
+	_, err = d.runner.Run("docker", "info")
 
 	if err != nil {
-		status.ClusterReachable = false
+		status.DockerRunning = false
 		return status, nil
 	}
 
-	status.ClusterReachable = true
+	status.DockerRunning = true
 
 	return status, nil
 }

@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     build-essential \
     iproute2 \
+    docker.io \
     && rm -rf /var/lib/apt/lists/*
 
 # -----------------------------
@@ -35,6 +36,9 @@ RUN go version
 
 # Install delve debugger
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
+# Install opencode
+RUN curl -fsSL https://opencode.ai/install | bash
 
 ENV PATH="/root/go/bin:${PATH}"
 

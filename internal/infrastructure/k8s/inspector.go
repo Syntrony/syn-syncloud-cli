@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
 	domainresource "synctl/internal/domain/Resource"
@@ -24,21 +24,23 @@ var resources = []string{
 
 type Inspector struct {
 	runner interfaces.CommandRunner
+	logger interfaces.Logger
 }
 
-func NewInspector(runner interfaces.CommandRunner) *Inspector {
+func NewInspector(runner interfaces.CommandRunner, logger interfaces.Logger) *Inspector {
 	return &Inspector{
 		runner: runner,
+		logger: logger,
 	}
 }
 
 func (i *Inspector) Snapshot() (*domain.Snapshot, error) {
 	snapshot := &domain.Snapshot{}
-	fmt.Println("Collecting Kubernetes resources...")
+	i.logger.Info("Collecting Kubernetes resources...")
 
 	for _, resource := range resources {
 
-		fmt.Printf("Collecting %s...\n", resource)
+		i.logger.Info("Collecting " + resource + "...")
 
 		rs, err := i.Collect([]string{}, resource, true)
 		if err != nil {
@@ -80,24 +82,21 @@ func (i *Inspector) Collect(
 		resource := domain.Resource{
 			Id:      item.Metadata.Uid,
 			Name:    item.Metadata.Name,
-			Kind:    "k8s." + item.Kind,
+			Kind:    "k8s." + strings.ToLower(item.Kind),
 			Runtime: "kubernetes",
-			NodeId:  "", // lo puedes mapear después si aplica
-
+			NodeId:  "",
 			Spec: domainresource.Spec{
 				Raw: item.Spec,
 			},
-
 			Status: domainresource.Status{
 				Raw: item.Status,
 			},
-
 			CreatedAt: item.Metadata.CreationTimestamp,
 			UpdatedAt: item.Metadata.CreationTimestamp,
 		}
 
 		if len(item.Metadata.OwnerReferences) > 0 {
-			owner := item.Metadata.OwnerReferences[0] // Solo tomamos el primer owner reference para simplificar
+			owner := item.Metadata.OwnerReferences[0]
 
 			resource.Ownership = domainresource.Ownership{
 				OwnerId:   owner.Uid,

@@ -1,9 +1,9 @@
 package inspect
 
 import (
-	"fmt"
 	services "synctl/internal/application/services"
 	"synctl/internal/domain/persistence"
+	loggerinfra "synctl/internal/logger"
 
 	"github.com/spf13/cobra"
 )
@@ -13,8 +13,10 @@ var Cmd = &cobra.Command{
 	Short: "Inspect existing resources on the server",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo := &persistence.StateRepository{
-			Path: "helpers/state.json",
+			Path: "helpers/syncloud-state.json",
 		}
+
+		logger := loggerinfra.NewConsoleLogger()
 
 		service := services.InspectService{
 			Repo: repo,
@@ -26,15 +28,15 @@ var Cmd = &cobra.Command{
 		}
 
 		if !result.Found {
-			fmt.Println("Syncloud not initialized")
+			logger.Info("Syncloud not initialized")
 			return nil
 		}
 
-		fmt.Println("Syncloud State: FOUND")
-		fmt.Println("Version:", result.Version)
-		fmt.Println("Mode:", result.Mode)
-		fmt.Println("Nodes:", result.NodeCount)
-		fmt.Println("Resources:", result.ResCount)
+		logger.Info("Syncloud State: FOUND")
+		logger.Info("Version: " + result.Version)
+		logger.Info("Mode: " + result.Mode)
+		logger.Info("Nodes: " + string(rune(result.NodeCount+'0')))
+		logger.Info("Resources: " + string(rune(result.ResCount+'0')))
 
 		return nil
 

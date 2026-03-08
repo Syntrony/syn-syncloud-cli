@@ -1,7 +1,7 @@
 package version
 
 import (
-	"fmt"
+	"synctl/internal/logger"
 
 	"github.com/spf13/cobra"
 )
@@ -12,6 +12,7 @@ var Cmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version of synctl",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("synctl version", version)
+		logger := logger.NewConsoleLogger()
+		logger.Info("synctl version " + version)
 	},
 }

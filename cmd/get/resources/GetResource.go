@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"fmt"
 	"synctl/internal/application/outputs"
 	services "synctl/internal/application/services/get"
 	filters "synctl/internal/domain/filters"
 	"synctl/internal/domain/persistence"
+	loggerinfra "synctl/internal/logger"
 
 	"github.com/spf13/cobra"
 )
@@ -22,7 +22,6 @@ func init() {
 	Cmd.Flags().StringVarP(&name, "name", "n", "", "Filter by resource name")
 	Cmd.Flags().StringVarP(&kind, "kind", "k", "", "Filter by resource kind")
 	Cmd.Flags().StringVarP(&runtime, "runtime", "r", "", "Filter by resource runtime")
-	// Cmd.Flags().StringVarP(&nodeId, "node-id", "nid", "", "Filter by node id")
 	Cmd.Flags().StringVarP(&id, "id", "i", "", "Filter by resource id")
 }
 
@@ -31,8 +30,10 @@ var Cmd = &cobra.Command{
 	Short: "List existing resources in every node",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo := &persistence.StateRepository{
-			Path: "helpers/state.json",
+			Path: "helpers/syncloud-state.json",
 		}
+
+		logger := loggerinfra.NewConsoleLogger()
 
 		rService := services.GetResourceService{
 			Repo: repo,
@@ -53,8 +54,7 @@ var Cmd = &cobra.Command{
 		}
 
 		if len(result) == 0 {
-			fmt.Println("No resources found in system!!!")
-
+			logger.Info("No resources found in system!!!")
 			return nil
 		}
 

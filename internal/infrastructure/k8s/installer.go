@@ -13,23 +13,26 @@ type Installer struct {
 	runner  interfaces.CommandRunner
 	sudo    interfaces.PrivilegedRunner
 	runtime domain.RuntimeType
+	logger  interfaces.Logger
 }
 
 func NewInstaller(
 	runner interfaces.CommandRunner,
 	sudo interfaces.PrivilegedRunner,
 	runtime domain.RuntimeType,
+	logger interfaces.Logger,
 ) *Installer {
 	return &Installer{
 		runner:  runner,
 		sudo:    sudo,
 		runtime: runtime,
+		logger:  logger,
 	}
 }
 
 func (i *Installer) InstallKubectl() error {
 
-	fmt.Println("Installing kubectl...")
+	i.logger.Info("Installing kubectl...")
 
 	arch := "amd64"
 
@@ -64,21 +67,21 @@ func (i *Installer) InstallKubectl() error {
 		return fmt.Errorf("kubectl install failed: %w", err)
 	}
 
-	fmt.Println("kubectl installed successfully")
+	i.logger.Info("kubectl installed successfully")
 
 	return nil
 }
 
 func (i *Installer) InstallCluster() error {
 
-	fmt.Println("Installing cluster...")
+	i.logger.Info("Installing cluster...")
 
 	switch i.runtime {
 
-	case domain.K3d:
+	case domain.Container:
 		return i.InstallK3d()
 
-	case domain.K3s:
+	case domain.VPS:
 		return i.InstallK3s()
 
 	default:
@@ -90,10 +93,10 @@ func (i *Installer) ConfigureCluster() error {
 
 	switch i.runtime {
 
-	case domain.K3s:
+	case domain.VPS:
 		return i.ConfigureK3s()
 
-	case domain.K3d:
+	case domain.Container:
 		return i.ConfigureK3d()
 
 	default:
@@ -103,7 +106,7 @@ func (i *Installer) ConfigureCluster() error {
 
 func (i *Installer) InstallK3s() error {
 
-	fmt.Println("Installing k3s cluster...")
+	i.logger.Info("Installing k3s cluster...")
 
 	_, err := i.runner.Run(
 		"sh",
@@ -120,7 +123,7 @@ func (i *Installer) InstallK3s() error {
 
 func (i *Installer) InstallK3d() error {
 
-	fmt.Println("Installing k3d cluster...")
+	i.logger.Info("Installing k3d cluster...")
 
 	_, err := i.runner.Run(
 		"sh",
@@ -132,11 +135,10 @@ func (i *Installer) InstallK3d() error {
 		return fmt.Errorf("k3d install failed: %w", err)
 	}
 
-	// Check if cluster exists
 	_, err = i.runner.Run("k3d", "cluster", "get", "syncloud")
 
 	if err == nil {
-		fmt.Println("k3d cluster already exists")
+		i.logger.Info("k3d cluster already exists")
 		return nil
 	}
 
@@ -151,14 +153,14 @@ func (i *Installer) InstallK3d() error {
 		return fmt.Errorf("k3d cluster creation failed: %w", err)
 	}
 
-	fmt.Println("k3d cluster created")
+	i.logger.Info("k3d cluster created")
 
 	return nil
 }
 
 func (i *Installer) ConfigureK3s() error {
 
-	fmt.Println("Configuring kubectl for k3s...")
+	i.logger.Info("Configuring kubectl for k3s...")
 
 	home := os.Getenv("HOME")
 
@@ -195,14 +197,14 @@ func (i *Installer) ConfigureK3s() error {
 		return fmt.Errorf("chown kubeconfig failed: %w", err)
 	}
 
-	fmt.Println("kubectl configured")
+	i.logger.Info("kubectl configured")
 
 	return nil
 }
 
 func (i *Installer) ConfigureK3d() error {
 
-	fmt.Println("Configuring kubectl for k3d...")
+	i.logger.Info("Configuring kubectl for k3d...")
 
 	_, err := i.runner.Run(
 		"k3d",
@@ -216,7 +218,7 @@ func (i *Installer) ConfigureK3d() error {
 		return fmt.Errorf("k3d kubeconfig merge failed: %w", err)
 	}
 
-	fmt.Println("kubectl configured")
+	i.logger.Info("kubectl configured")
 
 	return nil
 }
