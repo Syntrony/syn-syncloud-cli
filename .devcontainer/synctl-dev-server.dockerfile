@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     iproute2 \
     docker.io \
+    dnsmasq \
+    dnsutils \
     && rm -rf /var/lib/apt/lists/*
 
 # -----------------------------

@@ -10,6 +10,7 @@ import (
 	systemsvc "synctl/internal/application/services/system"
 	"synctl/internal/domain/persistence"
 	executor "synctl/internal/executor"
+	dnsinfra "synctl/internal/infrastructure/dns"
 	dockerinfra "synctl/internal/infrastructure/docker"
 	k8sinfra "synctl/internal/infrastructure/k8s"
 	systeminfra "synctl/internal/infrastructure/system"
@@ -17,6 +18,7 @@ import (
 
 	// services
 	installservice "synctl/internal/application/services/install"
+	dnsservice "synctl/internal/application/services/install/dns"
 	dockerservice "synctl/internal/application/services/install/docker"
 	k8sservice "synctl/internal/application/services/install/k8s"
 
@@ -80,11 +82,23 @@ var Cmd = &cobra.Command{
 
 		systemInspector := systeminfra.NewInspector(runner)
 
+		systemFile := systeminfra.NewFileSystem()
+
+		dnsDetector := dnsinfra.NewDetector(runner, logger)
+		dnsInspector := dnsinfra.NewInspector(runner, logger)
+		dnsInstaller := dnsinfra.NewInstaller(runner, sudo, runtime, logger, systemInspector, systemFile)
+
+		dnsRuntime := dnsservice.NewInstallService(
+			dnsDetector,
+			dnsInspector,
+			dnsInstaller,
+		)
+
 		builder := installservice.NewStateBuilder()
 
 		service := installservice.NewInstallService(
 			repo,
-			[]installiface.RuntimeInstaller{k8sRuntime, dockerRuntime},
+			[]installiface.RuntimeInstaller{k8sRuntime, dockerRuntime, dnsRuntime},
 			systemInspector,
 			builder,
 			logger,

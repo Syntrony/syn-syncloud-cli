@@ -23,5 +23,6 @@ func (b *StateBuilder) Build(snapshot *domain.Snapshot, nodes []domain.Node) *do
 		Cluster:   cluster,
 		Nodes:     nodes,
 		Resources: snapshot.Resources,
+		Dns:       &domain.Dns{Records: snapshot.Records},
 	}
 }

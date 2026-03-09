@@ -42,6 +42,7 @@ func (s *InstallService) Install() error {
 		}
 
 		snapshot.Resources = append(snapshot.Resources, snap.Resources...)
+		snapshot.Records = append(snapshot.Records, snap.Records...)
 	}
 
 	nodes, err := s.nodeInspector.Inspect()
