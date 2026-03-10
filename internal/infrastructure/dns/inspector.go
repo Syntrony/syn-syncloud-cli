@@ -2,6 +2,8 @@ package dns
 
 import (
 	"bufio"
+	"os"
+	"path/filepath"
 	"strings"
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
@@ -24,34 +26,38 @@ func (i *Inspector) Snapshot() (*domain.Snapshot, error) {
 	i.logger.Info("Collecting dns resources...")
 	snapshot := &domain.Snapshot{}
 
-	out, err := i.runner.Run(
-		"cat",
-		"/etc/dnsmasq.d/syncloud.conf",
-	)
+	files, err := filepath.Glob("/etc/dnsmasq.d/*.conf")
 
 	if err != nil {
 		return nil, err
 	}
 
-	scanner := bufio.NewScanner(strings.NewReader(out.Stdout))
+	for _, file := range files {
+		// 2. Abrimos cada archivo individualmente
+		f, err := os.Open(file)
+		if err != nil {
+			i.logger.Info("Could not read file: " + file)
+			continue
+		}
 
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
 
-		if !(line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "server=")) && strings.HasPrefix(line, "address=/") {
-			// rm prefix
-			trimmed := strings.TrimPrefix(line, "address=/")
+			// Tu lógica de parsing se mantiene igual
+			if strings.HasPrefix(line, "address=/") {
+				trimmed := strings.TrimPrefix(line, "address=/")
+				parts := strings.Split(trimmed, "/")
 
-			// split "google.com/1.2.3.4"
-			parts := strings.Split(trimmed, "/")
-
-			if len(parts) == 2 {
-				snapshot.Records = append(snapshot.Records, resource.Record{
-					Name:   parts[0],
-					Server: parts[1],
-				})
+				if len(parts) == 2 {
+					snapshot.Records = append(snapshot.Records, resource.Record{
+						Name:   parts[0],
+						Server: parts[1],
+					})
+				}
 			}
 		}
+		f.Close()
 	}
 
 	return snapshot, nil

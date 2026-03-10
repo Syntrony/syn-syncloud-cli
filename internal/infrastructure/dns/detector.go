@@ -32,7 +32,7 @@ func (d *Detector) Detect() (*dto.Status, error) {
 
 	_, err = d.runner.Run(
 		"cat",
-		"/etc/dnsmasq.d/syncloud.conf",
+		"/etc/dnsmasq.d/*.conf",
 	)
 
 	if err != nil {

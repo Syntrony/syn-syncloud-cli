@@ -4,19 +4,19 @@
     "id": "cluster-01",
     "name": "syncloud-local",
     "mode": "single",
-    "createdAt": "2026-03-10T01:07:31Z"
+    "createdAt": "2026-03-10T02:16:48Z"
   },
   "nodes": [
     {
-      "id": "dda2ed9c-0845-4e00-9479-05de8189376f",
-      "hostname": "e6366b1d085d",
+      "id": "f77976fb-c098-4880-bb49-f63e3b101407",
+      "hostname": "cf231f9f86de",
       "role": "control-plane",
       "ip": "172.17.0.3"
     }
   ],
   "resources": [
     {
-      "id": "ef8f2f58-8523-4c53-8249-84b677ca7e68",
+      "id": "f3e422e5-d6ff-4bd3-afff-71570576a528",
       "name": "default",
       "kind": "k8s.namespace",
       "runtime": "kubernetes",
@@ -34,11 +34,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "3c37aa96-5257-4735-902d-4cde206e4f7d",
+      "id": "fc35a5c1-e808-46ee-a42f-333309e5f124",
       "name": "kube-node-lease",
       "kind": "k8s.namespace",
       "runtime": "kubernetes",
@@ -56,11 +56,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "d89f2353-8acd-4dc7-87be-2941dff822d8",
+      "id": "3288cd29-805c-4073-af9f-9a7753178966",
       "name": "kube-public",
       "kind": "k8s.namespace",
       "runtime": "kubernetes",
@@ -78,11 +78,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:22Z",
-      "updatedAt": "2026-03-10T01:02:22Z"
+      "createdAt": "2026-03-10T02:01:09Z",
+      "updatedAt": "2026-03-10T02:01:09Z"
     },
     {
-      "id": "da079b2b-ec3c-4335-957a-9bef8f4254a4",
+      "id": "45aa3142-c121-4b4e-92e7-4dcc6f3f1a1d",
       "name": "kube-system",
       "kind": "k8s.namespace",
       "runtime": "kubernetes",
@@ -100,11 +100,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:22Z",
-      "updatedAt": "2026-03-10T01:02:22Z"
+      "createdAt": "2026-03-10T02:01:09Z",
+      "updatedAt": "2026-03-10T02:01:09Z"
     },
     {
-      "id": "0faeff41-9fba-424c-93ca-845ddb0cf598",
+      "id": "9eff0a7d-f5f5-4c1a-be28-905164a11d66",
       "name": "coredns",
       "kind": "k8s.deployment",
       "runtime": "kubernetes",
@@ -295,16 +295,16 @@
           "availableReplicas": 1,
           "conditions": [
             {
-              "lastTransitionTime": "2026-03-10T01:02:30Z",
-              "lastUpdateTime": "2026-03-10T01:02:30Z",
+              "lastTransitionTime": "2026-03-10T02:01:16Z",
+              "lastUpdateTime": "2026-03-10T02:01:16Z",
               "message": "Deployment has minimum availability.",
               "reason": "MinimumReplicasAvailable",
               "status": "True",
               "type": "Available"
             },
             {
-              "lastTransitionTime": "2026-03-10T01:02:30Z",
-              "lastUpdateTime": "2026-03-10T01:02:42Z",
+              "lastTransitionTime": "2026-03-10T02:01:16Z",
+              "lastUpdateTime": "2026-03-10T02:01:28Z",
               "message": "ReplicaSet \"coredns-ccb96694c\" has successfully progressed.",
               "reason": "NewReplicaSetAvailable",
               "status": "True",
@@ -318,11 +318,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "a068d079-864f-47d5-9760-4bf4eff4eb49",
+      "id": "e922108a-6419-4455-bd1f-b2ce81eaf167",
       "name": "local-path-provisioner",
       "kind": "k8s.deployment",
       "runtime": "kubernetes",
@@ -427,16 +427,16 @@
           "availableReplicas": 1,
           "conditions": [
             {
-              "lastTransitionTime": "2026-03-10T01:02:30Z",
-              "lastUpdateTime": "2026-03-10T01:02:30Z",
+              "lastTransitionTime": "2026-03-10T02:01:16Z",
+              "lastUpdateTime": "2026-03-10T02:01:16Z",
               "message": "Deployment has minimum availability.",
               "reason": "MinimumReplicasAvailable",
               "status": "True",
               "type": "Available"
             },
             {
-              "lastTransitionTime": "2026-03-10T01:02:30Z",
-              "lastUpdateTime": "2026-03-10T01:02:41Z",
+              "lastTransitionTime": "2026-03-10T02:01:16Z",
+              "lastUpdateTime": "2026-03-10T02:01:23Z",
               "message": "ReplicaSet \"local-path-provisioner-5cf85fd84d\" has successfully progressed.",
               "reason": "NewReplicaSetAvailable",
               "status": "True",
@@ -450,11 +450,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "170c2de6-7ce5-4399-8cca-b5afa8c7d806",
+      "id": "4b6f0301-5e44-46c4-8e95-9e484ee1b7a3",
       "name": "metrics-server",
       "kind": "k8s.deployment",
       "runtime": "kubernetes",
@@ -589,16 +589,16 @@
           "availableReplicas": 1,
           "conditions": [
             {
-              "lastTransitionTime": "2026-03-10T01:02:30Z",
-              "lastUpdateTime": "2026-03-10T01:02:30Z",
+              "lastTransitionTime": "2026-03-10T02:01:16Z",
+              "lastUpdateTime": "2026-03-10T02:01:16Z",
               "message": "Deployment has minimum availability.",
               "reason": "MinimumReplicasAvailable",
               "status": "True",
               "type": "Available"
             },
             {
-              "lastTransitionTime": "2026-03-10T01:02:30Z",
-              "lastUpdateTime": "2026-03-10T01:02:56Z",
+              "lastTransitionTime": "2026-03-10T02:01:16Z",
+              "lastUpdateTime": "2026-03-10T02:01:33Z",
               "message": "ReplicaSet \"metrics-server-5985cbc9d7\" has successfully progressed.",
               "reason": "NewReplicaSetAvailable",
               "status": "True",
@@ -612,11 +612,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "f8a8a5e3-8e72-4b38-a675-4006bb0156b4",
+      "id": "c384707e-045a-45f7-9ebd-f6376a3121d0",
       "name": "traefik",
       "kind": "k8s.deployment",
       "runtime": "kubernetes",
@@ -814,16 +814,16 @@
           "availableReplicas": 1,
           "conditions": [
             {
-              "lastTransitionTime": "2026-03-10T01:02:52Z",
-              "lastUpdateTime": "2026-03-10T01:02:52Z",
+              "lastTransitionTime": "2026-03-10T02:01:38Z",
+              "lastUpdateTime": "2026-03-10T02:01:38Z",
               "message": "Deployment has minimum availability.",
               "reason": "MinimumReplicasAvailable",
               "status": "True",
               "type": "Available"
             },
             {
-              "lastTransitionTime": "2026-03-10T01:02:44Z",
-              "lastUpdateTime": "2026-03-10T01:02:52Z",
+              "lastTransitionTime": "2026-03-10T02:01:29Z",
+              "lastUpdateTime": "2026-03-10T02:01:38Z",
               "message": "ReplicaSet \"traefik-5d45fc8cc9\" has successfully progressed.",
               "reason": "NewReplicaSetAvailable",
               "status": "True",
@@ -837,11 +837,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:44Z",
-      "updatedAt": "2026-03-10T01:02:44Z"
+      "createdAt": "2026-03-10T02:01:29Z",
+      "updatedAt": "2026-03-10T02:01:29Z"
     },
     {
-      "id": "6d8014f6-d3db-4a5b-b289-4a132ed8810a",
+      "id": "57cdacf4-e8e9-4fab-81a4-08419d386ace",
       "name": "kubernetes",
       "kind": "k8s.service",
       "runtime": "kubernetes",
@@ -875,11 +875,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:24Z",
-      "updatedAt": "2026-03-10T01:02:24Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "e93fb02a-16b0-4e63-af39-4026216b01a0",
+      "id": "c427ea1e-18b0-46ad-9dd5-44e3b4eafe0f",
       "name": "kube-dns",
       "kind": "k8s.service",
       "runtime": "kubernetes",
@@ -928,20 +928,20 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "03463bdb-8ed3-4a79-aa08-74a9455f7ba2",
+      "id": "2661fa93-1e12-42c4-b755-d25915604085",
       "name": "metrics-server",
       "kind": "k8s.service",
       "runtime": "kubernetes",
       "nodeId": "",
       "spec": {
         "raw": {
-          "clusterIP": "10.43.205.10",
+          "clusterIP": "10.43.73.58",
           "clusterIPs": [
-            "10.43.205.10"
+            "10.43.73.58"
           ],
           "internalTrafficPolicy": "Cluster",
           "ipFamilies": [
@@ -969,11 +969,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "37a8e10c-623e-4227-8523-ba3dc67d5fe1",
+      "id": "1c8c1167-c285-4a53-bbac-78cd9f0c9c40",
       "name": "traefik",
       "kind": "k8s.service",
       "runtime": "kubernetes",
@@ -981,9 +981,9 @@
       "spec": {
         "raw": {
           "allocateLoadBalancerNodePorts": true,
-          "clusterIP": "10.43.215.202",
+          "clusterIP": "10.43.249.217",
           "clusterIPs": [
-            "10.43.215.202"
+            "10.43.249.217"
           ],
           "externalTrafficPolicy": "Cluster",
           "internalTrafficPolicy": "Cluster",
@@ -994,14 +994,14 @@
           "ports": [
             {
               "name": "web",
-              "nodePort": 30876,
+              "nodePort": 30356,
               "port": 80,
               "protocol": "TCP",
               "targetPort": "web"
             },
             {
               "name": "websecure",
-              "nodePort": 31697,
+              "nodePort": 30392,
               "port": 443,
               "protocol": "TCP",
               "targetPort": "websecure"
@@ -1028,11 +1028,11 @@
         }
       },
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:44Z",
-      "updatedAt": "2026-03-10T01:02:44Z"
+      "createdAt": "2026-03-10T02:01:29Z",
+      "updatedAt": "2026-03-10T02:01:29Z"
     },
     {
-      "id": "01d7d6b3-6129-4d04-a1fa-7677f209f5b2",
+      "id": "78824d70-6611-42fb-a9cc-be79153dc561",
       "name": "default",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1040,11 +1040,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:30Z",
-      "updatedAt": "2026-03-10T01:02:30Z"
+      "createdAt": "2026-03-10T02:01:16Z",
+      "updatedAt": "2026-03-10T02:01:16Z"
     },
     {
-      "id": "ad9d6d3c-46a4-49ee-b71f-24ee669011b0",
+      "id": "0380a59f-103b-4cc5-a80c-5c61eb9b9a37",
       "name": "default",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1052,11 +1052,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:30Z",
-      "updatedAt": "2026-03-10T01:02:30Z"
+      "createdAt": "2026-03-10T02:01:16Z",
+      "updatedAt": "2026-03-10T02:01:16Z"
     },
     {
-      "id": "b1186774-58b2-4539-8b10-264eabb75cdf",
+      "id": "4d146da2-5f52-40cb-b232-3cfcd7d69f33",
       "name": "default",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1064,11 +1064,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:30Z",
-      "updatedAt": "2026-03-10T01:02:30Z"
+      "createdAt": "2026-03-10T02:01:16Z",
+      "updatedAt": "2026-03-10T02:01:16Z"
     },
     {
-      "id": "d17c8231-c93d-4e65-a344-eefc8dd0a230",
+      "id": "50046960-74b5-4a14-81db-eb0217d9817d",
       "name": "attachdetach-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1076,11 +1076,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:26Z",
-      "updatedAt": "2026-03-10T01:02:26Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "18432043-2d79-4995-b6e0-568fbf565c12",
+      "id": "e76091b1-dc84-423f-8c58-2ec1cd60cb1b",
       "name": "certificate-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1088,11 +1088,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "51e694fc-57ae-49a7-8b87-5120226d88b1",
+      "id": "57ae4529-a7ce-4a20-b1b0-87f115ae623f",
       "name": "clusterrole-aggregation-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1100,11 +1100,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "4136b545-cd19-4cf7-b65d-731aff2bb564",
+      "id": "82d63abd-730d-45c9-9201-9db5d09def89",
       "name": "coredns",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1112,11 +1112,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "548180b2-aeb7-4b72-9b1e-87e0ca4db59d",
+      "id": "2f17d637-f454-455e-aac9-363abffed527",
       "name": "cronjob-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1124,11 +1124,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "d81ad7e3-26a2-474a-a7cd-3672c8f7f3eb",
+      "id": "135516ab-359f-4fba-8a9a-bbb2df76f7f5",
       "name": "daemon-set-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1136,11 +1136,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "774607db-5622-47dc-9ed7-f23ba5f419b1",
+      "id": "d895b153-1e85-49d4-bd6e-f8b7ff7ec19f",
       "name": "default",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1148,11 +1148,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:30Z",
-      "updatedAt": "2026-03-10T01:02:30Z"
+      "createdAt": "2026-03-10T02:01:16Z",
+      "updatedAt": "2026-03-10T02:01:16Z"
     },
     {
-      "id": "4cde6589-312b-4ebe-92d2-0e164960280a",
+      "id": "ec3769ec-ce09-4138-959d-259955e855d5",
       "name": "deployment-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1160,11 +1160,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:16Z",
+      "updatedAt": "2026-03-10T02:01:16Z"
     },
     {
-      "id": "2b1dd6f7-9547-49cf-8a17-55094d1df307",
+      "id": "2e0bcf3d-b23d-460d-a6a1-ba80249f1afd",
       "name": "disruption-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1172,11 +1172,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "fce7e86e-4a5e-44f9-8dff-13fac9e177cb",
+      "id": "278a887a-127f-42e4-9aaa-66e54824b30e",
       "name": "endpoint-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1184,11 +1184,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:12Z",
+      "updatedAt": "2026-03-10T02:01:12Z"
     },
     {
-      "id": "14d5dc95-e9ec-465b-bb96-bcecd3162e77",
+      "id": "8247fdf7-9780-4cf5-bfa6-37e7eb276915",
       "name": "endpointslice-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1196,11 +1196,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:29Z",
-      "updatedAt": "2026-03-10T01:02:29Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "52a65b27-d884-46f6-a616-261f56353f32",
+      "id": "65422a4f-1b6a-4861-af89-72b6f5e07384",
       "name": "endpointslicemirroring-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1208,11 +1208,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "e3f0d2d8-1527-4da7-9b52-553ef2198bb0",
+      "id": "87ae8927-acd7-4744-b376-55185916db8b",
       "name": "ephemeral-volume-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1220,11 +1220,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:26Z",
-      "updatedAt": "2026-03-10T01:02:26Z"
+      "createdAt": "2026-03-10T02:01:13Z",
+      "updatedAt": "2026-03-10T02:01:13Z"
     },
     {
-      "id": "5cd39d26-9cab-41a5-ab72-35744e80aaee",
+      "id": "3b70f234-b8fe-41ad-909e-795107ab2abc",
       "name": "expand-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1232,11 +1232,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "06dfe4ae-610a-4d9a-87f6-8eb80c6f9b09",
+      "id": "6a0e6bf4-5f65-458c-a1b1-52e772493f4a",
       "name": "generic-garbage-collector",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1244,11 +1244,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "b787d8e4-c259-47e7-8401-c86b135101e4",
+      "id": "a3a70230-cb97-4f3f-9144-efa9333d8d73",
       "name": "helm-traefik",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1256,15 +1256,15 @@
       "spec": {},
       "status": {},
       "ownership": {
-        "ownerId": "04749367-e723-4635-adee-f64f3824e9fb",
+        "ownerId": "1eba4767-c02c-4524-bf80-e5d6c18c0291",
         "ownerKind": "HelmChart",
         "ownerName": "traefik"
       },
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "f649ff01-aa0a-4725-9eb2-2179a6d5dbf3",
+      "id": "36f3595d-baae-42c2-9e19-149c1fa9202d",
       "name": "helm-traefik-crd",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1272,15 +1272,15 @@
       "spec": {},
       "status": {},
       "ownership": {
-        "ownerId": "9ff9edf2-8db5-4bf1-a069-c681eeedddf9",
+        "ownerId": "2cd3427a-4af0-4a75-9873-8c76517d3dfb",
         "ownerKind": "HelmChart",
         "ownerName": "traefik-crd"
       },
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "890bb9f6-5d13-46d8-b081-8ef597ac432d",
+      "id": "5d314818-090e-4269-b255-de6c7d8fe875",
       "name": "horizontal-pod-autoscaler",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1288,11 +1288,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:13Z",
+      "updatedAt": "2026-03-10T02:01:13Z"
     },
     {
-      "id": "b6970ca9-ec32-44de-a5f3-5382a8cb0b9f",
+      "id": "55a26f05-9433-4998-8741-8fde47e1d749",
       "name": "job-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1300,11 +1300,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:26Z",
-      "updatedAt": "2026-03-10T01:02:26Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "79bcb605-c8d4-43cb-8a6d-9e2220559d12",
+      "id": "7454486c-1141-4f75-a40e-caf2b69a34d5",
       "name": "legacy-service-account-token-cleaner",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1312,11 +1312,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:12Z",
+      "updatedAt": "2026-03-10T02:01:12Z"
     },
     {
-      "id": "51afc478-b11e-4663-8535-41800d046114",
+      "id": "897649be-d74b-4e98-ae62-3f5779b09c4a",
       "name": "local-path-provisioner-service-account",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1324,11 +1324,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "036ee79e-6512-481d-879f-b3d6c256d921",
+      "id": "4f4fe536-837c-4988-bb3c-100e908d17cf",
       "name": "metrics-server",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1336,11 +1336,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "1c5d5cab-c0fd-403b-85ea-ccdbdba355bd",
+      "id": "303a3783-a814-4be6-8ca2-5062444abca4",
       "name": "namespace-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1348,11 +1348,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:13Z",
+      "updatedAt": "2026-03-10T02:01:13Z"
     },
     {
-      "id": "cf40ce0b-b80c-42bb-91f8-e1d9ad56e735",
+      "id": "501b2b82-490f-4f11-a4df-784749f8ac06",
       "name": "node-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1360,11 +1360,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "302f789e-adc7-4c05-a324-104625bb36a0",
+      "id": "c6235316-4d00-499d-88eb-6a8956367d40",
       "name": "persistent-volume-binder",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1372,11 +1372,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:29Z",
-      "updatedAt": "2026-03-10T01:02:29Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "595216ec-93d3-47d3-897e-aafa1eeeb7b8",
+      "id": "42d12c8f-fa87-4f6f-b96b-27a72f95000e",
       "name": "pod-garbage-collector",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1384,11 +1384,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:29Z",
-      "updatedAt": "2026-03-10T01:02:29Z"
+      "createdAt": "2026-03-10T02:01:12Z",
+      "updatedAt": "2026-03-10T02:01:12Z"
     },
     {
-      "id": "01ca3358-246e-47e5-bbf5-42c5a1593105",
+      "id": "aa954de8-2fba-4196-94db-e9f9d35cc660",
       "name": "pv-protection-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1396,11 +1396,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "e350ffd8-8f63-4a1a-a2b8-a543ee5608ba",
+      "id": "4b482ada-0f6f-4268-acff-e225f7007b51",
       "name": "pvc-protection-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1408,11 +1408,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:13Z",
+      "updatedAt": "2026-03-10T02:01:13Z"
     },
     {
-      "id": "859467f4-d37f-4ed0-a690-1f698b939fdd",
+      "id": "6f93ce2c-2a84-4952-a58d-949a2893c97d",
       "name": "replicaset-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1420,11 +1420,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "16ba7917-1b15-4f7b-833e-2ba2f8549157",
+      "id": "d2c44d05-b958-48b6-83de-7d2b06de12a6",
       "name": "replication-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1432,11 +1432,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "21df3dd9-b52f-4bab-9657-71ada35ba979",
+      "id": "0bafc119-9a42-45b3-8933-737c478a1ec1",
       "name": "resourcequota-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1444,11 +1444,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:12Z",
+      "updatedAt": "2026-03-10T02:01:12Z"
     },
     {
-      "id": "84e84b51-c929-4ccd-9e66-d392165bc1d8",
+      "id": "029569c9-dbae-4b46-901b-5a8762b1b69e",
       "name": "root-ca-cert-publisher",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1456,11 +1456,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "782b716e-5377-46df-8bb0-f0989dcb646f",
+      "id": "b20fe223-e495-4cc0-9117-3c559a2eb541",
       "name": "service-account-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1468,11 +1468,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:12Z",
+      "updatedAt": "2026-03-10T02:01:12Z"
     },
     {
-      "id": "12ca1af7-5842-494e-a65c-5302027299ce",
+      "id": "21f13897-98e3-4196-bd30-1b9e9e8d3b18",
       "name": "statefulset-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1480,11 +1480,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:26Z",
-      "updatedAt": "2026-03-10T01:02:26Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "187150bf-686d-433c-a8e6-1277f27100bc",
+      "id": "1b6a6c26-d7a8-4bbc-a230-3c298c7e9310",
       "name": "svclb",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1492,11 +1492,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "818e445c-6a17-4e05-8007-2ad59345ee28",
+      "id": "ba8f6641-9519-4939-aded-61d3eb6d8ea3",
       "name": "token-cleaner",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1504,11 +1504,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:26Z",
-      "updatedAt": "2026-03-10T01:02:26Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "3947b449-8d08-423a-a8e0-012ed89f50eb",
+      "id": "edc4b8c3-94ad-4c2c-b6ba-d5e263d793ed",
       "name": "traefik",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1516,11 +1516,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:44Z",
-      "updatedAt": "2026-03-10T01:02:44Z"
+      "createdAt": "2026-03-10T02:01:29Z",
+      "updatedAt": "2026-03-10T02:01:29Z"
     },
     {
-      "id": "bceeb1f4-268a-4368-9c44-70b91b86555b",
+      "id": "3c291fc6-b975-4ede-9133-d5469a431d96",
       "name": "ttl-after-finished-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1528,11 +1528,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:26Z",
-      "updatedAt": "2026-03-10T01:02:26Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "f3a5037b-ec79-4d7e-b869-3c36a4998d72",
+      "id": "0f04adb0-d539-4991-948a-49821df8989c",
       "name": "ttl-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1540,11 +1540,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:29Z",
-      "updatedAt": "2026-03-10T01:02:29Z"
+      "createdAt": "2026-03-10T02:01:12Z",
+      "updatedAt": "2026-03-10T02:01:12Z"
     },
     {
-      "id": "708d2b63-f6b8-4c9d-b055-c082f365422a",
+      "id": "5e4cc303-7f19-49e9-8cb5-81bebc7435b0",
       "name": "validatingadmissionpolicy-status-controller",
       "kind": "k8s.serviceaccount",
       "runtime": "kubernetes",
@@ -1552,11 +1552,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "a947255c-a1c5-4b9a-9ac3-051e29ae171e",
+      "id": "385aa74e-8d95-46f5-b7af-47209086daa9",
       "name": "system:controller:bootstrap-signer",
       "kind": "k8s.role",
       "runtime": "kubernetes",
@@ -1564,11 +1564,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "3d282c2b-aafa-4659-9fdc-8db9e499150f",
+      "id": "1d682ec8-6c25-45d1-8788-349d082243be",
       "name": "extension-apiserver-authentication-reader",
       "kind": "k8s.role",
       "runtime": "kubernetes",
@@ -1576,11 +1576,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "b331179a-939a-4eac-93de-b858acaf3fc8",
+      "id": "a82a666d-0abb-4a16-a014-f795ac81e194",
       "name": "system::leader-locking-kube-controller-manager",
       "kind": "k8s.role",
       "runtime": "kubernetes",
@@ -1588,11 +1588,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "a8db3f27-4c51-4208-8406-f313594c68e1",
+      "id": "e4657155-7910-486e-8dc7-99ebd443104a",
       "name": "system::leader-locking-kube-scheduler",
       "kind": "k8s.role",
       "runtime": "kubernetes",
@@ -1600,11 +1600,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "f9b6c29d-6d93-4379-976e-ab54bc209dae",
+      "id": "757587b3-d459-4420-b0f5-7e9ab5eecfcc",
       "name": "system:controller:bootstrap-signer",
       "kind": "k8s.role",
       "runtime": "kubernetes",
@@ -1612,11 +1612,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "ed503c90-8400-4b82-b1ca-345d27c09ed6",
+      "id": "f54740e8-e871-440b-8a0c-d882d985836f",
       "name": "system:controller:cloud-provider",
       "kind": "k8s.role",
       "runtime": "kubernetes",
@@ -1624,11 +1624,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "ab81e4b0-c884-44b9-be46-24742d8c109f",
+      "id": "2b39f44b-7771-4750-9025-022705352ce2",
       "name": "system:controller:token-cleaner",
       "kind": "k8s.role",
       "runtime": "kubernetes",
@@ -1636,11 +1636,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "e783c6e0-8c32-47b9-9f65-efcc5935bc5d",
+      "id": "893844b7-7851-4d22-80d3-65c1a3c0baa5",
       "name": "system:controller:bootstrap-signer",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1648,11 +1648,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:24Z",
-      "updatedAt": "2026-03-10T01:02:24Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "8caed508-e0c1-4442-962f-cbb9d40c64df",
+      "id": "2f217c0c-8136-48ea-b098-d3363fe79bac",
       "name": "k3s-cloud-controller-manager-authentication-reader",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1660,11 +1660,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "937c74ee-24a5-47bd-9fa4-eb6b2dab39cb",
+      "id": "826f0865-59b6-4703-9532-da45cbe1d17b",
       "name": "metrics-server-auth-reader",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1672,11 +1672,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "e7afc0d5-8ca4-4956-a1e2-7eda8b3df2de",
+      "id": "fe350a4a-24b4-4e0d-9b11-a2e68597dc3d",
       "name": "system::extension-apiserver-authentication-reader",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1684,11 +1684,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "64b21b1e-bd91-4bf2-afa4-4c3ce36dec7b",
+      "id": "f0f9e0de-2aca-4a68-ba52-bb6d17c6727b",
       "name": "system::leader-locking-kube-controller-manager",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1696,11 +1696,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "c27c08fc-8efa-4c41-953e-8b0cec7bab4b",
+      "id": "75a433af-2346-40f5-84e1-52e6d2c79484",
       "name": "system::leader-locking-kube-scheduler",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1708,11 +1708,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "dc844260-e352-421e-b26b-d4bfb4fa09dd",
+      "id": "e384213d-bc60-4972-9947-23b02346609f",
       "name": "system:controller:bootstrap-signer",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1720,11 +1720,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "7f72a120-9bb6-44cc-a55e-c4a9ea0db1bd",
+      "id": "9ed5c14b-b143-4049-89ca-454afcf3ac08",
       "name": "system:controller:cloud-provider",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1732,11 +1732,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "690f4978-30ad-4e9a-b1e0-00abe3343ff3",
+      "id": "a968faff-2e65-4659-9ed3-cad5d345a0fe",
       "name": "system:controller:token-cleaner",
       "kind": "k8s.rolebinding",
       "runtime": "kubernetes",
@@ -1744,11 +1744,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "65f3a09f-a68c-4ee0-ac80-6ab3a23cec81",
+      "id": "04ed4d6e-7d79-443f-aca1-8a8367036ef0",
       "name": "admin",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1756,11 +1756,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "df1c8b7b-41a7-4cec-b2a6-052f551f4175",
+      "id": "71583f2f-3639-471c-9078-0ef48b4ef989",
       "name": "cluster-admin",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1768,11 +1768,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "9af7fbf5-a583-4da7-b7d1-3205098cdb24",
+      "id": "0025f021-09e0-42dd-b0fb-05fa5c27f18d",
       "name": "clustercidrs-node",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1780,11 +1780,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "4d5f51f3-a6d5-4d76-80de-ff12d570e462",
+      "id": "b6e0f3b2-b992-4c00-bd25-5b3dd600f287",
       "name": "edit",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1792,11 +1792,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "4bef6ac1-fb91-4d0e-a56d-a5c79439b65f",
+      "id": "280243c8-f38d-4b41-966f-4365a479949f",
       "name": "k3s-cloud-controller-manager",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1804,11 +1804,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "3a503493-9711-4aa0-bc5b-55f694de8c93",
+      "id": "a4ebab1a-0d8b-4504-8be5-48d62a136749",
       "name": "local-path-provisioner-role",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1816,11 +1816,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "24433140-68ca-4d57-8cb6-2c0c73154fd5",
+      "id": "7db6bbbf-ce85-4d4e-bd5d-393d46c5a366",
       "name": "system:aggregate-to-admin",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1828,11 +1828,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "cade7977-e165-4f7c-8fa4-3e4ca40aef5e",
+      "id": "607bf970-974c-406d-9419-a05bd1a7225e",
       "name": "system:aggregate-to-edit",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1840,11 +1840,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "a5538623-6a7b-43f7-8806-f7de06838dc9",
+      "id": "04af205d-b404-4357-afda-d227e6386127",
       "name": "system:aggregate-to-view",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1852,11 +1852,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "473834b6-68c3-4556-98e4-bc3551a21ea6",
+      "id": "b62ad162-7aa3-4ed9-9b74-0713444c7234",
       "name": "system:aggregated-metrics-reader",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1864,11 +1864,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "f5f75fa6-f0a2-436b-bf02-9dbd7e8e4da2",
+      "id": "e068c051-3a44-4000-8916-b435c1626d41",
       "name": "system:auth-delegator",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1876,11 +1876,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "cc6597f5-cac6-47cb-aced-63cffc2857b1",
+      "id": "23d3824a-9a65-4232-9ab6-ea6d163f8cbe",
       "name": "system:basic-user",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1888,11 +1888,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "ac7f12a3-714a-48e1-968d-7674260b2c62",
+      "id": "b631a789-6b36-4aee-8d0e-f911c832babc",
       "name": "system:certificates.k8s.io:certificatesigningrequests:nodeclient",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1900,11 +1900,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "276a5056-d0ac-4e68-9684-cc6ebafc2e7d",
+      "id": "ecd98554-1a33-4709-9141-c6caa8d48b83",
       "name": "system:certificates.k8s.io:certificatesigningrequests:selfnodeclient",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1912,11 +1912,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "5821800a-cf8f-45cd-ae26-d712b5761453",
+      "id": "725e855c-741a-4d38-a1d1-8c0f4a4a2a29",
       "name": "system:certificates.k8s.io:kube-apiserver-client-approver",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1924,11 +1924,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "e534a30a-8541-4ab4-b0b9-8f0d0046a433",
+      "id": "bb92aafa-69f5-4640-8707-6e11353fab02",
       "name": "system:certificates.k8s.io:kube-apiserver-client-kubelet-approver",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1936,11 +1936,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "fc23eda4-ebfb-4c58-90ba-536618cf00ea",
+      "id": "eba1f2b9-e01f-4f05-bd0a-ecdb4c93a022",
       "name": "system:certificates.k8s.io:kubelet-serving-approver",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1948,11 +1948,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "089e28ca-15fb-4885-a83a-fa74b90167a5",
+      "id": "19033860-5428-4f03-96de-9b83b5dc93ae",
       "name": "system:certificates.k8s.io:legacy-unknown-approver",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1960,11 +1960,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "7aaccd66-3a74-41a5-937e-4403a1a4a8a4",
+      "id": "ee31f49d-6d24-4c4a-b259-1419f77cef37",
       "name": "system:controller:attachdetach-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1972,11 +1972,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "9416db2b-3e82-48ed-a087-04450c2bdf10",
+      "id": "6849d30c-3d5f-4f8b-bc31-5c8d224dc041",
       "name": "system:controller:certificate-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1984,11 +1984,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "aade0ddd-0b74-4a2e-a21c-6cd79c1fb55f",
+      "id": "61a92353-d701-47a3-9edd-a701cd67d11e",
       "name": "system:controller:clusterrole-aggregation-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -1996,11 +1996,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "e2021688-52ff-4fb5-ae70-842c9c10245b",
+      "id": "d439ebe9-fcdd-4480-816a-839551862106",
       "name": "system:controller:cronjob-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2008,11 +2008,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "4f1f0dee-a8c0-4569-a388-6a733fb6468f",
+      "id": "4b2a8d63-2fa8-402b-89dc-855aa8c2dd89",
       "name": "system:controller:daemon-set-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2020,11 +2020,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "a4700baa-cca0-4c90-8406-5d0150fedff7",
+      "id": "14b7f848-5fa7-4968-9068-cda0346a0c73",
       "name": "system:controller:deployment-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2032,11 +2032,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "8dc51285-0f30-47c2-b57e-bbce90832f6c",
+      "id": "8f7ac991-5a0b-465d-be03-f35a625f4441",
       "name": "system:controller:disruption-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2044,11 +2044,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "6fa7e77d-d46a-49c2-bf2b-c43f39f93f4e",
+      "id": "2c0537ba-89ea-47c1-9fd1-af8db2605c34",
       "name": "system:controller:endpoint-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2056,11 +2056,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "211eccf7-14c5-4f86-83bc-a48c7828f0a0",
+      "id": "137202b3-b0bb-4fbc-b4d1-0d5b5841462b",
       "name": "system:controller:endpointslice-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2068,11 +2068,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "5a3f893c-696f-439d-8ad5-f995ef5086e5",
+      "id": "23ae6579-a1a0-4bf5-8dda-68a4cb6155b6",
       "name": "system:controller:endpointslicemirroring-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2080,11 +2080,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "9a3cbfc7-c70a-408f-b2c1-a9562d85eb22",
+      "id": "d75a7004-b3d4-4829-ab64-d93c650dadd2",
       "name": "system:controller:ephemeral-volume-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2092,11 +2092,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "1724083d-9263-4c62-926e-5b5c526d5af5",
+      "id": "c9ea3ad7-e9b0-449d-af98-473210a1e52d",
       "name": "system:controller:expand-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2104,11 +2104,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "cda575d5-86b8-4789-834c-d00032552f92",
+      "id": "9ef76f0f-1584-4855-a7ef-5ec774567a7f",
       "name": "system:controller:generic-garbage-collector",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2116,11 +2116,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "13c43eae-2982-4000-b8b2-d2452ecaf60b",
+      "id": "ebc84ae7-1498-4a0f-8852-c5f21d2203ad",
       "name": "system:controller:horizontal-pod-autoscaler",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2128,11 +2128,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "835a34f7-be24-4141-9849-db93f8199ac6",
+      "id": "356877b7-7a6a-4c4b-80c4-66045d2ce7df",
       "name": "system:controller:job-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2140,11 +2140,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "62e65af9-5b76-4c84-a7a4-d01517b30661",
+      "id": "ebc81ae8-59bf-4c66-b1f8-2c1994f0b086",
       "name": "system:controller:legacy-service-account-token-cleaner",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2152,11 +2152,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "98f0d824-44bc-475d-8aca-da538243eaaf",
+      "id": "8540d176-9b21-4c13-af96-900e488e14aa",
       "name": "system:controller:namespace-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2164,11 +2164,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "f3974d4c-1bef-461d-8e29-267572a9696e",
+      "id": "2d1345ea-89c8-4823-9a56-df9dcdf6f8e2",
       "name": "system:controller:node-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2176,11 +2176,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "ae8cdc04-29ef-4e71-bd3f-d3ab8614cfc2",
+      "id": "fce1e318-994e-4ae8-8cec-8c7b14d89da2",
       "name": "system:controller:persistent-volume-binder",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2188,11 +2188,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "ce0032f2-9090-4ea9-8ab5-c5794da8a0e0",
+      "id": "ecce3fe8-1295-4359-9431-8e507331583a",
       "name": "system:controller:pod-garbage-collector",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2200,11 +2200,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "0d03ff7e-a110-4e4a-9f18-9904a98df01c",
+      "id": "35ca074c-f3fd-4e1d-8f1d-87154b545d53",
       "name": "system:controller:pv-protection-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2212,11 +2212,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "c54b3c17-ca2c-40d1-96b3-6bb5c776c555",
+      "id": "085b2916-2c43-4b58-bdd3-7eebc3005cbe",
       "name": "system:controller:pvc-protection-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2224,11 +2224,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "677ae3b1-1439-40fe-b8d3-b34326a52641",
+      "id": "9665b390-2e56-4e30-b676-b75586738d15",
       "name": "system:controller:replicaset-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2236,11 +2236,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "100ae16f-c9d0-4c26-ab87-860205c0f40f",
+      "id": "c1bba6cf-210e-45c9-9645-ef6c80fc404b",
       "name": "system:controller:replication-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2248,11 +2248,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "92abfd96-07e6-49f7-9b9e-0fe0f29ae0fa",
+      "id": "f64368fc-488b-4a77-8f02-40d64d3539ac",
       "name": "system:controller:resourcequota-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2260,11 +2260,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "4e6efa6a-1be0-499b-aa18-e528246e8d22",
+      "id": "807609e2-e249-4b54-98a1-ef6174248d2b",
       "name": "system:controller:root-ca-cert-publisher",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2272,11 +2272,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "0c1748b7-8cd4-4e84-a1be-bfe641f73649",
+      "id": "48a72f8f-0ffe-4778-9023-dac5e5311f09",
       "name": "system:controller:route-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2284,11 +2284,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "7f9e8965-1990-4d22-a549-4918de489d55",
+      "id": "c840fafd-af50-4bc9-bab2-d5bbdcaa2325",
       "name": "system:controller:service-account-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2296,11 +2296,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "ec904e56-ddb4-43df-982a-c16b68e44bfb",
+      "id": "244103fa-859d-472d-880b-6ed4fc8b1ade",
       "name": "system:controller:service-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2308,11 +2308,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "6bdaa9a8-356b-4e97-95ba-c0dd8a5407c7",
+      "id": "d09d6071-5e49-43b1-9fd0-db99d361a1d8",
       "name": "system:controller:statefulset-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2320,11 +2320,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "9977b31d-f1e1-4124-bc09-b03e20c50177",
+      "id": "778aa24e-1895-4af3-8e1a-b35ee48fc1ff",
       "name": "system:controller:ttl-after-finished-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2332,11 +2332,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "d7dcfb6c-0aab-4f2b-9147-1c0494e50931",
+      "id": "c6863324-c6b6-421e-9c0b-9ce97b03145e",
       "name": "system:controller:ttl-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2344,11 +2344,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "6693c712-b7a0-4dea-965d-a008f8557400",
+      "id": "6a99bcb7-0ca1-4387-945c-42d5cbd98230",
       "name": "system:controller:validatingadmissionpolicy-status-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2356,11 +2356,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "f0cd02c1-91a1-40e5-9f0a-79b86da006e8",
+      "id": "cbb91c38-0128-45cf-9647-fc1b9dc86eef",
       "name": "system:coredns",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2368,11 +2368,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "dde103b6-ce63-423a-a295-64200897198e",
+      "id": "4704b3ea-c736-4582-84ea-94051f106e52",
       "name": "system:discovery",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2380,11 +2380,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "97b9f44c-61dd-4aac-b46b-99178519164e",
+      "id": "f8bb9576-da53-417b-b4e5-56bd0c895078",
       "name": "system:heapster",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2392,11 +2392,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "501e3c08-99a3-4492-bbce-fcdc3f6fdcc4",
+      "id": "c6208ea5-d696-4c7d-9de4-75d33903bec0",
       "name": "system:k3s-controller",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2404,11 +2404,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "316e0236-16c1-4032-a1d6-d87fbbe076a5",
+      "id": "3993382b-0037-4eac-aa95-150139de94c0",
       "name": "system:kube-aggregator",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2416,11 +2416,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "b91e1786-9407-4237-a966-92c9248c922d",
+      "id": "059ab3c0-6713-4ef5-aa44-7650db618f02",
       "name": "system:kube-controller-manager",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2428,11 +2428,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "e9fb5497-f668-48a2-85b1-511bc486218b",
+      "id": "e56c501f-5fc9-401f-a052-e414cdb5ac5d",
       "name": "system:kube-dns",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2440,11 +2440,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "a7d23519-65e0-4e5b-8acc-6ba14385ba52",
+      "id": "9709d08f-41c8-4c1f-b741-46f9166aa41f",
       "name": "system:kube-scheduler",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2452,11 +2452,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "d79d8780-f27f-4c4e-b9ac-3ff82d42306a",
+      "id": "9ac534c0-c119-476d-aa76-0176b504c290",
       "name": "system:kubelet-api-admin",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2464,11 +2464,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "5bc40cf0-85a8-4e3e-b618-6c95a3f63af0",
+      "id": "57ebc98d-3729-449b-be14-d9c434371eb1",
       "name": "system:metrics-server",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2476,11 +2476,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "d5670237-0c2e-4b8d-b06e-760e7a304f5d",
+      "id": "df3438e7-758c-4930-8569-b01d6a725491",
       "name": "system:monitoring",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2488,11 +2488,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "d8bdf2b6-4167-44d3-b1e3-4d945fed1793",
+      "id": "c0012801-7929-429f-92b6-19b6f5fe19f9",
       "name": "system:node",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2500,11 +2500,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "89a4e390-cff7-41ea-9740-0a1829b3344d",
+      "id": "6a5cf6e8-e0a6-42cf-9a33-249df8c3e708",
       "name": "system:node-bootstrapper",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2512,11 +2512,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "1d53877f-bc5b-4dbf-a24e-ab4138e20f19",
+      "id": "54407a1d-f5fb-446f-b80f-f4e7c49ce56d",
       "name": "system:node-problem-detector",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2524,11 +2524,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "5f7a58a5-9dd2-4b2e-a7ad-4062504f2958",
+      "id": "ea19bbba-4c17-4b22-97de-153cbbaf85c5",
       "name": "system:node-proxier",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2536,11 +2536,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "0d1e1c96-edb0-4146-af83-0a8b2974f3ef",
+      "id": "518ff4d2-0d58-4156-ab61-d51c7012ab57",
       "name": "system:persistent-volume-provisioner",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2548,11 +2548,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "dd6c9759-10c7-48f9-a7d4-1683f2e69050",
+      "id": "f02d32ac-a3da-4303-9114-2798fa5dca79",
       "name": "system:public-info-viewer",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2560,11 +2560,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "1470f1b4-68a9-46af-9de2-4071a1827ffa",
+      "id": "57ab92c3-6883-4ce7-9de3-c59941157654",
       "name": "system:service-account-issuer-discovery",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2572,11 +2572,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "70b217d6-a921-4674-beb3-1f513fe2ab53",
+      "id": "3af806b0-e595-4cbf-8509-6819712cb0c5",
       "name": "system:volume-scheduler",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2584,11 +2584,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "1a5ccdea-7be8-4047-92e5-6f50fc953e9b",
+      "id": "e12a1e3a-3d79-420d-9500-94e8070a8e38",
       "name": "traefik-kube-system",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2596,11 +2596,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:44Z",
-      "updatedAt": "2026-03-10T01:02:44Z"
+      "createdAt": "2026-03-10T02:01:29Z",
+      "updatedAt": "2026-03-10T02:01:29Z"
     },
     {
-      "id": "c1d6c0a5-3556-47b8-9256-0d29177f1260",
+      "id": "e45d45ec-6ad0-4b4b-85de-a80fdc423940",
       "name": "view",
       "kind": "k8s.clusterrole",
       "runtime": "kubernetes",
@@ -2608,11 +2608,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:23Z",
-      "updatedAt": "2026-03-10T01:02:23Z"
+      "createdAt": "2026-03-10T02:01:10Z",
+      "updatedAt": "2026-03-10T02:01:10Z"
     },
     {
-      "id": "342a8556-4d1b-4ed1-a9b5-fef165f61a21",
+      "id": "8275657b-d3f7-4e6d-be81-b560be54f83b",
       "name": "chart-values-traefik",
       "kind": "k8s.secret",
       "runtime": "kubernetes",
@@ -2620,15 +2620,15 @@
       "spec": {},
       "status": {},
       "ownership": {
-        "ownerId": "04749367-e723-4635-adee-f64f3824e9fb",
+        "ownerId": "1eba4767-c02c-4524-bf80-e5d6c18c0291",
         "ownerKind": "HelmChart",
         "ownerName": "traefik"
       },
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "a571f3b8-65ad-4cf0-af0c-740f4d47e065",
+      "id": "68e95489-2e24-4fde-bd79-69be36ad59a5",
       "name": "chart-values-traefik-crd",
       "kind": "k8s.secret",
       "runtime": "kubernetes",
@@ -2636,15 +2636,15 @@
       "spec": {},
       "status": {},
       "ownership": {
-        "ownerId": "9ff9edf2-8db5-4bf1-a069-c681eeedddf9",
+        "ownerId": "2cd3427a-4af0-4a75-9873-8c76517d3dfb",
         "ownerKind": "HelmChart",
         "ownerName": "traefik-crd"
       },
-      "createdAt": "2026-03-10T01:02:28Z",
-      "updatedAt": "2026-03-10T01:02:28Z"
+      "createdAt": "2026-03-10T02:01:15Z",
+      "updatedAt": "2026-03-10T02:01:15Z"
     },
     {
-      "id": "08f945b0-fc40-4323-8458-a3206319f02a",
+      "id": "228968cf-8e78-4d83-82e2-7d6bfe9e6016",
       "name": "k3d-syncloud-server-0.node-password.k3s",
       "kind": "k8s.secret",
       "runtime": "kubernetes",
@@ -2652,11 +2652,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:27Z",
-      "updatedAt": "2026-03-10T01:02:27Z"
+      "createdAt": "2026-03-10T02:01:14Z",
+      "updatedAt": "2026-03-10T02:01:14Z"
     },
     {
-      "id": "bd5ef7ec-9f49-4108-92c2-3d65055250d9",
+      "id": "17036d14-f567-41de-8ae1-6cb03d9b947b",
       "name": "k3s-serving",
       "kind": "k8s.secret",
       "runtime": "kubernetes",
@@ -2664,11 +2664,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:25Z",
-      "updatedAt": "2026-03-10T01:02:25Z"
+      "createdAt": "2026-03-10T02:01:13Z",
+      "updatedAt": "2026-03-10T02:01:13Z"
     },
     {
-      "id": "3c2c9370-7c1b-4b7f-aabe-df3e57bb9beb",
+      "id": "1f2da1ae-2219-4bc7-8c9d-88a259171a21",
       "name": "sh.helm.release.v1.traefik-crd.v1",
       "kind": "k8s.secret",
       "runtime": "kubernetes",
@@ -2676,11 +2676,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:43Z",
-      "updatedAt": "2026-03-10T01:02:43Z"
+      "createdAt": "2026-03-10T02:01:29Z",
+      "updatedAt": "2026-03-10T02:01:29Z"
     },
     {
-      "id": "e5c63474-fc82-4e0c-9f0b-83b6108b1f1d",
+      "id": "b5bfb765-8542-43da-86db-88e42f5cd165",
       "name": "sh.helm.release.v1.traefik.v1",
       "kind": "k8s.secret",
       "runtime": "kubernetes",
@@ -2688,11 +2688,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:44Z",
-      "updatedAt": "2026-03-10T01:02:44Z"
+      "createdAt": "2026-03-10T02:01:29Z",
+      "updatedAt": "2026-03-10T02:01:29Z"
     },
     {
-      "id": "0b94a5bb-9b46-45af-9d51-022dbd505d4b",
+      "id": "b9a4b854-2fac-4d3a-8de5-570d5c4d2402",
       "name": "kubernetes",
       "kind": "k8s.endpoints",
       "runtime": "kubernetes",
@@ -2700,11 +2700,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:24Z",
-      "updatedAt": "2026-03-10T01:02:24Z"
+      "createdAt": "2026-03-10T02:01:11Z",
+      "updatedAt": "2026-03-10T02:01:11Z"
     },
     {
-      "id": "adecc703-8bbe-4804-a9e0-a6c8b2dec7a6",
+      "id": "769a382a-04f3-4555-acea-e1c490473fc4",
       "name": "kube-dns",
       "kind": "k8s.endpoints",
       "runtime": "kubernetes",
@@ -2712,11 +2712,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:30Z",
-      "updatedAt": "2026-03-10T01:02:30Z"
+      "createdAt": "2026-03-10T02:01:16Z",
+      "updatedAt": "2026-03-10T02:01:16Z"
     },
     {
-      "id": "9b68a776-72e2-41d4-84b4-72eb9b0425f5",
+      "id": "625ecbaa-ac65-48d6-ae6a-d031441fce2c",
       "name": "metrics-server",
       "kind": "k8s.endpoints",
       "runtime": "kubernetes",
@@ -2724,11 +2724,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:30Z",
-      "updatedAt": "2026-03-10T01:02:30Z"
+      "createdAt": "2026-03-10T02:01:16Z",
+      "updatedAt": "2026-03-10T02:01:16Z"
     },
     {
-      "id": "da7d5f09-3641-4309-98c3-bce5367a7789",
+      "id": "22fa120d-f518-4f89-a00d-3b13dc1bd567",
       "name": "traefik",
       "kind": "k8s.endpoints",
       "runtime": "kubernetes",
@@ -2736,11 +2736,11 @@
       "spec": {},
       "status": {},
       "ownership": {},
-      "createdAt": "2026-03-10T01:02:44Z",
-      "updatedAt": "2026-03-10T01:02:44Z"
+      "createdAt": "2026-03-10T02:01:29Z",
+      "updatedAt": "2026-03-10T02:01:29Z"
     },
     {
-      "id": "8c04dfc8f63d",
+      "id": "7ec1839d8b84",
       "name": "k3d-syncloud-tools",
       "kind": "docker.container",
       "runtime": "docker",
@@ -2763,7 +2763,7 @@
       "updatedAt": ""
     },
     {
-      "id": "e4a0a6fcfe13",
+      "id": "51627f8ead34",
       "name": "k3d-syncloud-serverlb",
       "kind": "docker.container",
       "runtime": "docker",
@@ -2772,8 +2772,8 @@
         "raw": {
           "command": "\"/bin/sh -c nginx-pr…\"",
           "image": "ghcr.io/k3d-io/k3d-proxy:5.8.3",
-          "labels": "app=k3d,k3d.cluster.imageVolume=k3d-syncloud-images,k3d.cluster.network.external=true,k3d.cluster.network.id=3b4bdc5a071e859dfe1f1db7a272988fadeaf1073da67fbf23510a38497cb597,k3d.cluster.network.iprange=172.18.0.0/16,k3d.cluster.network=k3d-syncloud,k3d.cluster.token=bTDGZbLxdVOYWSZqYdPW,k3d.cluster.url=https://k3d-syncloud-server-0:6443,k3d.cluster=syncloud,k3d.role=loadbalancer,k3d.server.loadbalancer=k3d-syncloud-serverlb,k3d.version=v5.8.3,maintainer=NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e,org.opencontainers.image.created=2025-02-15T19:07:40.209Z,org.opencontainers.image.description=Little helper to run CNCF's k3s in Docker,org.opencontainers.image.licenses=MIT,org.opencontainers.image.revision=201b614ea6798f0ee9e75c63360eef891b36bb19,org.opencontainers.image.source=https://github.com/k3d-io/k3d,org.opencontainers.image.title=k3d,org.opencontainers.image.url=https://github.com/k3d-io/k3d,org.opencontainers.image.version=5",
-          "ports": "80/tcp, 0.0.0.0:43145-\u003e6443/tcp"
+          "labels": "app=k3d,k3d.cluster.imageVolume=k3d-syncloud-images,k3d.cluster.network.external=true,k3d.cluster.network.id=3b4bdc5a071e859dfe1f1db7a272988fadeaf1073da67fbf23510a38497cb597,k3d.cluster.network.iprange=172.18.0.0/16,k3d.cluster.network=k3d-syncloud,k3d.cluster.token=HLMqyzKbqOzDiIRcfzwI,k3d.cluster.url=https://k3d-syncloud-server-0:6443,k3d.cluster=syncloud,k3d.role=loadbalancer,k3d.server.loadbalancer=k3d-syncloud-serverlb,k3d.version=v5.8.3,maintainer=NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e,org.opencontainers.image.created=2025-02-15T19:07:40.209Z,org.opencontainers.image.description=Little helper to run CNCF's k3s in Docker,org.opencontainers.image.licenses=MIT,org.opencontainers.image.revision=201b614ea6798f0ee9e75c63360eef891b36bb19,org.opencontainers.image.source=https://github.com/k3d-io/k3d,org.opencontainers.image.title=k3d,org.opencontainers.image.url=https://github.com/k3d-io/k3d,org.opencontainers.image.version=5",
+          "ports": "80/tcp, 0.0.0.0:36429-\u003e6443/tcp"
         }
       },
       "status": {
@@ -2786,7 +2786,7 @@
       "updatedAt": ""
     },
     {
-      "id": "aa379ab86c06",
+      "id": "b5d2b41aa6a7",
       "name": "k3d-syncloud-server-0",
       "kind": "docker.container",
       "runtime": "docker",
@@ -2795,7 +2795,7 @@
         "raw": {
           "command": "\"/bin/k3d-entrypoint…\"",
           "image": "rancher/k3s:v1.31.5-k3s1",
-          "labels": "app=k3d,k3d.cluster.imageVolume=k3d-syncloud-images,k3d.cluster.network.external=true,k3d.cluster.network.id=3b4bdc5a071e859dfe1f1db7a272988fadeaf1073da67fbf23510a38497cb597,k3d.cluster.network.iprange=172.18.0.0/16,k3d.cluster.network=k3d-syncloud,k3d.cluster.token=bTDGZbLxdVOYWSZqYdPW,k3d.cluster.url=https://k3d-syncloud-server-0:6443,k3d.cluster=syncloud,k3d.role=server,k3d.server.api.host=host.docker.internal,k3d.server.api.hostIP=0.0.0.0,k3d.server.api.port=43145,k3d.server.loadbalancer=k3d-syncloud-serverlb,k3d.version=v5.8.3,org.opencontainers.image.created=2025-01-28T16:51:52Z,org.opencontainers.image.revision=56ec5dd4d012c1d77dc7f50f21f65183044c92e7,org.opencontainers.image.source=https://github.com/k3s-io/k3s.git,org.opencontainers.image.url=https://github.com/k3s-io/k3s",
+          "labels": "app=k3d,k3d.cluster.imageVolume=k3d-syncloud-images,k3d.cluster.network.external=true,k3d.cluster.network.id=3b4bdc5a071e859dfe1f1db7a272988fadeaf1073da67fbf23510a38497cb597,k3d.cluster.network.iprange=172.18.0.0/16,k3d.cluster.network=k3d-syncloud,k3d.cluster.token=HLMqyzKbqOzDiIRcfzwI,k3d.cluster.url=https://k3d-syncloud-server-0:6443,k3d.cluster=syncloud,k3d.role=server,k3d.server.api.host=host.docker.internal,k3d.server.api.hostIP=0.0.0.0,k3d.server.api.port=36429,k3d.server.loadbalancer=k3d-syncloud-serverlb,k3d.version=v5.8.3,org.opencontainers.image.created=2025-01-28T16:51:52Z,org.opencontainers.image.revision=56ec5dd4d012c1d77dc7f50f21f65183044c92e7,org.opencontainers.image.source=https://github.com/k3s-io/k3s.git,org.opencontainers.image.url=https://github.com/k3s-io/k3s",
           "ports": ""
         }
       },
@@ -2809,8 +2809,8 @@
       "updatedAt": ""
     },
     {
-      "id": "e6366b1d085d",
-      "name": "crazy_keldysh",
+      "id": "cf231f9f86de",
+      "name": "silly_engelbart",
       "kind": "docker.container",
       "runtime": "docker",
       "nodeId": "",
@@ -2905,7 +2905,7 @@
     "records": [
       {
         "server": "172.17.0.3",
-        "name": "are.syncloud.local"
+        "name": "numerous.syncloud.local"
       }
     ]
   }
