@@ -52,3 +52,35 @@
 ## Estado
 
 El estado de Syncloud se guarda en: `helpers/syncloud-state.json`
+
+## Devcontainer
+
+Para ejecutar en un entorno de desarrollo con devcontainer:
+
+### Levantar dnsmasq en contenedor
+
+```bash
+dnsmasq --no-daemon --log-queries --conf-dir=/etc/dnsmasq.d,*.conf
+```
+
+### Validar configuracion con dig
+
+```bash
+# Resolver un dominio configurado
+dig syncloud.local @127.0.0.1
+
+# Ver respuesta completa con consultas DNS
+dig +trace syncloud.local @127.0.0.1
+```
+
+### Configuracion de red
+
+Asegurate de que el archivo `/etc/dnsmasq.d/syncloud.conf` contenga la configuracion correcta:
+
+```conf
+address=/syncloud.local/192.168.1.100
+server=8.8.8.8
+server=8.8.4.4
+listen-address=127.0.0.1,192.168.1.100
+bind-interfaces
+```
