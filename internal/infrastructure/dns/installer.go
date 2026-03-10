@@ -34,6 +34,7 @@ func NewInstaller(runner interfaces.CommandRunner,
 }
 
 func (i *Installer) InstallDns() error {
+
 	if i.runtime == domain.Container {
 		i.logger.Info("Skipping dns install inside container runtime")
 		return nil
@@ -60,6 +61,7 @@ func (i *Installer) InstallDns() error {
 	return nil
 }
 
+// Revisar pipeline del repositorio de Networking
 func (i *Installer) ConfigureDns() error {
 	i.logger.Info("Configuring dnsmasq file...")
 
@@ -76,12 +78,52 @@ func (i *Installer) ConfigureDns() error {
 		Server: host[0].Ip,
 	}
 
-	content := i.SetupDnsFile([]resource.Record{record})
+	content := i.SetupDnsFile([]resource.Record{record}, host[0].Ip)
 
-	return i.sysfile.WriteFile(
-		"/etc/dnsmasq.d/syncloud.conf",
-		content,
-	)
+	// Definir rutas
+	finalPath := "/etc/dnsmasq.d/syncloud.conf"
+	tmpPath := "/tmp/syncloud.conf.tmp"
+	backupPath := fmt.Sprintf("/etc/dnsmasq.d/syncloud.conf.bak")
+
+	// Escribir archivo temporal
+	if err := i.sysfile.WriteFile(tmpPath, content); err != nil {
+		return fmt.Errorf("failed to write tmp config: %w", err)
+	}
+
+	// Validacion de archivo temporal
+	_, err = i.runner.Run("dnsmasq", "--test", "--conf-file="+tmpPath)
+
+	if err != nil {
+		return fmt.Errorf("invalid dnsmasq configuration: %w", err)
+	}
+
+	if i.runtime == domain.Container {
+		// Backup del archivo
+		i.runner.Run("cp", finalPath, backupPath)
+
+		if _, err := i.runner.Run("mv", tmpPath, finalPath); err != nil {
+			return fmt.Errorf("Failed to deploy config: %w", err)
+		}
+
+	} else {
+		i.sudo.Run("cp", finalPath, backupPath)
+
+		if _, err := i.sudo.Run("mv", tmpPath, finalPath); err != nil {
+			return fmt.Errorf("Failed to deploy config: %w", err)
+		}
+
+		_, err = i.sudo.Run("systemctl", "reload", "dnsmasq")
+
+		if err != nil {
+			i.logger.Error("Reload failed, performing rollback...")
+			i.sudo.Run("cp", backupPath, finalPath)
+			i.sudo.Run("systemctl", "reload", "dnsmasq")
+			return fmt.Errorf("dnsmasq reload failed, rolled back: %w", err)
+		}
+	}
+
+	i.logger.Info("DNS config applied successfully with record: " + record.Name)
+	return nil
 }
 
 func (i *Installer) DisableSystemd() error {
@@ -96,7 +138,7 @@ func (i *Installer) DisableSystemd() error {
 	return nil
 }
 
-func (i *Installer) SetupDnsFile(records []resource.Record) string {
+func (i *Installer) SetupDnsFile(records []resource.Record, generalIp string) string {
 	var b strings.Builder
 
 	b.WriteString("# ==========================================\n")
@@ -111,6 +153,10 @@ func (i *Installer) SetupDnsFile(records []resource.Record) string {
 	b.WriteString("\nserver=8.8.8.8\n")
 
 	b.WriteString("server=8.8.4.4\n")
+
+	b.WriteString("listen-address=127.0.0.1," + generalIp + "\n")
+
+	b.WriteString("bind-interfaces\n")
 
 	return b.String()
 }
