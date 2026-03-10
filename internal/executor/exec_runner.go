@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"strings"
+
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain/dto"
 )
@@ -48,4 +50,12 @@ func (r *ExecRunner) Run(name string, args ...string) (*dto.CommandResult, error
 	}
 
 	return result, nil
+}
+
+func (r *ExecRunner) Whoami() (string, error) {
+	result, err := r.Run("whoami")
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(result.Stdout), nil
 }

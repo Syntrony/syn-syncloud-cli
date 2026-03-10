@@ -1,6 +1,8 @@
 package docker
 
 import (
+	"strings"
+
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain/dto"
 )
@@ -39,5 +41,24 @@ func (d *Detector) Detect() (*dto.Status, error) {
 
 	status.DockerRunning = true
 
+	if !d.UserHasDockerAccess() {
+		status.DockerRunning = false
+		d.logger.Info("Docker installed but user lacks permissions (not in docker group)")
+	}
+
 	return status, nil
+}
+
+func (d *Detector) UserHasDockerAccess() bool {
+	user, err := d.runner.Whoami()
+	if err != nil || user == "" {
+		return false
+	}
+
+	output, err := d.runner.Run("groups", user)
+	if err != nil {
+		return false
+	}
+
+	return strings.Contains(string(output.Stdout), "docker")
 }

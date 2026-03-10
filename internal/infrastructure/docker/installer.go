@@ -2,7 +2,6 @@ package docker
 
 import (
 	"fmt"
-	"os"
 
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
@@ -38,9 +37,12 @@ func (i *Installer) InstallDocker() error {
 
 	i.logger.Info("Installing docker...")
 
-	user := os.Getenv("USER")
+	user, err := i.sudo.Whoami()
+	if err != nil {
+		return fmt.Errorf("failed to get current user: %w", err)
+	}
 
-	_, err := i.sudo.Run("apt-get", "install", "-y", "docker.io")
+	_, err = i.sudo.Run("apt-get", "install", "-y", "docker.io")
 	if err != nil {
 		return fmt.Errorf("docker install failed: %w", err)
 	}
