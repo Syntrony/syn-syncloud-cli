@@ -7,6 +7,8 @@ import (
 	"synctl/internal/domain"
 	domainresource "synctl/internal/domain/Resource"
 	"synctl/internal/domain/k8s"
+
+	"github.com/google/uuid"
 )
 
 var resources = []string{
@@ -65,9 +67,7 @@ func (i *Inspector) Collect(
 	}
 
 	KubectlArgs = append(KubectlArgs, "-o", "json")
-
 	output, err := i.runner.Run("kubectl", append([]string{"get", kind}, KubectlArgs...)...)
-
 	if err != nil {
 		return nil, err
 	}
@@ -78,13 +78,37 @@ func (i *Inspector) Collect(
 	}
 
 	for _, item := range list.Items {
+		name := item.Metadata.Name
+		ns := item.Metadata.Namespace
+		k8sKind := strings.ToLower(item.Kind)
+
+		// 1. Filtro de Namespaces de Sistema
+		isSystemNS := ns == "kube-system" || ns == "kube-public" || ns == "kube-node-lease" || ns == "default"
+
+		// 2. Filtro de objetos Namespace (cuando el recurso listado es un Namespace)
+		isSystemNSObject := k8sKind == "namespace" && isSystemNS
+
+		// 3. Filtro de recursos globales (ClusterRoles, etc) que son de K8s interno
+		// Ignoramos los que empiezan con "system:", "admin", "edit", "view" o nombres de provisioners comunes
+		isInternalRBAC := (k8sKind == "clusterrole" || k8sKind == "clusterrolebinding") && (strings.HasPrefix(name, "system:") ||
+			name == "admin" || name == "edit" || name == "view" || name == "cluster-admin" ||
+			strings.Contains(name, "local-path-provisioner") ||
+			strings.Contains(name, "k3s-") ||
+			strings.Contains(name, "traefik"))
+
+		// 4. Filtro por nombre para recursos huérfanos en default
+		isOrphanInternal := isSystemNS && (name == "kubernetes" || name == "default")
+
+		if isSystemNS || isSystemNSObject || isInternalRBAC || isOrphanInternal {
+			continue
+		}
 
 		resource := domain.Resource{
 			Id:      item.Metadata.Uid,
-			Name:    item.Metadata.Name,
-			Kind:    "k8s." + strings.ToLower(item.Kind),
+			Name:    name,
+			Kind:    "k8s." + k8sKind,
 			Runtime: "kubernetes",
-			NodeId:  "",
+			NodeId:  uuid.NewString(), // Nota: Considera usar item.Metadata.Uid para persistencia
 			Spec: domainresource.Spec{
 				Raw: item.Spec,
 			},
@@ -95,9 +119,9 @@ func (i *Inspector) Collect(
 			UpdatedAt: item.Metadata.CreationTimestamp,
 		}
 
+		// Lógica de Ownership...
 		if len(item.Metadata.OwnerReferences) > 0 {
 			owner := item.Metadata.OwnerReferences[0]
-
 			resource.Ownership = domainresource.Ownership{
 				OwnerId:   owner.Uid,
 				OwnerKind: owner.Kind,
@@ -106,9 +130,7 @@ func (i *Inspector) Collect(
 		}
 
 		resources = append(resources, resource)
-
 	}
 
 	return resources, nil
-
 }

@@ -8,6 +8,8 @@ import (
 	"synctl/internal/domain"
 	domainresource "synctl/internal/domain/Resource"
 	"synctl/internal/domain/docker"
+
+	"github.com/google/uuid"
 )
 
 type Inspector struct {
@@ -52,12 +54,18 @@ func (i *Inspector) Snapshot() (*domain.Snapshot, error) {
 			return nil, err
 		}
 
+		if strings.HasPrefix(c.Names, "k3d-") ||
+			strings.HasPrefix(c.Names, "buildx_buildkit") ||
+			strings.HasPrefix(c.Names, "devcontainer") {
+			continue
+		}
+
 		resource := domain.Resource{
 			Id:      c.ID,
 			Name:    c.Names,
 			Kind:    "docker.container",
 			Runtime: "docker",
-			NodeId:  "",
+			NodeId:  uuid.NewString(),
 			Spec: domainresource.Spec{
 				Raw: map[string]interface{}{
 					"image":   c.Image,
