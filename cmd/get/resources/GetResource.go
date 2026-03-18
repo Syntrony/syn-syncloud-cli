@@ -1,11 +1,10 @@
 package resources
 
 import (
-	"synctl/internal/application/outputs"
+	"synctl/internal/app"
+	outputs "synctl/internal/application/outputs"
 	services "synctl/internal/application/services/get"
 	filters "synctl/internal/domain/filters"
-	"synctl/internal/domain/persistence"
-	loggerinfra "synctl/internal/logger"
 
 	"github.com/spf13/cobra"
 )
@@ -29,14 +28,12 @@ var Cmd = &cobra.Command{
 	Use:   "resources",
 	Short: "List existing resources in every node",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		repo := &persistence.StateRepository{
-			Path: "helpers/syncloud-state.json",
-		}
-
-		logger := loggerinfra.NewConsoleLogger()
+		components := app.NewComponents()
+		components.Init()
+		components.WithDefaultRepo()
 
 		rService := services.GetResourceService{
-			Repo: repo,
+			Repo: components.Repo,
 		}
 
 		filter := filters.GetResourceFilter{
@@ -54,7 +51,7 @@ var Cmd = &cobra.Command{
 		}
 
 		if len(result) == 0 {
-			logger.Info("No resources found in system!!!")
+			components.Logger.Info("No resources found in system!!!")
 			return nil
 		}
 

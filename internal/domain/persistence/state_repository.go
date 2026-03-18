@@ -46,3 +46,18 @@ func (f *StateRepository) Save(st *domain.State) error {
 
 	return os.WriteFile(f.Path, data, 0644)
 }
+
+func (f *StateRepository) Upsert(resources []*domain.Resource) (*domain.Snapshot, error) {
+	snapshot := &domain.Snapshot{
+		Resources: make([]domain.Resource, 0, len(resources)),
+	}
+
+	for _, r := range resources {
+		if r != nil {
+			snapshot.Resources = append(snapshot.Resources, *r)
+		}
+	}
+
+	return snapshot, nil
+
+}

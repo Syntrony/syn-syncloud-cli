@@ -12,6 +12,21 @@
             ]
         },
         {
+            "name": "synctl apply",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": [
+                "apply",
+                "-f",
+                "helpers/template-docker.yaml"
+            ],
+            "env": {
+                "DEBUG": "1"
+            }
+        },
+        {
             "name": "synctl get resources",
             "type": "go",
             "request": "launch",

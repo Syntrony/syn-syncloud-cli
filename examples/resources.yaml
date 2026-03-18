@@ -1,0 +1,120 @@
+# Syncloud Resource Examples
+#
+# This file demonstrates the Syncloud resource model.
+# Use: synctl apply -f examples/resources.yaml
+
+---
+# Docker Container Example (abstract mode)
+apiVersion: syncloud/v1
+kind: Container
+metadata:
+  name: postgres-db
+  namespace: app
+spec:
+  image: postgres:15
+  restart: unless-stopped
+  ports:
+    - hostPort: 5432
+      containerPort: 5432
+  env:
+    - name: POSTGRES_PASSWORD
+      value: secret
+    - name: POSTGRES_DB
+      value: syncloud
+  volumes:
+    - source: /data/postgres
+      target: /var/lib/postgresql/data
+  network:
+    name: syncloud-internal
+
+---
+# Docker Network Example
+apiVersion: syncloud/v1
+kind: Network
+metadata:
+  name: syncloud-internal
+spec:
+  driver: bridge
+
+---
+# Docker Image Example
+apiVersion: syncloud/v1
+kind: Image
+metadata:
+  name: nginx:latest
+spec: {}
+
+---
+# Kubernetes Deployment Example
+apiVersion: syncloud/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: default
+spec:
+  replicas: 3
+  image: nginx:latest
+  ports:
+    - port: 80
+      targetPort: 8080
+
+---
+# Kubernetes Service Example
+apiVersion: syncloud/v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: default
+spec:
+  selector:
+    app: web-app
+  ports:
+    - port: 80
+      targetPort: 8080
+
+---
+# Kubernetes Ingress Example
+apiVersion: syncloud/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  namespace: default
+spec:
+  rules:
+    - host: app.syncloud.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              serviceName: web-service
+              servicePort: 80
+
+---
+# Kubernetes Secret Example
+apiVersion: syncloud/v1
+kind: Secret
+metadata:
+  name: db-credentials
+  namespace: default
+spec:
+  type: Opaque
+  data:
+    username: YWRtaW4=
+    password: c2VjcmV0
+
+---
+# Kubernetes Raw Resource (passthrough)
+apiVersion: syncloud/v1
+kind: K8sResource
+metadata:
+  name: custom-resource
+  namespace: default
+spec:
+  manifest: |
+    apiVersion: custom.example.com/v1
+    kind: CustomResource
+    metadata:
+      name: my-custom
+    spec:
+      field: value

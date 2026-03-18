@@ -1,4 +1,4 @@
-package install
+package state
 
 import (
 	"synctl/internal/domain"

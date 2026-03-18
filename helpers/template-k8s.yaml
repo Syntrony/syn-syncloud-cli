@@ -1,0 +1,34 @@
+apiVersion: syncloud.io/v1
+kind: Deployment
+
+metadata:
+  name: api-server
+  namespace: platform
+  labels:
+    app: api
+
+spec:
+  replicas: 2
+
+  pod:
+    containers:
+      - name: api
+        image: nginx:latest
+
+        ports:
+          - containerPort: 80
+
+        env:
+          - name: ENVIRONMENT
+            value: production
+
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+
+  expose:
+    service:
+      type: ClusterIP
+      port: 80
+      targetPort: 80

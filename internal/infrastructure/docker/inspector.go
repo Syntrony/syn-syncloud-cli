@@ -6,7 +6,6 @@ import (
 	"strings"
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
-	domainresource "synctl/internal/domain/Resource"
 	"synctl/internal/domain/docker"
 
 	"github.com/google/uuid"
@@ -66,18 +65,14 @@ func (i *Inspector) Snapshot() (*domain.Snapshot, error) {
 			Kind:    "docker.container",
 			Runtime: "docker",
 			NodeId:  uuid.NewString(),
-			Spec: domainresource.Spec{
-				Raw: map[string]interface{}{
-					"image":   c.Image,
-					"command": c.Command,
-					"ports":   c.Ports,
-					"labels":  c.Labels,
-				},
+			Spec: map[string]interface{}{
+				"image":   c.Image,
+				"command": c.Command,
+				"ports":   c.Ports,
+				"labels":  c.Labels,
 			},
-			Status: domainresource.Status{
-				Raw: map[string]interface{}{
-					"state": c.State,
-				},
+			Status: map[string]interface{}{
+				"state": c.State,
 			},
 			CreatedAt: c.Created,
 			UpdatedAt: c.Created,

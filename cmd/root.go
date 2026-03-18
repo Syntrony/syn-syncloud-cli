@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"synctl/cmd/apply"
 	"synctl/cmd/get"
 	"synctl/cmd/inspect"
 	"synctl/cmd/install"
@@ -19,4 +20,5 @@ func init() {
 	RootCmd.AddCommand(inspect.Cmd)
 	RootCmd.AddCommand(get.Cmd)
 	RootCmd.AddCommand(install.Cmd)
+	RootCmd.AddCommand(apply.Cmd)
 }

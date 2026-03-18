@@ -7,11 +7,12 @@ synctl sigue los principios de Clean Architecture con separacion en capas:
 ```
 cmd/               → Comandos CLI (Cobra)
 internal/
-├── application/   → Interfaces y servicios
-├── domain/        → Modelos y DTOs
-├── infrastructure/ → Implementaciones
-├── executor/      → Ejecucion de comandos
-└── logger/       → Logging
+ ├── app/          → Componentes centralizados
+ ├── application/  → Interfaces y servicios
+ ├── domain/       → Modelos y DTOs
+ ├── infrastructure/→ Implementaciones
+ ├── executor/     → Ejecucion de comandos
+ └── logger/       → Logging
 ```
 
 ## Capas
@@ -21,9 +22,26 @@ internal/
 Contiene los comandos Cobra que son el punto de entrada de la CLI.
 
 - **install**: Instala Syncloud en el cluster
+- **apply**: Aplica recursos desde YAML
 - **inspect**: Inspecciona el estado actual
 - **get**: Obtiene recursos (nodes, resources)
 - **version**: Muestra version
+
+### internal/app/ - Componentes Centralizados
+
+Factory para inicializar componentes comunes:
+
+```go
+components := app.NewComponents()
+components.Init()
+components.WithDefaultRepo()
+components.DetectSudo()
+```
+
+**Beneficios:**
+- DRY: Elimina código duplicado de inicialización
+- Single Source: Un solo lugar para cambiar rutas/configuraciones
+- Testability: Fácil mock de dependencias
 
 ### internal/application/interfaces/ - Puertos
 
@@ -38,6 +56,7 @@ type Repository interface {
     Save(state *domain.State) error
     Load() (*domain.State, error)
     Exists() (bool, error)
+    Upsert(resources []*domain.Resource) (*domain.Snapshot, error)
 }
 
 type Logger interface {
@@ -46,8 +65,10 @@ type Logger interface {
     Debug(message string)
 }
 
-type PrivilegedRunner interface {
-    Run(name string, args ...string) (*dto.CommandResult, error)
+type RuntimeReconciler interface {
+    Runtime() string
+    Observe(resource *domain.Resource) (*domain.RuntimeResourceState, error)
+    Reconcile(context domain.ReconcileContext) error
 }
 ```
 
@@ -55,7 +76,21 @@ type PrivilegedRunner interface {
 
 Contiene la logica de negocio:
 
-- **InstallService**: Orquesta la instalacion
+**Install Flow:**
+- **InstallService**: Orquesta la instalacion de runtimes
+- **k8s.InstallService**: Instala K3s/K3d
+- **docker.InstallService**: Instala Docker
+- **dns.InstallService**: Instala dnsmasq
+
+**Apply Flow:**
+- **ApplyService**: Orquesta la aplicacion de recursos
+- **ResourceParser**: Parsea YAML a Domain Resources
+- **KindResolver**: Mapea tipos a runtimes
+- **Validator**: Valida recursos
+- **DockerReconciler**: Reconcilia recursos Docker
+- **K8sReconciler**: Reconcilia recursos Kubernetes
+
+**Query Flow:**
 - **InspectService**: Inspecciona estado
 - **GetNodeService**: Obtiene nodos
 - **GetResourceService**: Obtiene recursos con filtros
@@ -69,6 +104,7 @@ Modelos del dominio:
 - **Node**: Nodo del sistema (id, hostname, role, ip)
 - **Resource**: Recurso (id, name, kind, runtime, nodeId, spec, status, ownership)
 - **RuntimeType**: Tipo de entorno (Container, VPS)
+- **ReconcileContext**: Contexto para reconciliacion
 
 ### internal/infrastructure/ - Adaptadores
 
@@ -77,26 +113,55 @@ Implementaciones concretas de las interfaces:
 - **k8s/**: Instalador K3s/K3d, detector, inspector
 - **docker/**: Instalador Docker, detector, inspector
 - **system/**: Detector de entorno, inspector
+- **dns/**: Instalador dnsmasq, detector, inspector
 
 ### internal/executor/ - Ejecutor
 
 - **ExecRunner**: Ejecuta comandos del sistema
 - **SudoRunner**: Ejecuta comandos con sudo
 
-## Flujo de instalacion
+## Flujo de Apply (synctl apply -f resources.yaml)
 
-1. **Detectar entorno**: Container vs VPS
-2. **Detectar si requiere sudo**
-3. **Instalar Docker** (si no existe, VPS only)
-4. **Instalar K3s/K3d** segun tipo de entorno
-5. **Configurar kubectl**
-6. **Guardar estado** en `helpers/syncloud-state.json`
+```
+1. Parse YAML → ResourceYAML[]
+       ↓
+2. KindResolver.Resolve() → {runtime, kind, mode}
+       ↓
+3. ResourceBuilder.Build() → *domain.Resource
+       ↓
+4. Validator.Validate() → spec validation
+       ↓
+5. Repository.Upsert() → Snapshot
+       ↓
+6. StateBuilder.Build() → *State
+       ↓
+7. Repository.Save(state)
+       ↓
+8. Para cada RuntimeReconciler:
+   ├── Observe(resource) → RuntimeResourceState
+   ├── Diff.Compare() → Action
+   └── Reconcile(ctx) → Apply changes
+```
+
+### Recursos Soportados
+
+**Docker:**
+- Container
+- Network
+- Image
+
+**Kubernetes:**
+- Deployment, Namespace, Service, Ingress
+- ServiceAccount, Role, RoleBinding, ClusterRole
+- Secret, ConfigMap, Endpoints, Pod
+- K8sResource (raw mode)
 
 ## Dependencias
 
 ```
 github.com/spf13/cobra  → CLI
 github.com/google/uuid  → UUIDs
+go.yaml.in/yaml/v3      → YAML parsing
 ```
 
 ## Extension
@@ -104,11 +169,12 @@ github.com/google/uuid  → UUIDs
 Para agregar un nuevo comando:
 
 1. Crear directorio en `cmd/<comando>/`
-2. Definir `Cmd` como `*cobra.Command`
-3. Registrar en `cmd/root.go` `init()`
+2. Usar `app.NewComponents()` para inicializar
+3. Definir `Cmd` como `*cobra.Command`
+4. Registrar en `cmd/root.go` `init()`
 
-Para agregar nueva funcionalidad:
+Para agregar un nuevo runtime:
 
-1. Definir interfaz en `internal/application/interfaces/`
-2. Implementar en `internal/infrastructure/`
-3. Consumir en servicios
+1. Implementar `RuntimeReconciler` en `internal/application/services/apply/reconciler/<runtime>/`
+2. Registrar en ApplyService
+3. Agregar mapeo en `KindResolver`

@@ -1,0 +1,27 @@
+apiVersion: syncloud.io/v1
+kind: Container
+
+metadata:
+  name: nginx
+  labels:
+    app: webserver
+
+spec:
+  image: nginx:latest
+
+  restart: unless-stopped
+
+  ports:
+    - hostPort: 80
+      containerPort: 80
+
+  env:
+    - name: NGINX_PASSWORD
+      value: example
+
+  volumes:
+    - source: nginx-data
+      target: /var/lib/nginx/data
+
+  # network:
+  #   name: syncloud

@@ -104,17 +104,13 @@ func (i *Inspector) Collect(
 		}
 
 		resource := domain.Resource{
-			Id:      item.Metadata.Uid,
-			Name:    name,
-			Kind:    "k8s." + k8sKind,
-			Runtime: "kubernetes",
-			NodeId:  uuid.NewString(), // Nota: Considera usar item.Metadata.Uid para persistencia
-			Spec: domainresource.Spec{
-				Raw: item.Spec,
-			},
-			Status: domainresource.Status{
-				Raw: item.Status,
-			},
+			Id:        item.Metadata.Uid,
+			Name:      name,
+			Kind:      "k8s." + k8sKind,
+			Runtime:   "kubernetes",
+			NodeId:    uuid.NewString(), // Nota: Considera usar item.Metadata.Uid para persistencia
+			Spec:      item.Spec,
+			Status:    item.Status,
 			CreatedAt: item.Metadata.CreationTimestamp,
 			UpdatedAt: item.Metadata.CreationTimestamp,
 		}

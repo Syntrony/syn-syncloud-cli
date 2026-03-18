@@ -1,68 +1,37 @@
 package install
 
 import (
-	"github.com/spf13/cobra"
-
-	// domain
-	"synctl/internal/domain"
-
-	// infrastructure
-	systemsvc "synctl/internal/application/services/system"
-	"synctl/internal/domain/persistence"
-	executor "synctl/internal/executor"
-	dnsinfra "synctl/internal/infrastructure/dns"
-	dockerinfra "synctl/internal/infrastructure/docker"
-	k8sinfra "synctl/internal/infrastructure/k8s"
-	systeminfra "synctl/internal/infrastructure/system"
-	loggerinfra "synctl/internal/logger"
-
-	// services
+	"synctl/internal/app"
+	"synctl/internal/application/interfaces/install"
 	installservice "synctl/internal/application/services/install"
 	dnsservice "synctl/internal/application/services/install/dns"
 	dockerservice "synctl/internal/application/services/install/docker"
 	k8sservice "synctl/internal/application/services/install/k8s"
+	statebuilder "synctl/internal/application/services/state"
 
-	interfaces "synctl/internal/application/interfaces"
-	installiface "synctl/internal/application/interfaces/install"
+	dnsinfra "synctl/internal/infrastructure/dns"
+	dockerinfra "synctl/internal/infrastructure/docker"
+	k8sinfra "synctl/internal/infrastructure/k8s"
+	systeminfra "synctl/internal/infrastructure/system"
+
+	"github.com/spf13/cobra"
 )
 
 var Cmd = &cobra.Command{
 	Use:   "install",
 	Short: "Install Syncloud on the cluster",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		repo := &persistence.StateRepository{
-			Path: "helpers/syncloud-state.json",
+		components := app.NewComponents()
+		components.Init()
+		components.WithDefaultRepo()
+
+		if err := components.DetectSudo(); err != nil {
+			return err
 		}
 
-		envDetector := systeminfra.NewEnvironmentDetector()
-		logger := loggerinfra.NewConsoleLogger()
-		runner := executor.NewExecRunner(logger)
-
-		var sudo interfaces.PrivilegedRunner
-
-		var runtime domain.RuntimeType = domain.VPS
-
-		if envDetector.IsContainer() {
-			logger.Info("Container environment detected -> using DEV mode (k3d)")
-			runtime = domain.Container
-			sudo = runner
-		} else if envDetector.IsRoot() {
-			logger.Info("Running as root -> sudo not required")
-			sudo = runner
-		} else {
-			logger.Info("Running as user -> sudo required")
-			sudoSession := &systemsvc.SudoSession{}
-
-			if err := sudoSession.Ensure(runner); err != nil {
-				return err
-			}
-
-			sudo = executor.NewSudoRunner(runner)
-		}
-
-		k8sDetector := k8sinfra.NewDetector(runner, logger)
-		k8sInspector := k8sinfra.NewInspector(runner, logger)
-		k8sInstaller := k8sinfra.NewInstaller(runner, sudo, runtime, logger)
+		k8sDetector := k8sinfra.NewDetector(components.Runner, components.Logger)
+		k8sInspector := k8sinfra.NewInspector(components.Runner, components.Logger)
+		k8sInstaller := k8sinfra.NewInstaller(components.Runner, components.Sudo, components.RuntimeType, components.Logger)
 
 		k8sRuntime := k8sservice.NewInstallService(
 			k8sDetector,
@@ -70,9 +39,9 @@ var Cmd = &cobra.Command{
 			k8sInstaller,
 		)
 
-		dockerDetector := dockerinfra.NewDetector(runner, logger)
-		dockerInspector := dockerinfra.NewInspector(runner, logger)
-		dockerInstaller := dockerinfra.NewInstaller(runner, sudo, runtime, logger)
+		dockerDetector := dockerinfra.NewDetector(components.Runner, components.Logger)
+		dockerInspector := dockerinfra.NewInspector(components.Runner, components.Logger)
+		dockerInstaller := dockerinfra.NewInstaller(components.Runner, components.Sudo, components.RuntimeType, components.Logger)
 
 		dockerRuntime := dockerservice.NewInstallService(
 			dockerDetector,
@@ -80,13 +49,12 @@ var Cmd = &cobra.Command{
 			dockerInstaller,
 		)
 
-		systemInspector := systeminfra.NewInspector(runner)
-
+		systemInspector := systeminfra.NewInspector(components.Runner)
 		systemFile := systeminfra.NewFileSystem()
 
-		dnsDetector := dnsinfra.NewDetector(runner, logger)
-		dnsInspector := dnsinfra.NewInspector(runner, logger)
-		dnsInstaller := dnsinfra.NewInstaller(runner, sudo, runtime, logger, systemInspector, systemFile)
+		dnsDetector := dnsinfra.NewDetector(components.Runner, components.Logger)
+		dnsInspector := dnsinfra.NewInspector(components.Runner, components.Logger)
+		dnsInstaller := dnsinfra.NewInstaller(components.Runner, components.Sudo, components.RuntimeType, components.Logger, systemInspector, systemFile)
 
 		dnsRuntime := dnsservice.NewInstallService(
 			dnsDetector,
@@ -94,14 +62,14 @@ var Cmd = &cobra.Command{
 			dnsInstaller,
 		)
 
-		builder := installservice.NewStateBuilder()
+		builder := statebuilder.NewStateBuilder()
 
 		service := installservice.NewInstallService(
-			repo,
-			[]installiface.RuntimeInstaller{k8sRuntime, dockerRuntime, dnsRuntime},
+			components.Repo,
+			[]install.RuntimeInstaller{k8sRuntime, dockerRuntime, dnsRuntime},
 			systemInspector,
 			builder,
-			logger,
+			components.Logger,
 		)
 
 		return service.Install()

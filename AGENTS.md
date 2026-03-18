@@ -5,18 +5,19 @@
 Go CLI (`synctl`) for managing Syncloud resources using kubernetes, docker, dnsmasq.
 - **Module**: `synctl`
 - **Go Version**: 1.25.0
-- **Dependencies**: `github.com/spf13/cobra`, `github.com/google/uuid`
+- **Dependencies**: `github.com/spf13/cobra`, `github.com/google/uuid`, `go.yaml.in/yaml/v3`
 
 ---
 
 ## Build Commands
 
 ```bash
-go build -o synctl .
-go run .
-go run . install
-go run . get nodes
-GOOS=linux GOARCH=amd64 go build -o synctl-linux-amd64 .
+go build -o synctl .              # Build binary
+go run .                          # Run without building
+go run . install                  # Run install command
+go run . get nodes                # Run get nodes command
+GOOS=linux GOARCH=amd64 go build -o synctl-linux-amd64 .  # Cross-compile
+go build -o /dev/null .           # Build check only
 ```
 
 ---
@@ -24,12 +25,12 @@ GOOS=linux GOARCH=amd64 go build -o synctl-linux-amd64 .
 ## Test Commands
 
 ```bash
-go test ./...
-go test -v ./...
-go test -v -run TestName ./...
-go test -v ./internal/domain/...
-go test -cover ./...
-go test -race ./...
+go test ./...                     # Run all tests
+go test -v ./...                  # Verbose output
+go test -v -run TestName ./...   # Run single test by name
+go test -v ./internal/domain/... # Run tests in specific package
+go test -cover ./...              # With coverage
+go test -race ./...               # Race detector
 ```
 
 ---
@@ -37,10 +38,9 @@ go test -race ./...
 ## Lint and Format
 
 ```bash
-go fmt ./...
-go vet ./...
-golangci-lint run ./...
-go build ./... 2>&1 | head -50
+go fmt ./...          # Format code
+go vet ./...          # Vet checks
+golangci-lint run ./...  # Full linting (if installed)
 ```
 
 ---
@@ -49,10 +49,7 @@ go build ./... 2>&1 | head -50
 
 ### Import Organization
 
-Three groups separated by blank lines:
-1. Standard library
-2. External packages
-3. Internal packages (synctl/...)
+Three groups separated by blank lines: stdlib, external, internal.
 
 ```go
 import (
@@ -67,14 +64,9 @@ import (
 )
 ```
 
-Use aliases for conflicts:
-```go
-import (
-    nodes "synctl/cmd/get/nodes"
-)
-```
+Use aliases for conflicts: `nodes "synctl/cmd/get/nodes"`
 
-### Naming
+### Naming Conventions
 
 - **Files**: snake_case (`install_service.go`)
 - **Packages**: lowercase (`install`, `dns`)
@@ -86,15 +78,15 @@ import (
 ### Package Structure
 
 ```
-cmd/                     # Cobra commands
+cmd/               # Cobra commands
 internal/
-  ├── application/       # Services & interfaces
-  │   ├── interfaces/   # Port interfaces
-  │   ├── services/     # Service implementations
-  │   └── outputs/      # Output formatters
-  ├── domain/           # Entities, DTOs
-  ├── infrastructure/   # Adapters (docker, k8s, dns, system)
-  └── logger/           # Logging
+  ├── application/ # Services & interfaces
+  │   ├── interfaces/
+  │   ├── services/
+  │   └── outputs/
+  ├── domain/     # Entities, DTOs
+  ├── infrastructure/  # Adapters (docker, k8s, dns, system)
+  └── logger/    # Logging
 ```
 
 ### Interface Definition
@@ -110,14 +102,13 @@ type DnsInstaller interface {
 
 ### Error Handling
 
-Early returns with wrapped errors:
+Early returns with wrapped errors. Never log and return errors.
 
 ```go
 func (s *InstallService) Install() error {
     for _, runtime := range s.runtimes {
-        snap, err := runtime.Install()
-        if err != nil {
-            return err
+        if err := runtime.Install(); err != nil {
+            return fmt.Errorf("installing runtime: %w", err)
         }
     }
     return s.repo.Save(state)
@@ -127,58 +118,40 @@ func (s *InstallService) Install() error {
 ### Constructor Functions
 
 ```go
-func NewInstaller(
-    runner interfaces.CommandRunner,
-    sudo interfaces.PrivilegedRunner,
-    logger interfaces.Logger,
-) *Installer {
-    return &Installer{
-        runner: runner,
-        sudo:   sudo,
-        logger: logger,
-    }
-}
-```
-
-### Struct Tags
-
-```go
-type State struct {
-    Version   string     `json:"version"`
-    Cluster   *Cluster   `json:"cluster,omitempty"`
-    Nodes     []Node     `json:"nodes"`
+func NewInstaller(runner interfaces.CommandRunner, logger interfaces.Logger) *Installer {
+    return &Installer{runner: runner, logger: logger}
 }
 ```
 
 ### Logging
 
-Use `synctl/internal/application/interfaces/logger.go`. Use `logger.Info()`, `logger.Error()`. Don't log and return errors.
+Use `synctl/internal/application/interfaces/logger.go`. Prefer `logger.Info()`, `logger.Error()`.
 
 ### Cobra Commands
 
 ```go
 var Cmd = &cobra.Command{...}
-
-func init() {
-    RootCmd.AddCommand(Cmd)
-}
+func init() { RootCmd.AddCommand(Cmd) }
 ```
 
-Keep logic in services, not cmd packages.
+Keep business logic in services, not cmd packages.
 
 ---
 
 ## Workflow
 
-Before committing: `go fmt ./...` and `go vet ./...`. Test: `go test ./...`. Build check: `go build -o /dev/null .`
+Before committing:
+```bash
+go fmt ./... && go vet ./... && go test ./... && go build -o /dev/null .
+```
 
 ---
 
 ## Adding New Commands
 
-1. Create `cmd/newcommand/`
+1. Create `cmd/newcommand/command.go`
 2. Add `var Cmd = &cobra.Command{...}`
-3. Register in parent's `init()`
+3. Register in parent's `init()`: `ParentCmd.AddCommand(Cmd)`
 4. Keep logic in `internal/application/services/`
 
 ## Adding New Services

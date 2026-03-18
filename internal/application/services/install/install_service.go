@@ -4,6 +4,7 @@ import (
 	"synctl/internal/application/interfaces"
 	run_install "synctl/internal/application/interfaces/install"
 	"synctl/internal/application/interfaces/system"
+	"synctl/internal/application/services/state"
 	"synctl/internal/domain"
 )
 
@@ -11,7 +12,7 @@ type InstallService struct {
 	repo          interfaces.Repository
 	runtimes      []run_install.RuntimeInstaller
 	nodeInspector system.Inspector
-	builder       *StateBuilder
+	builder       *state.StateBuilder
 	logger        interfaces.Logger
 }
 
@@ -19,7 +20,7 @@ func NewInstallService(
 	repo interfaces.Repository,
 	runtimes []run_install.RuntimeInstaller,
 	nodeInspector system.Inspector,
-	builder *StateBuilder,
+	builder *state.StateBuilder,
 	logger interfaces.Logger,
 ) *InstallService {
 	return &InstallService{
