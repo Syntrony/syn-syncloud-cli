@@ -49,25 +49,20 @@ func (s *ApplyService) Apply(file string) error {
 		return err
 	}
 
-	state, err := s.repo.Load()
-	if err != nil {
-		return err
-	}
-
 	snapshot, err := s.repo.Upsert(resources)
 
 	if err != nil {
 		return err
 	}
 
-	state = s.builder.Build(snapshot, nil)
+	var snap domain.Snapshot
 
-	if err := s.repo.Save(state); err != nil {
-		return err
-	}
+	snap.Resources = snapshot
+
+	state := s.builder.Build(&snap, nil)
 
 	ctx := domain.ReconcileContext{
-		Resources: resources,
+		Resources: toResourcePointers(state.Resources),
 		State:     state,
 	}
 
@@ -107,5 +102,19 @@ func (s *ApplyService) Apply(file string) error {
 		}
 	}
 
+	if err := s.repo.Save(state); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func toResourcePointers(resources []domain.Resource) []*domain.Resource {
+	result := make([]*domain.Resource, 0, len(resources))
+
+	for i := range resources {
+		result = append(result, &resources[i])
+	}
+
+	return result
 }

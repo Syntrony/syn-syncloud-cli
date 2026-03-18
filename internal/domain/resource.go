@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	resource "synctl/internal/domain/Resource"
 )
 
@@ -15,4 +16,12 @@ type Resource struct {
 	Ownership resource.Ownership     `json:"ownership"`
 	CreatedAt string                 `json:"createdAt"`
 	UpdatedAt string                 `json:"updatedAt"`
+}
+
+func (r *Resource) Key() string {
+	return fmt.Sprintf("%s/%s/%s",
+		r.Runtime,
+		r.Kind,
+		r.Name,
+	)
 }

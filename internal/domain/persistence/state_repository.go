@@ -47,17 +47,44 @@ func (f *StateRepository) Save(st *domain.State) error {
 	return os.WriteFile(f.Path, data, 0644)
 }
 
-func (f *StateRepository) Upsert(resources []*domain.Resource) (*domain.Snapshot, error) {
-	snapshot := &domain.Snapshot{
-		Resources: make([]domain.Resource, 0, len(resources)),
+func (f *StateRepository) Upsert(desired []*domain.Resource) ([]domain.Resource, error) {
+	state, err := f.Load()
+
+	if err != nil {
+		return nil, err
 	}
 
-	for _, r := range resources {
-		if r != nil {
-			snapshot.Resources = append(snapshot.Resources, *r)
+	merged := map[string]domain.Resource{}
+
+	//Cargar existentes
+	for _, res := range state.Resources {
+		merged[res.Key()] = res
+	}
+
+	//Sobreescribir con desired
+	for _, res := range desired {
+		key := res.Key()
+
+		if existing, ok := merged[key]; ok {
+			res.Id = existing.Id
+			res.Name = existing.Name
+			res.Kind = existing.Kind
+			res.Runtime = existing.Runtime
+			res.NodeId = existing.NodeId
+			res.Spec = existing.Spec
+			res.Status = existing.Status
+			res.Ownership = existing.Ownership
+			res.CreatedAt = existing.CreatedAt
+			res.UpdatedAt = existing.UpdatedAt
+
 		}
+		merged[res.Key()] = *res
 	}
 
-	return snapshot, nil
+	var snapshot []domain.Resource
 
+	for _, v := range merged {
+		snapshot = append(snapshot, v)
+	}
+	return snapshot, nil
 }
