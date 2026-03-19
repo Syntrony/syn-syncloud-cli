@@ -1,6 +1,6 @@
 # synctl - Syncloud CLI
 
-`synctl` es una herramienta CLI para gestionar **Syncloud Resources** de forma declarativa.
+`synctl` es una herramienta CLI para gestionar **Syncloud Resources** de forma declarativa, orquestando contenedores en Docker y Kubernetes a través de un modelo de recursos universal.
 
 ## Flujo MVP
 
@@ -15,12 +15,32 @@ synctl deploy
 # http://syncloud.local
 ```
 
-## Filosofía
+## Arquitectura Conceptual
 
-Syncloud **NO administra Docker o Kubernetes directamente**. Administra recursos abstractos que luego se reconcilian hacia el runtime apropiado. Todo gira alrededor de `syncloud-state.json`:
+Syncloud **NO administra Docker o Kubernetes directamente**. Administra **Syncloud Resources** que luego se reconcilian hacia los runtimes apropiados.
 
 ```
-synctl deploy → syncloud-state.json → Reconciler → Docker/Kubernetes
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         synctl CLI                                      │
+│  ┌─────────┐     ┌─────────────────────┐     ┌─────────────────────┐  │
+│  │ install │     │      deploy         │     │      apply          │  │
+│  └────┬────┘     └──────────┬──────────┘     └──────────┬──────────┘  │
+└───────┼─────────────────────┼───────────────────────────┼─────────────┘
+        │                     │                           │
+        ▼                     ▼                           ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    syncloud-state.json                                 │
+│                    (FUENTE DE VERDAD - MÉDULA DEL SISTEMA)            │
+└─────────────────────────────────────────────────────────────────────────┘
+        │                     │                           │
+        ▼                     ▼                           ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      Reconciler Layer                                   │
+│  ┌─────────────────────┐         ┌─────────────────────┐             │
+│  │  DockerReconciler   │         │   K8sReconciler     │             │
+│  │  docker run / APIs  │         │  kubectl apply/APIs │             │
+│  └─────────────────────┘         └─────────────────────┘             │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Comandos

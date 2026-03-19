@@ -1,12 +1,12 @@
-# Roadmap de Desarrollo
+# Roadmap de Desarrollo - Syncloud CLI
 
-## Contexto: El centro es syncloud-state.json
+## Contexto: syncloud-state.json como Médula
 
-Todo gira alrededor de `syncloud-state.json`:
+El archivo `syncloud-state.json` es el contrato central del sistema:
 - **Estado deseado**: Recursos declarados por el usuario
-- **Estado actual**: Recursos observados en los runtimes
-- **Diff**: Diferencia entre desired y actual
-- **Reconciler**: Aplica cambios para cerrar el gap
+- **Persistencia**: Sobrevive reinicios
+- **Sincronización**: Reconciler compara desired vs actual
+- **DNS**: Campo `cluster.dns` define la URL de acceso
 
 ```
 syncloud-state.json ──► Reconciler ──► Docker/K8s
@@ -17,141 +17,128 @@ syncloud-state.json ──► Reconciler ──► Docker/K8s
 
 ---
 
-## MVP (0.1.0) - Flujo Completo
+## Objetivo MVP: Completar Flujo Despliegue
+
+El MVP permite:
+1. `synctl install` → Genera state con cluster.dns
+2. `synctl deploy` → Lee state, reconcilia, muestra DNS
+3. Usuario accede a `http://syncloud.local`
 
 ### ✅ Implementado
 
-| Item | Comando/Feature | Descripción |
-|------|-----------------|-------------|
-| ✅ | `synctl install` | Instala Docker/K3s + dnsmasq |
-| ✅ | `synctl apply -f` | Aplica recursos desde YAML |
-| ✅ | `synctl deploy` | Despliega stack completo |
-| ✅ | `synctl inspect` | Muestra estado actual |
-| ✅ | `synctl get resources` | Lista recursos |
-| ✅ | `synctl get nodes` | Lista nodos |
-| ✅ | Runtime Reconciler | Adaptador Docker/K8s |
+| Item | Descripción |
+|------|-------------|
+| `synctl install` | Instala Docker/K3s + dnsmasq, genera state |
+| `synctl deploy` | Aplica recursos de plataforma, muestra DNS |
+| `synctl apply -f` | Aplica recursos desde YAML |
+| `synctl inspect` | Muestra estado actual |
+| `synctl get resources` | Lista recursos |
+| `synctl get nodes` | Lista nodos |
+| Runtime Reconciler | Adaptador Docker/K8s |
+| syncloud-state.json | Fuente de verdad central |
 
-### 🔄 En Progreso
+---
 
-| # | Item | Descripción |
-|---|------|-------------|
-| 1 | Deploy resources | Recursos hardcodeados necesitan externalizarse |
+## Pendientes MVP
 
-### ❌ Pendientes para MVP Completo
+### 🔴 CRÍTICO - Requeridos para MVP funcional
 
 #### Comandos
 
-| # | Item | Prioridad | Descripción |
-|---|------|-----------|-------------|
-| 1 | `synctl delete <resource>` | 🔴 Alta | Eliminar recursos del state y runtime |
-| 2 | `synctl deploy --dry-run` | 🔴 Alta | Validar sin aplicar |
-| 3 | Output formatters | 🔴 Alta | `get resources --output json/yaml` |
+| # | Item | Descripción | Impacto |
+|---|------|-------------|---------|
+| 1 | `synctl delete <resource>` | Elimina recurso del state y runtime | Completar ciclo CRUD |
+| 2 | `synctl deploy --dry-run` | Valida recursos sin aplicar | Evitar errores en deploy |
+| 3 | Output formatters | `get resources --output json/yaml` | Depuración y scripting |
 
 #### Arquitectura
 
-| # | Item | Prioridad | Descripción |
-|---|------|-----------|-------------|
-| 1 | Diff separated | 🔴 Alta | Diff → Plan → Execute (no directo) |
-| 2 | Observe cycle | 🔴 Alta | Leer estado actual de runtime |
-| 3 | State comparison | 🔴 Alta | desired vs actual en reconciler |
+| # | Item | Descripción | Impacto |
+|---|------|-------------|---------|
+| 1 | Ciclo Observe | Leer estado actual del runtime | Sincronizar desired vs actual |
+| 2 | Diff separado | Diff → Plan → Execute | No ejecutar directo |
+| 3 | Actualización de status | RuntimeResourceState → Resource.status | Reflejar estado real en state |
 
 ---
 
-## Post-MVP 1 (0.2.0) - Developer Experience
+## Post-MVP 1 - Developer Experience
 
-### Comandos
+### 🟡 MEDIA - Mejoras de UX
 
-| # | Item | Prioridad | Descripción |
-|---|------|-----------|-------------|
-| 1 | `synctl logs <resource>` | 🟡 Media | Ver logs de contenedor/pod |
-| 2 | `synctl exec <resource> -- <cmd>` | 🟡 Media | Ejecutar en recurso |
-| 3 | `synctl describe <resource>` | 🟡 Media | Detalle completo |
-| 4 | `synctl port-forward <resource>` | 🟡 Media | Forward de puertos |
-
-### Arquitectura
-
-| # | Item | Prioridad | Descripción |
-|---|------|-----------|-------------|
-| 1 | Events/Audit | 🟡 Media | Historial de cambios |
-| 2 | Hooks pre/post | 🟡 Media | Scripts antes/después de apply |
+| # | Comando | Descripción |
+|---|---------|-------------|
+| 1 | `synctl logs <resource>` | Ver logs de contenedor/pod |
+| 2 | `synctl exec <resource> -- <cmd>` | Ejecutar comando en recurso |
+| 3 | `synctl describe <resource>` | Descripción detallada |
+| 4 | `synctl validate -f <file>` | Solo validación sin aplicar |
 
 ---
 
-## Post-MVP 2 (0.3.0) - Orquestación
+## Post-MVP 2 - Orquestación
 
-### Comandos
+### 🟢 BAJA - Nice to have
 
-| # | Item | Prioridad | Descripción |
-|---|------|-----------|-------------|
-| 1 | `synctl scale <resource> --replicas=N` | 🟢 Baja | Escalar deployments |
-| 2 | `synctl rollout undo <resource>` | 🟢 Baja | Rollback |
-| 3 | `synctl diff -f <file>` | 🟢 Baja | Comparar con estado |
-
-### Arquitectura
-
-| # | Item | Prioridad | Descripción |
-|---|------|-----------|-------------|
-| 1 | Resource dependencies | 🟢 Baja | Orden de aplicación |
-| 2 | Parallel apply | 🟢 Baja | Recursos independientes en paralelo |
+| # | Comando | Descripción |
+|---|---------|-------------|
+| 1 | `synctl scale <resource> --replicas=N` | Escalar deployments |
+| 2 | `synctl rollout undo <resource>` | Rollback |
+| 3 | `synctl diff -f <file>` | Comparar con estado actual |
 
 ---
 
-## Post-MVP 3 (1.0.0) - Producción
-
-| # | Item | Prioridad | Descripción |
-|---|------|-----------|-------------|
-| 1 | Plugin system | 🟢 Baja | Runtimes adicionales |
-| 2 | MCP Protocol | 🟢 Baja | Integración IA |
-| 3 | API Server mode | 🟢 Baja | Daemon con REST API |
-
----
-
-## Roadmap de Comandos
+## Roadmap Visual
 
 ```
-v0.1.0 (MVP)                    v0.2.0                  v0.3.0
+MVP (v0.1.0)                    v0.2.0                  v0.3.0
 ───────────────────            ──────────────           ───────────
 ✅ install                      ✅ logs                  ✅ scale
 ✅ deploy                       ✅ exec                  ✅ rollout
 ✅ apply                        ✅ describe              ✅ diff
-✅ inspect                      ✅ port-forward         ✅ validate
-✅ get resources                ✅ events               
-✅ get nodes                    ✅ hooks                
-🔴 delete (pendiente)           
-🔴 deploy --dry-run (pendiente) 
-🔴 output formats (pendiente)   
+✅ inspect                      ✅ validate             
+✅ get resources                🔴 delete (pendiente)   
+✅ get nodes                    🔴 dry-run (pendiente)  
+🔴 delete (pendiente)          🔴 output formats       
+🔴 dry-run (pendiente)                                   
+🔴 output formats                                          
+🔴 observe cycle                                         
+🔴 diff separated                                       
 ```
 
 ---
 
 ## Siguientes Pasos Inmediatos
 
-### 1. Completar flujo apply completo
+### 1. Implementar delete
 ```bash
-# Implementar
-synctl apply --dry-run     # Validación sin ejecución
-synctl delete <resource>   # Eliminación
+synctl delete postgres-db
+# 1. Leer state.json
+# 2. Remover recurso del array resources
+# 3. Ejecutar docker rm / kubectl delete
+# 4. Guardar state.json actualizado
 ```
 
-### 2. Externalizar deploy resources
+### 2. Implementar deploy --dry-run
 ```bash
-# De:
-internal/application/services/apply/deploy/resources.yaml
-
-# A:
-~/.syncloud/deploy.yaml  # O configurable
+synctl deploy --dry-run
+# 1. Parsear recursos
+# 2. Validar
+# 3. Mostrar diff sin aplicar
 ```
 
-### 3. Implementar ciclo observe
+### 3. Implementar observe cycle
 ```go
-# En reconciler
+// En reconciler
 for _, resource := range state.Resources {
-    actual := runtime.Observe(resource)
-    diff := compare(resource.Spec, actual)
-    if diff.HasChanges() {
-        runtime.Reconcile(diff)
-    }
+    observed := runtime.Observe(resource)
+    resource.Status = observed
 }
+repo.Save(state)
+```
+
+### 4. Output formatters
+```bash
+synctl get resources --output json
+synctl get resources --output yaml
 ```
 
 ---
@@ -159,7 +146,7 @@ for _, resource := range state.Resources {
 ## Notas
 
 - 🔴 = Crítico para MVP
-- 🟡 = Importante post-MVP
+- 🟡 = Importante post-MVP  
 - 🟢 = Nice to have
 - ✅ = Completado
 - 🔄 = En progreso
