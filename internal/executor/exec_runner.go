@@ -21,7 +21,8 @@ func NewExecRunner(logger interfaces.Logger) *ExecRunner {
 }
 
 func (r *ExecRunner) Run(name string, args ...string) (*dto.CommandResult, error) {
-	r.Logger.Info("Running command: " + name)
+	fullCmd := formatCommand(name, args)
+	r.Logger.Info("Running command: " + fullCmd)
 
 	cmd := exec.Command(name, args...)
 
@@ -41,14 +42,13 @@ func (r *ExecRunner) Run(name string, args ...string) (*dto.CommandResult, error
 	if err != nil {
 		result.Error = err.Error()
 		r.Logger.Error(fmt.Sprintf(
-			"Command failed: %s %v\nstderr: %s",
-			cmd,
-			args,
+			"Command failed: %s\nstderr: %s",
+			fullCmd,
 			result.Stderr,
 		))
 		return result, err
 	}
-
+	// r.Logger.Debug("stdout: " + result.Stdout)
 	return result, nil
 }
 
@@ -58,4 +58,11 @@ func (r *ExecRunner) Whoami() (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(result.Stdout), nil
+}
+
+func formatCommand(name string, args []string) string {
+	if len(args) == 0 {
+		return name
+	}
+	return fmt.Sprintf("%s %s", name, strings.Join(args, " "))
 }

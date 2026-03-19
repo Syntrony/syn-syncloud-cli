@@ -1,180 +1,247 @@
 # Arquitectura
 
-## Vision General
+## Visión General
 
-synctl sigue los principios de Clean Architecture con separacion en capas:
+Syncloud **NO administra Docker o Kubernetes directamente**. Administra **Syncloud Resources** que luego se reconcilian hacia distintos runtimes.
 
 ```
-cmd/               → Comandos CLI (Cobra)
-internal/
- ├── app/          → Componentes centralizados
- ├── application/  → Interfaces y servicios
- ├── domain/       → Modelos y DTOs
- ├── infrastructure/→ Implementaciones
- ├── executor/     → Ejecucion de comandos
- └── logger/       → Logging
+┌─────────────┐     ┌──────────────────────────────┐     ┌──────────────────────┐
+│  synctl CLI │ ──► │  Syncloud Resource Model    │ ──► │   Runtime Adapter     │
+│             │     │        (universal)           │     │ (Docker/Kubernetes)  │
+└─────────────┘     └──────────────────────────────┘     └──────────┬───────────┘
+                                                                     │
+                                                              ┌───────▼────────┐
+                                                              │   Reconciler   │
+                                                              └────────────────┘
+```
+
+**Arquitectura de flujo:**
+```
+synctl CLI
+  └─► Syncloud Resource Model (universal)
+        └─► Runtime Adapter (Docker/Kubernetes)
+              └─► Reconciler
+                    ├─► docker run / docker APIs
+                    └─► kubectl apply / k8s APIs
+```
+
+## Estructura del Proyecto
+
+```
+synctl/
+├── cmd/                    → Comandos CLI (Cobra)
+├── internal/
+│   ├── app/                → Componentes centralizados (factory)
+│   ├── application/        → Interfaces y servicios
+│   │   ├── interfaces/     → Puertos (contratos)
+│   │   ├── services/       → Lógica de negocio
+│   │   └── outputs/        → Formateadores de salida
+│   ├── domain/             → Modelos universales
+│   ├── infrastructure/     → Adaptadores de runtime
+│   │   ├── docker/         → Adaptador Docker
+│   │   ├── k8s/            → Adaptador Kubernetes
+│   │   └── dns/            → Sistema DNS
+│   ├── executor/           → Ejecutor de comandos
+│   └── logger/             → Logging
+├── docs/                   → Documentación
+└── examples/               → Ejemplos de recursos
 ```
 
 ## Capas
 
-### cmd/ - Capa de Presentacion
+### cmd/ - Capa de Presentación
 
-Contiene los comandos Cobra que son el punto de entrada de la CLI.
+Punto de entrada CLI con comandos Cobra:
 
-- **install**: Instala Syncloud en el cluster
-- **apply**: Aplica recursos desde YAML
-- **inspect**: Inspecciona el estado actual
-- **get**: Obtiene recursos (nodes, resources)
-- **version**: Muestra version
+| Comando | Descripción |
+|---------|-------------|
+| `install` | Instala Syncloud y sus dependencias |
+| `apply` | Aplica Syncloud Resources desde YAML |
+| `inspect` | Inspecciona el estado actual |
+| `get` | Consulta recursos y nodos |
+| `daemon` | Modo daemon (futuro) |
+| `version` | Muestra versión |
 
-### internal/app/ - Componentes Centralizados
+### internal/domain/ - Modelo de Recursos (Universal)
 
-Factory para inicializar componentes comunes:
+Define el modelo abstracto de recursos que es independiente del runtime:
 
 ```go
-components := app.NewComponents()
-components.Init()
-components.WithDefaultRepo()
-components.DetectSudo()
+type Resource struct {
+    Id        string                 // Identificador único
+    Name      string                 // Nombre del recurso
+    Kind      string                 // Tipo abstracto (Container, Deployment, etc.)
+    Runtime   string                 // Runtime destino (docker/kubernetes)
+    NodeId    string                 // Nodo donde se ejecuta
+    Spec      map[string]interface{} // Especificación universal
+    Status    map[string]interface{} // Estado observado
+    Ownership Ownership              // Propiedad del recurso
+    CreatedAt string
+    UpdatedAt string
+}
 ```
 
-**Beneficios:**
-- DRY: Elimina código duplicado de inicialización
-- Single Source: Un solo lugar para cambiar rutas/configuraciones
-- Testability: Fácil mock de dependencias
+**Principios del modelo:**
+- Los recursos son **declarativos** y **abstractos**
+- Un mismo recurso puede targetear Docker o Kubernetes
+- El `Kind` define la semántica, no la implementación
 
 ### internal/application/interfaces/ - Puertos
 
-Define los contratos (interfaces) que la aplicacion necesita:
+Contratos que permiten la abstracción de runtimes:
 
 ```go
-type CommandRunner interface {
-    Run(name string, args ...string) (*dto.CommandResult, error)
-}
-
-type Repository interface {
-    Save(state *domain.State) error
-    Load() (*domain.State, error)
-    Exists() (bool, error)
-    Upsert(resources []*domain.Resource) (*domain.Snapshot, error)
-}
-
-type Logger interface {
-    Info(message string)
-    Error(message string)
-    Debug(message string)
-}
-
+// RuntimeReconciler: Interfaz para adaptadores de runtime
 type RuntimeReconciler interface {
-    Runtime() string
-    Observe(resource *domain.Resource) (*domain.RuntimeResourceState, error)
-    Reconcile(context domain.ReconcileContext) error
+    Runtime() string                    // "docker" | "kubernetes"
+    Observe(resource *Resource) (*RuntimeResourceState, error)
+    Reconcile(ctx ReconcileContext) error
+}
+
+// ResourceParser: Parsea YAML a recursos del dominio
+type ResourceParser interface {
+    Parse(path string) ([]*Resource, error)
 }
 ```
 
 ### internal/application/services/ - Servicios
 
-Contiene la logica de negocio:
+Contiene la lógica de negocio organizada por flujo:
 
-**Install Flow:**
-- **InstallService**: Orquesta la instalacion de runtimes
-- **k8s.InstallService**: Instala K3s/K3d
-- **docker.InstallService**: Instala Docker
-- **dns.InstallService**: Instala dnsmasq
-
-**Apply Flow:**
-- **ApplyService**: Orquesta la aplicacion de recursos
-- **ResourceParser**: Parsea YAML a Domain Resources
-- **KindResolver**: Mapea tipos a runtimes
-- **Validator**: Valida recursos
-- **DockerReconciler**: Reconcilia recursos Docker
-- **K8sReconciler**: Reconcilia recursos Kubernetes
-
-**Query Flow:**
-- **InspectService**: Inspecciona estado
-- **GetNodeService**: Obtiene nodos
-- **GetResourceService**: Obtiene recursos con filtros
-
-### internal/domain/ - Entidades
-
-Modelos del dominio:
-
-- **State**: Estado de Syncloud (version, cluster, nodes, resources)
-- **Cluster**: Informacion del cluster (id, name, mode)
-- **Node**: Nodo del sistema (id, hostname, role, ip)
-- **Resource**: Recurso (id, name, kind, runtime, nodeId, spec, status, ownership)
-- **RuntimeType**: Tipo de entorno (Container, VPS)
-- **ReconcileContext**: Contexto para reconciliacion
-
-### internal/infrastructure/ - Adaptadores
-
-Implementaciones concretas de las interfaces:
-
-- **k8s/**: Instalador K3s/K3d, detector, inspector
-- **docker/**: Instalador Docker, detector, inspector
-- **system/**: Detector de entorno, inspector
-- **dns/**: Instalador dnsmasq, detector, inspector
-
-### internal/executor/ - Ejecutor
-
-- **ExecRunner**: Ejecuta comandos del sistema
-- **SudoRunner**: Ejecuta comandos con sudo
-
-## Flujo de Apply (synctl apply -f resources.yaml)
-
+#### Flujo de Apply
 ```
-1. Parse YAML → ResourceYAML[]
-       ↓
-2. KindResolver.Resolve() → {runtime, kind, mode}
-       ↓
-3. ResourceBuilder.Build() → *domain.Resource
-       ↓
-4. Validator.Validate() → spec validation
-       ↓
-5. Repository.Upsert() → Snapshot
-       ↓
-6. StateBuilder.Build() → *State
-       ↓
-7. Repository.Save(state)
-       ↓
-8. Para cada RuntimeReconciler:
-   ├── Observe(resource) → RuntimeResourceState
-   ├── Diff.Compare() → Action
-   └── Reconcile(ctx) → Apply changes
+ApplyService
+  ├─► ResourceParser     → Parsea YAML a recursos universales
+  ├─► KindResolver       → Mapea Kind a runtime específico
+  ├─► Validator          → Valida recursos antes de aplicar
+  ├─► Repository         → Persiste estado
+  └─► RuntimeReconciler → Reconcilia contra runtime
+        ├─► DockerReconciler
+        └─► K8sReconciler
 ```
 
-### Recursos Soportados
+#### Flujo de Install
+```
+InstallService
+  ├─► RuntimeInstaller   → Instala dependencias
+  │     ├─► K8sInstallService  (K3s/K3d)
+  │     ├─► DockerInstallService
+  │     └─► DnsInstallService
+  └─► StateBuilder       → Construye estado inicial
+```
 
-**Docker:**
-- Container
-- Network
-- Image
+### internal/infrastructure/ - Adaptadores de Runtime
 
-**Kubernetes:**
-- Deployment, Namespace, Service, Ingress
-- ServiceAccount, Role, RoleBinding, ClusterRole
-- Secret, ConfigMap, Endpoints, Pod
-- K8sResource (raw mode)
+Implementaciones concretas de los puertos:
+
+| Paquete | Responsabilidad |
+|---------|-----------------|
+| `docker/` | docker run, docker API para containers, networks, images |
+| `k8s/` | kubectl apply, k8s API para deployments, services, etc. |
+| `dns/` | dnsmasq para resolución de dominios |
+| `system/` | Detección de entorno, inspector del sistema |
+
+## Flujo de Apply
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      synctl apply -f resources.yaml              │
+└─────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  1. Parse YAML → ResourceYAML[]                                   │
+│     └─► apiVersion: syncloud/v1, kind: Container, spec: {...}   │
+└─────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  2. KindResolver.Resolve(kind) → {runtime, kind, mode}          │
+│     └─► "Container" → {runtime: "docker", kind: "docker.container"}│
+└─────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  3. ResourceBuilder.Build() → *domain.Resource                    │
+│     └─► Modelo universal con Spec abstracto                      │
+└─────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  4. Validator.Validate() → Validación semántica                │
+└─────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  5. Repository.Upsert() → Persistencia de estado                 │
+└─────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  6. RuntimeReconciler.Reconcile()                                │
+│                                                                  │
+│     ┌─────────────┐         ┌─────────────┐                      │
+│     │   Docker    │         │    K8s      │                      │
+│     │ Reconciler  │         │ Reconciler  │                      │
+│     └──────┬──────┘         └──────┬──────┘                      │
+│            │                       │                             │
+│            ▼                       ▼                             │
+│     ┌─────────────┐         ┌─────────────┐                      │
+│     │ docker run  │         │kubectl apply│                      │
+│     │ docker api │         │  k8s api   │                      │
+│     └─────────────┘         └─────────────┘                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Recursos Soportados
+
+### Modelo Universal (syncloud/v1)
+
+| Kind | Runtime | Descripción |
+|------|---------|-------------|
+| `Container` | Docker | Contenedor abstracto |
+| `Network` | Docker | Red de contenedores |
+| `Image` | Docker | Imagen Docker |
+| `Deployment` | Kubernetes | Deployment K8s |
+| `Service` | Kubernetes | Servicio K8s |
+| `Ingress` | Kubernetes | Ingress K8s |
+| `Namespace` | Kubernetes | Namespace K8s |
+| `Secret` | Kubernetes | Secret K8s |
+| `ConfigMap` | Kubernetes | ConfigMap K8s |
+| `ServiceAccount` | Kubernetes | ServiceAccount K8s |
+| `Role` | Kubernetes | Role RBAC |
+| `RoleBinding` | Kubernetes | RoleBinding RBAC |
+| `ClusterRole` | Kubernetes | ClusterRole RBAC |
+| `Endpoints` | Kubernetes | Endpoints |
+| `Pod` | Kubernetes | Pod individual |
+| `K8sResource` | Kubernetes | Recurso raw (passthrough) |
+
+## Extension
+
+### Agregar nuevo comando
+
+1. Crear `cmd/<comando>/<comando>.go`
+2. Definir `var Cmd = &cobra.Command{...}`
+3. Usar `app.NewComponents()` para inicializar dependencias
+4. Registrar en `cmd/root.go`
+
+### Agregar nuevo Kind
+
+1. Definir mapeo en `KindResolver` (`parser/kind_resolver.go`)
+2. Implementar reconciler si es necesario
+3. Agregar validación en `Validator`
+
+### Agregar nuevo Runtime
+
+1. Implementar `RuntimeReconciler` en `internal/application/services/apply/reconciler/<runtime>/`
+2. Registrar en `ApplyService`
+3. Agregar mapeo en `KindResolver`
 
 ## Dependencias
 
 ```
-github.com/spf13/cobra  → CLI
-github.com/google/uuid  → UUIDs
-go.yaml.in/yaml/v3      → YAML parsing
+github.com/spf13/cobra    → CLI framework
+github.com/google/uuid    → Generación de UUIDs
+go.yaml.in/yaml/v3        → Parsing YAML
+modelcontextprotocol/go-sdk → Protocolo MCP (futuro)
 ```
-
-## Extension
-
-Para agregar un nuevo comando:
-
-1. Crear directorio en `cmd/<comando>/`
-2. Usar `app.NewComponents()` para inicializar
-3. Definir `Cmd` como `*cobra.Command`
-4. Registrar en `cmd/root.go` `init()`
-
-Para agregar un nuevo runtime:
-
-1. Implementar `RuntimeReconciler` en `internal/application/services/apply/reconciler/<runtime>/`
-2. Registrar en ApplyService
-3. Agregar mapeo en `KindResolver`

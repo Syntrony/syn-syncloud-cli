@@ -1,11 +1,8 @@
 package apply
 
 import (
-	"fmt"
-
 	"synctl/internal/application/interfaces"
 	iApply "synctl/internal/application/interfaces/apply"
-	"synctl/internal/application/services/apply/diff"
 	"synctl/internal/application/services/state"
 	"synctl/internal/domain"
 )
@@ -15,18 +12,16 @@ type ApplyService struct {
 	builder   *state.StateBuilder
 	parser    iApply.ResourceParser
 	validator iApply.Validator
-	runtimes  []iApply.RuntimeReconciler
 	logger    interfaces.Logger
 }
 
 func NewApplyService(repo interfaces.Repository, builder *state.StateBuilder, parser iApply.ResourceParser,
-	validator iApply.Validator, runtimes []iApply.RuntimeReconciler, logger interfaces.Logger) *ApplyService {
+	validator iApply.Validator, logger interfaces.Logger) *ApplyService {
 	return &ApplyService{
 		repo:      repo,
 		builder:   builder,
 		parser:    parser,
 		validator: validator,
-		runtimes:  runtimes,
 		logger:    logger,
 	}
 }
@@ -56,65 +51,10 @@ func (s *ApplyService) Apply(file string) error {
 	}
 
 	var snap domain.Snapshot
-
 	snap.Resources = snapshot
 
 	state := s.builder.Build(&snap, nil)
 
-	ctx := domain.ReconcileContext{
-		Resources: toResourcePointers(state.Resources),
-		State:     state,
-	}
-
-	for _, runtime := range s.runtimes {
-		var runtimeResources []*domain.Resource
-
-		for _, resource := range ctx.Resources {
-			if resource.Runtime == runtime.Runtime() {
-				runtimeResources = append(runtimeResources, resource)
-			}
-		}
-
-		if len(runtimeResources) == 0 {
-			continue
-		}
-
-		var planned []*domain.Action
-
-		for _, res := range runtimeResources {
-			actual, err := runtime.Observe(res)
-			if err != nil {
-				return fmt.Errorf("observing resource %s: %w", res.Name, err)
-			}
-
-			action := diff.Compare(res, actual)
-			planned = append(planned, action)
-		}
-
-		subCtx := domain.ReconcileContext{
-			Resources: runtimeResources,
-			State:     ctx.State,
-			Actions:   planned,
-		}
-
-		if err := runtime.Reconcile(subCtx); err != nil {
-			return err
-		}
-	}
-
-	if err := s.repo.Save(state); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func toResourcePointers(resources []domain.Resource) []*domain.Resource {
-	result := make([]*domain.Resource, 0, len(resources))
-
-	for i := range resources {
-		result = append(result, &resources[i])
-	}
-
-	return result
+	s.logger.Info("Resource created")
+	return s.repo.Save(state)
 }

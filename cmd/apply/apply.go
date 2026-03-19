@@ -4,11 +4,8 @@ import (
 	"os"
 
 	"synctl/internal/app"
-	iApply "synctl/internal/application/interfaces/apply"
 	applyService "synctl/internal/application/services/apply"
 	"synctl/internal/application/services/apply/parser"
-	"synctl/internal/application/services/apply/reconciler/docker"
-	"synctl/internal/application/services/apply/reconciler/k8s"
 	validatorsvc "synctl/internal/application/services/apply/validator"
 	"synctl/internal/application/services/state"
 
@@ -26,6 +23,7 @@ var Cmd = &cobra.Command{
 	Use:   "apply -f <file>",
 	Short: "Apply Syncloud resources from a YAML file",
 	RunE: func(cmd *cobra.Command, args []string) error {
+
 		components := app.NewComponents()
 		components.Init()
 		components.WithDefaultRepo()
@@ -38,17 +36,11 @@ var Cmd = &cobra.Command{
 		validator := validatorsvc.NewValidator()
 		builder := state.NewStateBuilder()
 
-		dockerRecon := docker.NewDockerReconciler(components.Runner, components.Logger)
-		k8sRecon := k8s.NewK8sReconciler(components.Runner, components.Logger)
-
-		runtimes := []iApply.RuntimeReconciler{dockerRecon, k8sRecon}
-
 		service := applyService.NewApplyService(
 			components.Repo,
 			builder,
 			parser,
 			validator,
-			runtimes,
 			components.Logger,
 		)
 

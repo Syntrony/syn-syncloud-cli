@@ -1,86 +1,169 @@
 # synctl - Syncloud CLI
 
-`synctl` es una herramienta CLI en Go para gestionar recursos de Syncloud utilizando Cobra y Clean Architecture.
+`synctl` es una herramienta CLI para gestionar **Syncloud Resources** de forma declarativa.
 
-## Uso
+## Filosofía
 
-```bash
-# Instalar Syncloud en el cluster
-./synctl install
+Syncloud **NO administra Docker o Kubernetes directamente**. Administra recursos abstractos que luego se reconcilian hacia el runtime apropiado:
 
-# Inspeccionar recursos existentes
-./synctl inspect
-
-# Listar nodos
-./synctl get nodes
-
-# Listar recursos (con filtros)
-./synctl get resources
-./synctl get resources --name myapp
-./synctl get resources --runtime k3s
-./synctl get resources --kind deployment
-
-# Version
-./synctl version
+```
+synctl apply → Syncloud Resource → Runtime Adapter → Docker/Kubernetes
 ```
 
 ## Comandos
 
-| Comando | Descripcion |
-|---------|-------------|
-| `install` | Instala Syncloud en el cluster |
-| `inspect` | Inspecciona recursos existentes |
-| `get nodes` | Lista nodos del sistema |
-| `get resources` | Lista recursos con filtros |
-| `version` | Muestra version |
+```bash
+# Instalación
+synctl install              # Instala Syncloud y dependencias
 
-## Filtros para recursos
+# Gestión de recursos
+synctl apply -f <file>      # Aplica recursos desde YAML
+synctl inspect              # Inspecciona estado actual
+synctl get resources         # Lista recursos
+synctl get nodes            # Lista nodos
 
-| Flag | Descripcion |
-|------|-------------|
-| `-n, --name` | Filtrar por nombre de recurso |
-| `-k, --kind` | Filtrar por tipo de recurso |
-| `-r, --runtime` | Filtrar por runtime (k3s, docker) |
-| `-i, --id` | Filtrar por ID de recurso |
+# Utilidades
+synctl version              # Muestra versión
+```
 
-## Modos de ejecucion
+### apply
 
-- **Container (k3d)**: Detecta automaticamente cuando se ejecuta dentro de un contenedor
-- **VPS (k3s)**: Ejecucion estandar en servidor
-- **Sudo**: Solicita contrasena sudo si no es root
+Aplica recursos Syncloud desde archivos YAML:
+
+```bash
+synctl apply -f resources.yaml
+synctl apply -f examples/resources.yaml
+```
+
+**Flag:**
+- `-f, --file` - Ruta al archivo YAML (requerido)
+
+### get resources
+
+Lista recursos con filtros opcionales:
+
+```bash
+synctl get resources                    # Todos los recursos
+synctl get resources --name myapp       # Por nombre
+synctl get resources --kind Deployment # Por tipo
+synctl get resources --runtime docker  # Por runtime
+synctl get resources --namespace default # Por namespace
+```
+
+**Flags:**
+- `-n, --name` - Filtrar por nombre
+- `-k, --kind` - Filtrar por tipo de recurso
+- `-r, --runtime` - Filtrar por runtime (docker, kubernetes)
+- `--namespace` - Filtrar por namespace
+
+### get nodes
+
+Lista nodos del sistema:
+
+```bash
+synctl get nodes
+```
+
+### inspect
+
+Inspecciona el estado actual de Syncloud:
+
+```bash
+synctl inspect
+```
+
+Muestra: versión, modo (Container/VPS), nodos y conteo de recursos.
+
+### install
+
+Instala Syncloud y sus dependencias:
+
+```bash
+synctl install
+```
+
+Instala automáticamente:
+- Runtime detectado (K3s/K3d o Docker)
+- DNS (dnsmasq)
+- Configuración de red
+
+## Modelo de Recursos
+
+Syncloud usa un modelo declarativo universal basado en `apiVersion: syncloud/v1`:
+
+```yaml
+apiVersion: syncloud/v1
+kind: Container           # Kind abstracto
+metadata:
+  name: myapp
+  namespace: production
+spec:
+  image: nginx:latest
+  ports:
+    - hostPort: 8080
+      containerPort: 80
+```
+
+### Recursos Disponibles
+
+**Docker:**
+- `Container` - Contenedor
+- `Network` - Red
+- `Image` - Imagen
+
+**Kubernetes:**
+- `Deployment` - Deployment
+- `Service` - Servicio
+- `Ingress` - Ingress
+- `Namespace` - Namespace
+- `Secret` - Secret
+- `ConfigMap` - ConfigMap
+- `ServiceAccount` - ServiceAccount
+- `Role` / `ClusterRole` - RBAC
+- `Pod` - Pod individual
+- `K8sResource` - Recurso raw (passthrough)
+
+## Modos de Ejecución
+
+| Modo | Descripción | Runtime |
+|------|-------------|---------|
+| **Container** | Ejecutando en contenedor (k3d) | K3d |
+| **VPS** | Ejecutando en servidor | K3s |
+
+El modo se detecta automáticamente. Si es necesario sudo, se solicita la contraseña.
 
 ## Estado
 
-El estado de Syncloud se guarda en: `helpers/syncloud-state.json`
+El estado se guarda en: `helpers/syncloud-state.json`
 
-## Devcontainer
+## Ejemplos
 
-Para ejecutar en un entorno de desarrollo con devcontainer:
-
-### Levantar dnsmasq en contenedor
+Ver `examples/resources.yaml` para ejemplos completos de recursos.
 
 ```bash
-dnsmasq --no-daemon --log-queries --conf-dir=/etc/dnsmasq.d,*.conf
+# Aplicar ejemplos
+synctl apply -f examples/resources.yaml
+
+# Ver recursos aplicados
+synctl get resources
+
+# Inspeccionar estado
+synctl inspect
 ```
 
-### Validar configuracion con dig
+## Desarrollo
+
+### Build
 
 ```bash
-# Resolver un dominio configurado
-dig syncloud.local @127.0.0.1
-
-# Ver respuesta completa con consultas DNS
-dig +trace syncloud.local @127.0.0.1
+go build -o synctl .          # Compilar
+go run .                      # Ejecutar sin compilar
 ```
 
-### Configuracion de red
+### Linting
 
-Asegurate de que el archivo `/etc/dnsmasq.d/syncloud.conf` contenga la configuracion correcta:
-
-```conf
-address=/syncloud.local/192.168.1.100
-server=8.8.8.8
-server=8.8.4.4
-listen-address=127.0.0.1,192.168.1.100
-bind-interfaces
+```bash
+go fmt ./... && go vet ./... && go build -o /dev/null .
 ```
+
+Ver `AGENTS.md` para guía completa de desarrollo.
