@@ -2,19 +2,33 @@
 
 `synctl` es una herramienta CLI para gestionar **Syncloud Resources** de forma declarativa.
 
+## Flujo MVP
+
+```bash
+# 1. Instalar runtimes (Docker/K3s, dnsmasq)
+synctl install
+
+# 2. Desplegar plataforma completa
+synctl deploy
+
+# 3. Acceder via DNS
+# http://syncloud.local
+```
+
 ## Filosofía
 
-Syncloud **NO administra Docker o Kubernetes directamente**. Administra recursos abstractos que luego se reconcilian hacia el runtime apropiado:
+Syncloud **NO administra Docker o Kubernetes directamente**. Administra recursos abstractos que luego se reconcilian hacia el runtime apropiado. Todo gira alrededor de `syncloud-state.json`:
 
 ```
-synctl apply → Syncloud Resource → Runtime Adapter → Docker/Kubernetes
+synctl deploy → syncloud-state.json → Reconciler → Docker/Kubernetes
 ```
 
 ## Comandos
 
 ```bash
-# Instalación
+# Instalación y despliegue
 synctl install              # Instala Syncloud y dependencias
+synctl deploy              # Despliega la plataforma completa
 
 # Gestión de recursos
 synctl apply -f <file>      # Aplica recursos desde YAML

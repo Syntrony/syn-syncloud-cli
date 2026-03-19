@@ -1,123 +1,165 @@
-# Pendientes de Refinación
+# Roadmap de Desarrollo
 
-## Resumen
+## Contexto: El centro es syncloud-state.json
 
-Este documento lista las tareas pendientes para alinear la implementación actual con la arquitectura de Syncloud Resources.
+Todo gira alrededor de `syncloud-state.json`:
+- **Estado deseado**: Recursos declarados por el usuario
+- **Estado actual**: Recursos observados en los runtimes
+- **Diff**: Diferencia entre desired y actual
+- **Reconciler**: Aplica cambios para cerrar el gap
+
+```
+syncloud-state.json ──► Reconciler ──► Docker/K8s
+         ▲                                    │
+         │                                    ▼
+         └──────────── Observe ──────────── Runtime
+```
 
 ---
 
-## Prioridad ALTA
+## MVP (0.1.0) - Flujo Completo
+
+### ✅ Implementado
+
+| Item | Comando/Feature | Descripción |
+|------|-----------------|-------------|
+| ✅ | `synctl install` | Instala Docker/K3s + dnsmasq |
+| ✅ | `synctl apply -f` | Aplica recursos desde YAML |
+| ✅ | `synctl deploy` | Despliega stack completo |
+| ✅ | `synctl inspect` | Muestra estado actual |
+| ✅ | `synctl get resources` | Lista recursos |
+| ✅ | `synctl get nodes` | Lista nodos |
+| ✅ | Runtime Reconciler | Adaptador Docker/K8s |
+
+### 🔄 En Progreso
+
+| # | Item | Descripción |
+|---|------|-------------|
+| 1 | Deploy resources | Recursos hardcodeados necesitan externalizarse |
+
+### ❌ Pendientes para MVP Completo
+
+#### Comandos
+
+| # | Item | Prioridad | Descripción |
+|---|------|-----------|-------------|
+| 1 | `synctl delete <resource>` | 🔴 Alta | Eliminar recursos del state y runtime |
+| 2 | `synctl deploy --dry-run` | 🔴 Alta | Validar sin aplicar |
+| 3 | Output formatters | 🔴 Alta | `get resources --output json/yaml` |
+
+#### Arquitectura
+
+| # | Item | Prioridad | Descripción |
+|---|------|-----------|-------------|
+| 1 | Diff separated | 🔴 Alta | Diff → Plan → Execute (no directo) |
+| 2 | Observe cycle | 🔴 Alta | Leer estado actual de runtime |
+| 3 | State comparison | 🔴 Alta | desired vs actual en reconciler |
+
+---
+
+## Post-MVP 1 (0.2.0) - Developer Experience
 
 ### Comandos
 
-| # | Item | Estado | Descripción |
-|---|------|--------|-------------|
-| 1 | `apply --dry-run` | ❌ Pendiente | Ejecutar parseo y validación sin aplicar |
-| 2 | `apply --preview` | ❌ Pendiente | Mostrar diff antes de aplicar |
-| 3 | `delete <resource>` | ❌ Pendiente | Eliminar recursos por nombre/kind |
-| 4 | `get resources --output json/yaml` | ❌ Pendiente | Formato de salida configurable |
-| 5 | `apply -f -` (stdin) | ❌ Pendiente | Leer desde stdin |
+| # | Item | Prioridad | Descripción |
+|---|------|-----------|-------------|
+| 1 | `synctl logs <resource>` | 🟡 Media | Ver logs de contenedor/pod |
+| 2 | `synctl exec <resource> -- <cmd>` | 🟡 Media | Ejecutar en recurso |
+| 3 | `synctl describe <resource>` | 🟡 Media | Detalle completo |
+| 4 | `synctl port-forward <resource>` | 🟡 Media | Forward de puertos |
 
 ### Arquitectura
 
-| # | Item | Estado | Descripción |
-|---|------|--------|-------------|
-| 1 | RuntimeReconciler observado | ⚠️ Parcial | El reconciler existe pero no hay ciclo de observación implementado |
-| 2 | Plan de reconciliación separado | ❌ Pendiente | Diff → Plan → Execute (no ejecutar directo) |
-| 3 | Estado deseado vs actual | ❌ Pendiente | Persistir y comparar estado antes de aplicar |
+| # | Item | Prioridad | Descripción |
+|---|------|-----------|-------------|
+| 1 | Events/Audit | 🟡 Media | Historial de cambios |
+| 2 | Hooks pre/post | 🟡 Media | Scripts antes/después de apply |
 
 ---
 
-## Prioridad MEDIA
+## Post-MVP 2 (0.3.0) - Orquestación
 
 ### Comandos
 
-| # | Item | Estado | Descripción |
-|---|------|--------|-------------|
-| 1 | `logs <resource>` | ❌ Pendiente | Ver logs de contenedor/pod |
-| 2 | `exec <resource> -- <cmd>` | ❌ Pendiente | Ejecutar comando en recurso |
-| 3 | `port-forward <resource>` | ❌ Pendiente | Forward de puertos |
-| 4 | `describe <resource>` | ❌ Pendiente | Descripción detallada |
-| 5 | `validate -f <file>` | ❌ Pendiente | Solo validación sin aplicar |
+| # | Item | Prioridad | Descripción |
+|---|------|-----------|-------------|
+| 1 | `synctl scale <resource> --replicas=N` | 🟢 Baja | Escalar deployments |
+| 2 | `synctl rollout undo <resource>` | 🟢 Baja | Rollback |
+| 3 | `synctl diff -f <file>` | 🟢 Baja | Comparar con estado |
 
 ### Arquitectura
 
-| # | Item | Estado | Descripción |
-|---|------|--------|-------------|
-| 1 | Contenedor de políticas | ❌ Pendiente | Docker y K8s reconcilers en contenedores separados |
-| 2 | Métricas/Observabilidad | ❌ Pendiente | Instrumentación para monitoreo |
-| 3 | Eventos de recurso | ❌ Pendiente | Audit trail de cambios |
-| 4 | Hooks pre/post apply | ❌ Pendiente | Extensibilidad para scripts |
+| # | Item | Prioridad | Descripción |
+|---|------|-----------|-------------|
+| 1 | Resource dependencies | 🟢 Baja | Orden de aplicación |
+| 2 | Parallel apply | 🟢 Baja | Recursos independientes en paralelo |
 
 ---
 
-## Prioridad BAJA
+## Post-MVP 3 (1.0.0) - Producción
 
-### Comandos
-
-| # | Item | Estado | Descripción |
-|---|------|--------|-------------|
-| 1 | `scale <resource> --replicas=N` | ❌ Pendiente | Escalar deployments |
-| 2 | `rollout status <resource>` | ❌ Pendiente | Ver estado de rollout |
-| 3 | `rollout undo <resource>` | ❌ Pendiente | Revertir cambios |
-| 4 | `top resources` | ❌ Pendiente | Uso de recursos (CPU/mem) |
-| 5 | `diff -f <file>` | ❌ Pendiente | Diff entre YAML y estado actual |
-
-### Arquitectura
-
-| # | Item | Estado | Descripción |
-|---|------|--------|-------------|
-| 1 | Plugin system | ❌ Pendiente | Cargar runtimes adicionales |
-| 2 | Resource dependencies | ❌ Pendiente | Orden de aplicación basado en dependencias |
-| 3 | Parallel apply | ❌ Pendiente | Aplicar recursos independientes en paralelo |
-| 4 | MCP Protocol | ❌ Pendiente | Integración con Model Context Protocol |
-| 5 | API Server mode | ❌ Pendiente | Modo daemon con API REST/GRPC |
+| # | Item | Prioridad | Descripción |
+|---|------|-----------|-------------|
+| 1 | Plugin system | 🟢 Baja | Runtimes adicionales |
+| 2 | MCP Protocol | 🟢 Baja | Integración IA |
+| 3 | API Server mode | 🟢 Baja | Daemon con REST API |
 
 ---
 
-## Próximos Pasos Recomendados
+## Roadmap de Comandos
 
-### Fase 1: Completar ciclo de reconciliación
-
-```bash
-# Implementar
-1. apply --dry-run    # Validación sin ejecución
-2. apply --preview    # Mostrar diff
-3. Separar Diff → Plan → Execute
+```
+v0.1.0 (MVP)                    v0.2.0                  v0.3.0
+───────────────────            ──────────────           ───────────
+✅ install                      ✅ logs                  ✅ scale
+✅ deploy                       ✅ exec                  ✅ rollout
+✅ apply                        ✅ describe              ✅ diff
+✅ inspect                      ✅ port-forward         ✅ validate
+✅ get resources                ✅ events               
+✅ get nodes                    ✅ hooks                
+🔴 delete (pendiente)           
+🔴 deploy --dry-run (pendiente) 
+🔴 output formats (pendiente)   
 ```
 
-### Fase 2: Completar operaciones CRUD
+---
 
+## Siguientes Pasos Inmediatos
+
+### 1. Completar flujo apply completo
 ```bash
 # Implementar
-1. get resources --output json/yaml
-2. delete <resource>
-3. validate -f <file>
+synctl apply --dry-run     # Validación sin ejecución
+synctl delete <resource>   # Eliminación
 ```
 
-### Fase 3: Debug y diagnóstico
-
+### 2. Externalizar deploy resources
 ```bash
-# Implementar
-1. logs <resource>
-2. describe <resource>
-3. exec <resource> -- <cmd>
+# De:
+internal/application/services/apply/deploy/resources.yaml
+
+# A:
+~/.syncloud/deploy.yaml  # O configurable
 ```
 
-### Fase 4: Orquestación
-
-```bash
-# Implementar
-1. Resource dependencies (orden)
-2. Hooks pre/post apply
-3. Parallel apply
+### 3. Implementar ciclo observe
+```go
+# En reconciler
+for _, resource := range state.Resources {
+    actual := runtime.Observe(resource)
+    diff := compare(resource.Spec, actual)
+    if diff.HasChanges() {
+        runtime.Reconcile(diff)
+    }
+}
 ```
 
 ---
 
 ## Notas
 
-- ❌ = No implementado
-- ⚠️ = Parcialmente implementado
-- ✅ = Implementado
+- 🔴 = Crítico para MVP
+- 🟡 = Importante post-MVP
+- 🟢 = Nice to have
+- ✅ = Completado
 - 🔄 = En progreso

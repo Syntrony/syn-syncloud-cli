@@ -5,25 +5,51 @@
 Syncloud **NO administra Docker o Kubernetes directamente**. Administra **Syncloud Resources** que luego se reconcilian hacia distintos runtimes.
 
 ```
-┌─────────────┐     ┌──────────────────────────────┐     ┌──────────────────────┐
-│  synctl CLI │ ──► │  Syncloud Resource Model    │ ──► │   Runtime Adapter     │
-│             │     │        (universal)           │     │ (Docker/Kubernetes)  │
-└─────────────┘     └──────────────────────────────┘     └──────────┬───────────┘
-                                                                     │
-                                                              ┌───────▼────────┐
-                                                              │   Reconciler   │
-                                                              └────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    syncloud-state.json                          │
+│                    (FUENTE DE VERDAD)                          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │                   │
+                    ▼                   ▼
+         ┌──────────────────┐  ┌──────────────────┐
+         │  Estado Deseado  │  │  Estado Actual   │
+         │  (declared)      │  │  (observed)      │
+         └────────┬─────────┘  └────────┬─────────┘
+                  │                      │
+                  └──────────┬───────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │      DIFF        │
+                    │ (desired vs actual)│
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │   Reconciler     │
+                    └────────┬─────────┘
+                             │
+              ┌──────────────┴──────────────┐
+              │                             │
+              ▼                             ▼
+     ┌─────────────────┐          ┌─────────────────┐
+     │ DockerReconciler│          │  K8sReconciler  │
+     └────────┬────────┘          └────────┬────────┘
+              │                             │
+              ▼                             ▼
+     ┌─────────────────┐          ┌─────────────────┐
+     │  docker run /   │          │  kubectl apply  │
+     │  docker APIs    │          │    k8s APIs     │
+     └─────────────────┘          └─────────────────┘
 ```
 
-**Arquitectura de flujo:**
-```
-synctl CLI
-  └─► Syncloud Resource Model (universal)
-        └─► Runtime Adapter (Docker/Kubernetes)
-              └─► Reconciler
-                    ├─► docker run / docker APIs
-                    └─► kubectl apply / k8s APIs
-```
+**syncloud-state.json es el centro de todo:**
+- Define el **estado deseado** de todos los recursos
+- Es leído por el **Reconciler** para comparar con el estado actual
+- Se actualiza después de cada operación (`apply`, `deploy`, `delete`)
+- Persiste entre sesiones para sobrevida de reinicios
 
 ## Estructura del Proyecto
 

@@ -1,41 +1,57 @@
 # Syncloud CLI
 
-CLI para gestionar aplicaciones en Docker y Kubernetes usando un modelo de recursos declarativo y universal.
+CLI para desplegar y gestionar aplicaciones en Docker y Kubernetes con un modelo de recursos declarativo.
 
 ## Quick Start
 
 ```bash
-# Instalar Syncloud
+# 1. Instalar Syncloud (Docker, K3s, dnsmasq)
 synctl install
 
-# Aplicar recursos
-synctl apply -f examples/resources.yaml
+# 2. Desplegar la plataforma completa
+synctl deploy
 
-# Ver recursos
-synctl get resources
-
-# Inspeccionar estado
-synctl inspect
+# 3. Acceder (URL mostrada en terminal)
+# http://syncloud.local
 ```
 
-## Arquitectura
-
-Syncloud no administra Docker/Kubernetes directamente. Administra **Syncloud Resources** que se reconcilian hacia el runtime apropiado:
+## Flujo MVP
 
 ```
-synctl apply → Syncloud Resource → Runtime Adapter → Docker/Kubernetes
+┌─────────────────────────────────────────────────────────────┐
+│  synctl install → Configura runtimes (Docker/K3s + DNS)    │
+│                         ↓                                   │
+│  synctl deploy  → Despliega DB + Backend + WebApp          │
+│                         ↓                                   │
+│  http://syncloud.local → Abre en navegador                 │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-Ver [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) para detalles.
+El archivo `syncloud-state.json` es el centro del sistema:
+- **Estado deseado**: Recursos declarados
+- **Estado actual**: Recursos observados
+- **Diff**: Diferencia para reconciliar
+
+## Comandos
+
+| Comando | Descripción |
+|---------|-------------|
+| `synctl install` | Instala runtimes y configura el sistema |
+| `synctl deploy` | Despliega la plataforma completa |
+| `synctl apply -f <file>` | Aplica recursos desde YAML |
+| `synctl inspect` | Inspecciona el estado actual |
+| `synctl get resources` | Lista recursos con filtros |
+| `synctl get nodes` | Lista nodos del sistema |
+| `synctl version` | Muestra versión |
 
 ## Documentación
 
 | Documento | Descripción |
 |-----------|-------------|
-| [docs/README.md](docs/README.md) | Guía de uso y comandos |
-| [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) | Arquitectura del sistema |
-| [docs/REFERENCIA.md](docs/REFERENCIA.md) | Referencia de código y tipos |
-| [docs/PENDIENTES.md](docs/PENDIENTES.md) | Tareas pendientes y roadmap |
+| [docs/MVP.md](docs/MVP.md) | Flujo MVP y arquitectura del state |
+| [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) | Arquitectura completa del sistema |
+| [docs/README.md](docs/README.md) | Guía de uso detallada |
+| [docs/PENDIENTES.md](docs/PENDIENTES.md) | Roadmap de desarrollo |
 | [AGENTS.md](AGENTS.md) | Guía para desarrollo |
 
 ## Recursos Soportados

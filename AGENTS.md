@@ -15,6 +15,7 @@ Go CLI (`synctl`) for managing Syncloud resources using kubernetes, docker, dnsm
 go build -o synctl .              # Build binary
 go run .                          # Run without building
 go run . install                  # Run install command
+go run . deploy                   # Run deploy command
 go run . get nodes                # Run get nodes command
 GOOS=linux GOARCH=amd64 go build -o synctl-linux-amd64 .  # Cross-compile
 go build -o /dev/null .           # Build check only
