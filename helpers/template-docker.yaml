@@ -1,0 +1,6 @@
+apiVersion: syncloud/v1
+kind: Network
+metadata:
+  name: syncloud-internal
+spec:
+  driver: bridge

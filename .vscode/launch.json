@@ -1,0 +1,77 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "synctl install",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "install"
+            ]
+        },
+        {
+            "name": "synctl apply",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": [
+                "apply",
+                "-f",
+                "helpers/template-docker.yaml"
+            ],
+            "env": {
+                "DEBUG": "1"
+            }
+        },
+        {
+            "name": "synctl get resources",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "get resources"
+            ]
+        },
+        {
+            "name": "synctl get nodes",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "get nodes"
+            ]
+        },
+        {
+            "name": "synctl inspect",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "inspect"
+            ]
+        },
+        {
+            "name": "synctl daemon",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "daemon"
+            ]
+        },
+        {
+            "name": "synctl (manual args)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}"
+        }
+    ]
+}
