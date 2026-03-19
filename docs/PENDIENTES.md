@@ -1,152 +1,292 @@
-# Roadmap de Desarrollo - Syncloud CLI
+# Roadmap de Desarrollo - Syncloud CLI v1.0
 
-## Contexto: syncloud-state.json como Médula
+## Visión: Primera Versión Liberable
 
-El archivo `syncloud-state.json` es el contrato central del sistema:
-- **Estado deseado**: Recursos declarados por el usuario
-- **Persistencia**: Sobrevive reinicios
-- **Sincronización**: Reconciler compara desired vs actual
-- **DNS**: Campo `cluster.dns` define la URL de acceso
+El objetivo es una **v1.0 completa** que permita gestionar todo el ciclo de vida de Syncloud. Esta versión debe ser lo suficientemente robusta para uso en producción, con todas las operaciones CRUD sobre los objetos principales.
 
 ```
-syncloud-state.json ──► Reconciler ──► Docker/K8s
-         ▲                                    │
-         │                                    ▼
-         └──────────── Observe ──────────── Runtime
-```
-
----
-
-## Objetivo MVP: Completar Flujo Despliegue
-
-El MVP permite:
-1. `synctl install` → Genera state con cluster.dns
-2. `synctl deploy` → Lee state, reconcilia, muestra DNS
-3. Usuario accede a `http://syncloud.local`
-
-### ✅ Implementado
-
-| Item | Descripción |
-|------|-------------|
-| `synctl install` | Instala Docker/K3s + dnsmasq, genera state |
-| `synctl deploy` | Aplica recursos de plataforma, muestra DNS |
-| `synctl apply -f` | Aplica recursos desde YAML |
-| `synctl inspect` | Muestra estado actual |
-| `synctl get resources` | Lista recursos |
-| `synctl get nodes` | Lista nodos |
-| Runtime Reconciler | Adaptador Docker/K8s |
-| syncloud-state.json | Fuente de verdad central |
-
----
-
-## Pendientes MVP
-
-### 🔴 CRÍTICO - Requeridos para MVP funcional
-
-#### Comandos
-
-| # | Item | Descripción | Impacto |
-|---|------|-------------|---------|
-| 1 | `synctl delete <resource>` | Elimina recurso del state y runtime | Completar ciclo CRUD |
-| 2 | `synctl deploy --dry-run` | Valida recursos sin aplicar | Evitar errores en deploy |
-| 3 | Output formatters | `get resources --output json/yaml` | Depuración y scripting |
-
-#### Arquitectura
-
-| # | Item | Descripción | Impacto |
-|---|------|-------------|---------|
-| 1 | Ciclo Observe | Leer estado actual del runtime | Sincronizar desired vs actual |
-| 2 | Diff separado | Diff → Plan → Execute | No ejecutar directo |
-| 3 | Actualización de status | RuntimeResourceState → Resource.status | Reflejar estado real en state |
-
----
-
-## Post-MVP 1 - Developer Experience
-
-### 🟡 MEDIA - Mejoras de UX
-
-| # | Comando | Descripción |
-|---|---------|-------------|
-| 1 | `synctl logs <resource>` | Ver logs de contenedor/pod |
-| 2 | `synctl exec <resource> -- <cmd>` | Ejecutar comando en recurso |
-| 3 | `synctl describe <resource>` | Descripción detallada |
-| 4 | `synctl validate -f <file>` | Solo validación sin aplicar |
-
----
-
-## Post-MVP 2 - Orquestación
-
-### 🟢 BAJA - Nice to have
-
-| # | Comando | Descripción |
-|---|---------|-------------|
-| 1 | `synctl scale <resource> --replicas=N` | Escalar deployments |
-| 2 | `synctl rollout undo <resource>` | Rollback |
-| 3 | `synctl diff -f <file>` | Comparar con estado actual |
-
----
-
-## Roadmap Visual
-
-```
-MVP (v0.1.0)                    v0.2.0                  v0.3.0
-───────────────────            ──────────────           ───────────
-✅ install                      ✅ logs                  ✅ scale
-✅ deploy                       ✅ exec                  ✅ rollout
-✅ apply                        ✅ describe              ✅ diff
-✅ inspect                      ✅ validate             
-✅ get resources                🔴 delete (pendiente)   
-✅ get nodes                    🔴 dry-run (pendiente)  
-🔴 delete (pendiente)          🔴 output formats       
-🔴 dry-run (pendiente)                                   
-🔴 output formats                                          
-🔴 observe cycle                                         
-🔴 diff separated                                       
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     syncloud-state.json                                 │
+│                     (FUENTE DE VERDAD)                                 │
+│  ┌─────────┐  ┌──────────┐  ┌──────────┐  ┌────────────────────┐  │
+│  │ Cluster │  │  Nodes    │  │Resources │  │    DNS Records     │  │
+│  └─────────┘  └──────────┘  └──────────┘  └────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Siguientes Pasos Inmediatos
+## Objetos del Sistema
 
-### 1. Implementar delete
-```bash
-synctl delete postgres-db
-# 1. Leer state.json
-# 2. Remover recurso del array resources
-# 3. Ejecutar docker rm / kubectl delete
-# 4. Guardar state.json actualizado
-```
+### 1. Cluster
+Configuración global del cluster Syncloud.
 
-### 2. Implementar deploy --dry-run
-```bash
-synctl deploy --dry-run
-# 1. Parsear recursos
-# 2. Validar
-# 3. Mostrar diff sin aplicar
-```
-
-### 3. Implementar observe cycle
-```go
-// En reconciler
-for _, resource := range state.Resources {
-    observed := runtime.Observe(resource)
-    resource.Status = observed
+```json
+{
+  "id": "uuid",
+  "name": "syncloud",
+  "mode": "container|vps",
+  "dns": "syncloud.local"
 }
-repo.Save(state)
 ```
 
-### 4. Output formatters
+### 2. Nodes
+Nodos físicos o virtuales del cluster.
+
+```json
+{
+  "id": "node-1",
+  "hostname": "server-01",
+  "role": "control-plane|worker",
+  "ip": "192.168.1.100"
+}
+```
+
+### 3. Resources
+Recursos abstractos que se reconcilian a Docker/Kubernetes.
+
+```json
+{
+  "id": "uuid",
+  "name": "postgres-db",
+  "kind": "Container|Deployment|Service|...",
+  "runtime": "docker|kubernetes",
+  "nodeId": "node-1",
+  "spec": {...},
+  "status": {...},
+  "ownership": {...}
+}
+```
+
+### 4. DNS Records
+Registros DNS para acceso a recursos.
+
+```json
+{
+  "records": [
+    {"name": "app", "server": "192.168.1.100"},
+    {"name": "api", "server": "192.168.1.101"}
+  ]
+}
+```
+
+---
+
+## Comandos MVP v1.0 - COMPLETOS
+
+### Cluster
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl install` | Instala y configura el cluster | ✅ |
+| `synctl inspect` | Muestra estado del cluster | ✅ |
+| `synctl cluster status` | Estado detallado del cluster | 🔴 Pendiente |
+| `synctl cluster config` | Ver/actualizar configuración | 🔴 Pendiente |
+
+### Nodes
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl get nodes` | Lista nodos | ✅ |
+| `synctl node describe <name>` | Detalle de nodo | 🔴 Pendiente |
+| `synctl node add -f <file>` | Agregar nodo | 🔴 Pendiente |
+| `synctl node remove <name>` | Remover nodo | 🔴 Pendiente |
+| `synctl node cordon <name>` | Marcar nodo como no scheduling | 🔴 Pendiente |
+| `synctl node uncordon <name>` | Reactivar nodo | 🔴 Pendiente |
+
+### Resources
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl deploy` | Despliega plataforma completa | ✅ |
+| `synctl apply -f <file>` | Aplica recursos desde YAML | ✅ |
+| `synctl get resources` | Lista recursos | ✅ |
+| `synctl resource describe <name>` | Detalle de recurso | 🔴 Pendiente |
+| `synctl resource delete <name>` | Elimina recurso | 🔴 Pendiente |
+| `synctl resource logs <name>` | Ver logs | 🔴 Pendiente |
+| `synctl resource exec <name> -- <cmd>` | Ejecutar comando | 🔴 Pendiente |
+| `synctl resource scale <name> --replicas=N` | Escalar recurso | 🔴 Pendiente |
+| `synctl resource restart <name>` | Reiniciar recurso | 🔴 Pendiente |
+
+### DNS Records
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl get dns` | Lista registros DNS | 🔴 Pendiente |
+| `synctl dns add <name> --server <ip>` | Agregar registro | 🔴 Pendiente |
+| `synctl dns delete <name>` | Eliminar registro | 🔴 Pendiente |
+| `synctl dns update <name> --server <ip>` | Actualizar registro | 🔴 Pendiente |
+| `synctl dns resolve <name>` | Resolver DNS | 🔴 Pendiente |
+
+### Validate & Diff
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl validate -f <file>` | Validar recursos | 🔴 Pendiente |
+| `synctl diff -f <file>` | Comparar con estado actual | 🔴 Pendiente |
+| `synctl apply --dry-run -f <file>` | Validar sin aplicar | 🔴 Pendiente |
+| `synctl apply --preview -f <file>` | Preview de cambios | 🔴 Pendiente |
+
+### Output
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl get resources --output json` | Formato JSON | 🔴 Pendiente |
+| `synctl get resources --output yaml` | Formato YAML | 🔴 Pendiente |
+| `synctl get resources --output table` | Formato tabla (default) | ✅ |
+
+---
+
+## Arquitectura - Requerimientos
+
+### 🔴 CRÍTICO - v1.0
+
+| # | Componente | Descripción |
+|---|------------|-------------|
+| 1 | CRUD Resources | Create, Read, Update, Delete sobre recursos |
+| 2 | CRUD DNS | Create, Read, Update, Delete sobre DNS records |
+| 3 | CRUD Nodes | Create, Read, Update, Delete sobre nodos |
+| 4 | Observe Cycle | Leer estado actual del runtime |
+| 5 | Diff Engine | Comparar desired vs actual state |
+| 6 | Reconcile Engine | Aplicar cambios de forma idempotente |
+| 7 | Status Updates | Actualizar Resource.status desde runtime |
+| 8 | Error Handling | Manejo robusto de errores |
+| 9 | Validation | Validación de recursos antes de aplicar |
+| 10 | Rollback | Reversión ante fallos |
+
+### 🟡 IMPORTANTE - v1.0
+
+| # | Componente | Descripción |
+|---|------------|-------------|
+| 1 | Logging | Logging estructurado |
+| 2 | Progress indicators | Feedback visual durante operaciones |
+| 3 | Confirmation prompts | Confirmación para operaciones destructivas |
+| 4 | Help & docs inline | Ayuda contextual en comandos |
+
+---
+
+## Roadmap de Implementación
+
+### Fase 1: Fundamentos (Semana 1-2)
+
 ```bash
-synctl get resources --output json
-synctl get resources --output yaml
+# Completar CRUD de recursos
+synctl resource delete <name>          # Eliminar recurso
+synctl resource describe <name>         # Describir recurso
+synctl apply --dry-run -f <file>      # Dry run
+```
+
+### Fase 2: DNS Management (Semana 2-3)
+
+```bash
+# Gestionar DNS records
+synctl get dns                         # Listar
+synctl dns add <name> --server <ip>   # Agregar
+synctl dns delete <name>              # Eliminar
+synctl dns update <name> --server <ip> # Actualizar
+```
+
+### Fase 3: Node Management (Semana 3-4)
+
+```bash
+# Gestionar nodos
+synctl node describe <name>           # Describir
+synctl node add -f <file>            # Agregar
+synctl node remove <name>             # Remover
+synctl node cordon/uncordon <name>    # Scheduling
+```
+
+### Fase 4: Observability (Semana 4-5)
+
+```bash
+# Debug y diagnóstico
+synctl resource logs <name>           # Logs
+synctl resource exec <name> -- <cmd>  # Exec
+synctl diff -f <file>                # Diff
+```
+
+### Fase 5: Polish (Semana 5-6)
+
+```bash
+# Output formatting
+synctl get resources --output json    # JSON
+synctl get resources --output yaml   # YAML
+
+# Validation
+synctl validate -f <file>            # Validar
+
+# Scale & Restart
+synctl resource scale <name> --replicas=3
+synctl resource restart <name>
+```
+
+---
+
+## Comandos por Categoría
+
+### Currently Implemented (v0.0.x)
+```
+synctl install
+synctl deploy
+synctl apply -f
+synctl inspect
+synctl get resources
+synctl get nodes
+synctl version
+```
+
+### Phase 1 Target (v0.1.0)
+```
+synctl resource delete <name>
+synctl resource describe <name>
+synctl apply --dry-run -f
+synctl apply --preview -f
+```
+
+### Phase 2 Target (v0.2.0)
+```
+synctl get dns
+synctl dns add <name> --server <ip>
+synctl dns delete <name>
+synctl dns update <name> --server <ip>
+```
+
+### Phase 3 Target (v0.3.0)
+```
+synctl node describe <name>
+synctl node add -f <file>
+synctl node remove <name>
+synctl node cordon <name>
+synctl node uncordon <name>
+```
+
+### Phase 4 Target (v0.4.0)
+```
+synctl resource logs <name>
+synctl resource exec <name> -- <cmd>
+synctl diff -f <file>
+```
+
+### Phase 5 Target (v0.5.0)
+```
+synctl get resources --output json|yaml
+synctl validate -f <file>
+synctl resource scale <name> --replicas=N
+synctl resource restart <name>
+```
+
+### v1.0.0 - RELEASE
+```
+Todos los comandos anteriores implementados
+Documentación completa
+Tests coverage > 80%
 ```
 
 ---
 
 ## Notas
 
-- 🔴 = Crítico para MVP
-- 🟡 = Importante post-MVP  
-- 🟢 = Nice to have
-- ✅ = Completado
-- 🔄 = En progreso
+- ✅ = Implementado
+- 🔴 = Crítico para v1.0
+- 🟡 = Importante para v1.0
+- 🟢 = Nice to have post-v1.0

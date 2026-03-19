@@ -1,28 +1,45 @@
-# Flujo de MVP - Syncloud Platform
+# Flujo de MVP - Syncloud Platform v1.0
 
 ## Overview
 
-El flujo MVP permite a los usuarios desplegar una plataforma completa en 3 pasos mínimos:
+El objetivo es una **versión 1.0 completa y liberable** que permita gestionar todo el ciclo de vida de la plataforma Syncloud desde la terminal.
+
+### Flujo de Usuario
 
 ```
-1. synctl install   → Configurar runtimes (k8s, docker, dnsmasq)
-2. synctl deploy    → Desplegar la plataforma (DB + Backend + WebApp)
-3. Acceder via DNS → Abrir http://syncloud.local
+1. synctl install     → Configurar cluster (Docker/K3s, dnsmasq)
+2. synctl deploy      → Desplegar plataforma (DB + Backend + WebApp)
+3. synctl get dns     → Ver registros DNS configurados
+4. synctl get nodes   → Ver nodos del cluster
+5. synctl get resources → Ver recursos desplegados
+6. Acceder via URL    → http://syncloud.local
+```
+
+### Gestión Completa
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         syncloud-state.json                         │
+│                     (FUENTE DE VERDAD CENTRAL)                      │
+│                                                                      │
+│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────────────┐   │
+│  │ Cluster  │  │  Nodes    │  │ Resources │  │    DNS Records   │   │
+│  │  Config  │  │  Manage   │  │   CRUD    │  │      CRUD        │   │
+│  └──────────┘  └──────────┘  └───────────┘  └──────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+          ▼                   ▼                   ▼
+   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+   │   Docker    │     │   K8s      │     │   dnsmasq   │
+   │  Runtime    │     │  Runtime   │     │    DNS      │
+   └─────────────┘     └─────────────┘     └─────────────┘
 ```
 
 ## Flujo Detallado
 
-### Paso 1: Descargar e Instalar
-
-```bash
-# Descargar synctl (futuro: curl script o package manager)
-curl -fsSL https://get.syncloud.io | sh
-
-# O compilar desde código
-go build -o synctl .
-```
-
-### Paso 2: Install - Configurar Runtimes
+### Paso 1: Install
 
 ```bash
 synctl install
@@ -30,31 +47,39 @@ synctl install
 
 **Qué hace:**
 1. Detecta el entorno de ejecución (Container/VPS)
-2. Instala Docker o K3s/K3d según el entorno detectado
+2. Instala Docker o K3s/K3d según el entorno
 3. Instala y configura dnsmasq para resolución DNS
-4. Genera el archivo `syncloud-state.json` con la configuración inicial del cluster
-5. Configura la red interna y registra el DNS provisional
+4. Genera `syncloud-state.json` con la configuración inicial
+5. Registra el DNS provisional en `cluster.dns`
 
 **Output esperado:**
 ```
+Detecting runtime... container
 Installing Docker... done
 Installing dnsmasq... done
-Configuring DNS: syncloud.local
+Generating cluster configuration... done
+Creating syncloud-state.json... done
+
+Cluster configured:
+  - Mode: container
+  - DNS: syncloud.local
+  - Node: syncloud-node
+
 Syncloud installed successfully!
 ```
 
-### Paso 3: Deploy - Desplegar la Plataforma
+### Paso 2: Deploy
 
 ```bash
 synctl deploy
 ```
 
 **Qué hace:**
-1. Lee los recursos de `deploy/resources.yaml` (postgres-db, backend, webapp, network)
-2. Valida y parsea los recursos al modelo Syncloud
-3. Persiste el estado deseado en `syncloud-state.json`
-4. Ejecuta el Reconciler para crear los contenedores en Docker
-5. Recarga el state y muestra el DNS configurado
+1. Lee los recursos de `deploy/resources.yaml`
+2. Valida y parsea al modelo Syncloud
+3. Persiste en `syncloud-state.json`
+4. Ejecuta el Reconciler para crear contenedores
+5. Muestra el DNS configurado
 
 **Output esperado:**
 ```
@@ -68,61 +93,39 @@ Syncloud platform deployed successfully!
 Access your platform at: http://syncloud.local
 ```
 
-### Paso 4: Acceder
+### Paso 3: Gestionar
 
-El usuario copia la URL `http://syncloud.local` en su navegador.
+```bash
+# Ver estado del cluster
+synctl inspect
 
-## Diagrama de Flujo
+# Ver nodos
+synctl get nodes
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          USUARIO                                     │
-└─────────────────────────────────────────────────────────────────────┘
-                                   │
-                                   ▼
-                    ┌──────────────────────────┐
-                    │    synctl install        │
-                    │    ┌─────────────────┐   │
-                    │    │ Detect Runtime   │   │
-                    │    │ Install Docker   │   │
-                    │    │ Install K3s     │   │
-                    │    │ Setup dnsmasq   │   │
-                    │    │ Generate State  │   │
-                    │    └─────────────────┘   │
-                    │           │               │
-                    │           ▼               │
-                    │    syncloud-state.json    │
-                    └────────────┬─────────────┘
-                                 │
-                                 ▼
-                    ┌──────────────────────────┐
-                    │   synctl deploy          │
-                    │   ┌─────────────────┐   │
-                    │   │ Parse Resources │   │
-                    │   │ Validate       │   │
-                    │   │ Update State   │◄──┼── syncloud-state.json
-                    │   │ Reconcile      │   │     (desired state)
-                    │   └───────┬───────┘   │
-                    │           │           │
-                    │           ▼           │
-                    │   ┌─────────────────┐ │
-                    │   │ Docker Runtime  │ │
-                    │   │ docker run ...  │ │
-                    │   └─────────────────┘ │
-                    └────────────┬─────────────┘
-                                 │
-                                 ▼
-                    ┌──────────────────────────┐
-                    │  http://syncloud.local   │
-                    │    (Mostrar DNS terminal)│
-                    └──────────────────────────┘
+# Ver recursos
+synctl get resources
+
+# Ver DNS records
+synctl get dns
+
+# Ver detalle de recurso
+synctl resource describe postgres-db
+
+# Ver logs
+synctl resource logs backend
+
+# Agregar DNS record
+synctl dns add api --server 192.168.1.101
+
+# Eliminar recurso
+synctl resource delete webapp
 ```
 
 ## syncloud-state.json - Médula del Sistema
 
 El archivo `syncloud-state.json` es **el contrato central** que representa el estado deseado de la plataforma. Toda operación de synctl lee y escribe en este archivo.
 
-### Estructura Técnica
+### Estructura Completa
 
 ```json
 {
@@ -146,7 +149,7 @@ El archivo `syncloud-state.json` es **el contrato central** que representa el es
     {
       "id": "res-uuid",
       "name": "postgres-db",
-      "kind": "docker.container",
+      "kind": "Container",
       "runtime": "docker",
       "nodeId": "node-1",
       "spec": {
@@ -160,41 +163,47 @@ El archivo `syncloud-state.json` es **el contrato central** que representa el es
         "containerId": "abc123..."
       },
       "ownership": {
-        "managed": true,
-        "owner": "syncloud"
+        "ownerId": "syncloud",
+        "ownerKind": "platform",
+        "ownerName": "syncloud"
       },
       "createdAt": "...",
       "updatedAt": "..."
     }
-  ]
+  ],
+  "dns": {
+    "records": [
+      {"name": "app", "server": "192.168.1.100"},
+      {"name": "api", "server": "192.168.1.100"}
+    ]
+  }
 }
 ```
+
+### Objetos Gestionados
+
+| Objeto | Descripción | CRUD |
+|--------|-------------|------|
+| `cluster` | Configuración global del cluster | R/U |
+| `nodes` | Nodos físicos/virtuales | C/R/U/D |
+| `resources` | Recursos abstractos (Container, Deployment, etc.) | C/R/U/D |
+| `dns.records` | Registros DNS | C/R/U/D |
 
 ### Ciclo de Vida del State
 
 ```
 ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
 │   State     │ ──►  │  Reconciler │ ──►  │   Runtime   │
-│  (desired)  │      │   Compare   │      │  (docker/  │
-│             │      │   Diff     │      │   k8s)     │
+│  (desired)  │      │   Compare   │      │  (docker/   │
+│             │      │   Diff      │      │   k8s)      │
 └─────────────┘      └──────┬──────┘      └─────────────┘
-       ▲                   │
-       │                   ▼
-       │            ┌─────────────┐
-       └────────────│   Observe   │
-        (actual)    │  (runtime)  │
-                    └─────────────┘
+       ▲                    │
+       │                    ▼
+       │             ┌─────────────┐
+       └─────────────│   Observe   │
+        (actual)     │  (runtime)  │
+                     └─────────────┘
 ```
-
-### Funciones del State
-
-| Función | Descripción |
-|---------|-------------|
-| **Fuente de verdad** | Define qué recursos deben existir |
-| **Persistencia** | Sobrevive reinicios del sistema |
-| **Sincronización** | Reconciler lo usa para comparar desired vs actual |
-| **Auditoría** | Historial de cambios y timestamps |
-| **Contrato DNS** | El campo `cluster.dns` define la URL de acceso |
 
 ## Stack Desplegado
 
@@ -208,43 +217,97 @@ El archivo `syncloud-state.json` es **el contrato central** que representa el es
 │  │   :5432     │  │   :8080     │  │    :80      │ │
 │  └─────────────┘  └─────────────┘  └─────────────┘ │
 └─────────────────────────────────────────────────────┘
+         │               │                │
+         └───────────────┴────────────────┘
+                            │
+                            ▼
+                   ┌─────────────────┐
+                   │  syncloud.local  │
+                   │   (DNS dnsmasq)  │
+                   └─────────────────┘
 ```
 
-### Contenedores
+## Comandos v1.0 - Gestión Completa
 
-| Nombre | Imagen | Puertos | Descripción |
-|--------|--------|---------|-------------|
-| `postgres-db` | postgres:15-alpine | 5432 | Base de datos PostgreSQL |
-| `backend` | syncloud/backend:latest | 8080 | API backend |
-| `webapp` | syncloud/webapp:latest | 80 | Frontend Nginx |
-
-### Redes
-
-| Nombre | Driver | Descripción |
-|--------|--------|-------------|
-| `syncloud-network` | bridge | Red interna para la plataforma |
-
-## Comandos del Flujo MVP
+### Instalación y Despliegue
 
 | Comando | Descripción | Estado |
 |---------|-------------|--------|
-| `synctl install` | Instala runtimes y genera state inicial | ✅ Implementado |
-| `synctl deploy` | Despliega plataforma y muestra DNS | ✅ Implementado |
-| `synctl apply -f <file>` | Aplica recursos custom | ✅ Implementado |
-| `synctl inspect` | Muestra estado actual | ✅ Implementado |
-| `synctl get resources` | Lista recursos | ✅ Implementado |
-| `synctl get nodes` | Lista nodos | ✅ Implementado |
+| `synctl install` | Instalar y configurar cluster | ✅ |
+| `synctl deploy` | Desplegar plataforma completa | ✅ |
+| `synctl inspect` | Inspeccionar estado general | ✅ |
+
+### Gestión de Recursos (CRUD)
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl apply -f <file>` | Crear/actualizar recursos | ✅ |
+| `synctl get resources` | Leer recursos | ✅ |
+| `synctl resource describe <name>` | Ver detalle de recurso | 🔴 |
+| `synctl resource delete <name>` | Eliminar recurso | 🔴 |
+| `synctl resource logs <name>` | Ver logs | 🔴 |
+| `synctl resource exec <name> -- <cmd>` | Ejecutar comando | 🔴 |
+| `synctl resource scale <name> --replicas=N` | Escalar recurso | 🔴 |
+| `synctl resource restart <name>` | Reiniciar recurso | 🔴 |
+
+### Gestión de DNS (CRUD)
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl get dns` | Listar registros DNS | 🔴 |
+| `synctl dns add <name> --server <ip>` | Agregar registro | 🔴 |
+| `synctl dns delete <name>` | Eliminar registro | 🔴 |
+| `synctl dns update <name> --server <ip>` | Actualizar registro | 🔴 |
+
+### Gestión de Nodos (CRUD)
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl get nodes` | Listar nodos | ✅ |
+| `synctl node describe <name>` | Ver detalle de nodo | 🔴 |
+| `synctl node add -f <file>` | Agregar nodo | 🔴 |
+| `synctl node remove <name>` | Remover nodo | 🔴 |
+| `synctl node cordon <name>` | Deshabilitar scheduling | 🔴 |
+| `synctl node uncordon <name>` | Habilitar scheduling | 🔴 |
+
+### Validación y Diagnóstico
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl validate -f <file>` | Validar recursos | 🔴 |
+| `synctl diff -f <file>` | Comparar con estado | 🔴 |
+| `synctl apply --dry-run -f <file>` | Validar sin aplicar | 🔴 |
+| `synctl apply --preview -f <file>` | Preview de cambios | 🔴 |
+
+### Output
+
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl get resources --output json` | Formato JSON | 🔴 |
+| `synctl get resources --output yaml` | Formato YAML | 🔴 |
 
 ## Recursos del Deploy
 
-Los recursos de deploy están en: `internal/application/services/apply/deploy/resources.yaml`
+Ubicación: `internal/application/services/apply/deploy/resources.yaml`
 
-## Siguientes Pasos Post-MVP
+| Nombre | Imagen | Tipo |
+|--------|--------|------|
+| `postgres-db` | postgres:15-alpine | Container |
+| `backend` | syncloud/backend:latest | Container |
+| `webapp` | syncloud/webapp:latest | Container |
+| `syncloud-network` | - | Network |
 
-Una vez completado el flujo MVP:
+## Post-v1.0
 
-1. **Validación avanzada** - dry-run, preview de cambios
-2. **Operaciones CRUD** - delete, update de recursos
-3. **Observabilidad** - logs, describe, exec
-4. **Orquestación** - dependencias, rollback
-5. **Multi-tenant** - múltiples plataformas
+Una vez liberada la v1.0:
+
+1. **Plugins** - Cargar runtimes adicionales
+2. **MCP Protocol** - Integración con Model Context Protocol
+3. **API Server** - Modo daemon con REST API
+4. **Multi-cluster** - Gestión de múltiples clusters
+5. **CI/CD Integration** - Hooks para pipelines
+
+## Notas
+
+- ✅ = Implementado
+- 🔴 = Por implementar para v1.0

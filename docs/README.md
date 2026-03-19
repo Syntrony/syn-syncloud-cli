@@ -2,7 +2,7 @@
 
 `synctl` es una herramienta CLI para gestionar **Syncloud Resources** de forma declarativa, orquestando contenedores en Docker y Kubernetes a través de un modelo de recursos universal.
 
-## Flujo MVP
+## Flujo MVP v1.0
 
 ```bash
 # 1. Instalar runtimes (Docker/K3s, dnsmasq)
@@ -11,7 +11,12 @@ synctl install
 # 2. Desplegar plataforma completa
 synctl deploy
 
-# 3. Acceder via DNS
+# 3. Gestionar
+synctl get resources          # Ver recursos
+synctl get nodes              # Ver nodos
+synctl get dns                # Ver DNS records
+
+# 4. Acceder
 # http://syncloud.local
 ```
 
@@ -25,12 +30,19 @@ Syncloud **NO administra Docker o Kubernetes directamente**. Administra **Synclo
 │  ┌─────────┐     ┌─────────────────────┐     ┌─────────────────────┐  │
 │  │ install │     │      deploy         │     │      apply          │  │
 │  └────┬────┘     └──────────┬──────────┘     └──────────┬──────────┘  │
+│  ┌────┴────┐     ┌──────────┴──────────┐     ┌──────────┴──────────┐ │
+│  │  dns    │     │ resource describe   │     │ resource delete    │ │
+│  │  node   │     │ resource logs      │     │ resource exec      │ │
+│  └────┬────┘     └──────────┬──────────┘     └──────────┬──────────┘ │
 └───────┼─────────────────────┼───────────────────────────┼─────────────┘
         │                     │                           │
         ▼                     ▼                           ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                    syncloud-state.json                                 │
 │                    (FUENTE DE VERDAD - MÉDULA DEL SISTEMA)            │
+│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────────────────┐  │
+│  │ Cluster  │  │  Nodes   │  │ Resources │  │    DNS Records       │  │
+│  └──────────┘  └──────────┘  └───────────┘  └──────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────┘
         │                     │                           │
         ▼                     ▼                           ▼
@@ -45,81 +57,72 @@ Syncloud **NO administra Docker o Kubernetes directamente**. Administra **Synclo
 
 ## Comandos
 
+### Instalación y Despliegue
+
 ```bash
-# Instalación y despliegue
 synctl install              # Instala Syncloud y dependencias
 synctl deploy              # Despliega la plataforma completa
-
-# Gestión de recursos
-synctl apply -f <file>      # Aplica recursos desde YAML
 synctl inspect              # Inspecciona estado actual
-synctl get resources         # Lista recursos
-synctl get nodes            # Lista nodos
-
-# Utilidades
-synctl version              # Muestra versión
 ```
 
-### apply
-
-Aplica recursos Syncloud desde archivos YAML:
+### Gestión de Recursos
 
 ```bash
-synctl apply -f resources.yaml
-synctl apply -f examples/resources.yaml
+synctl apply -f <file>                  # Aplicar recursos desde YAML
+synctl get resources                     # Lista recursos
+synctl get resources --name myapp       # Filtrar por nombre
+synctl get resources --kind Deployment  # Filtrar por tipo
+synctl get resources --runtime docker   # Filtrar por runtime
+synctl resource describe <name>         # Ver detalle de recurso
+synctl resource delete <name>           # Eliminar recurso
+synctl resource logs <name>            # Ver logs
+synctl resource exec <name> -- <cmd>   # Ejecutar comando
+synctl resource scale <name> --replicas=3 # Escalar
+synctl resource restart <name>          # Reiniciar
 ```
 
-**Flag:**
-- `-f, --file` - Ruta al archivo YAML (requerido)
-
-### get resources
-
-Lista recursos con filtros opcionales:
+### Gestión de DNS
 
 ```bash
-synctl get resources                    # Todos los recursos
-synctl get resources --name myapp       # Por nombre
-synctl get resources --kind Deployment # Por tipo
-synctl get resources --runtime docker  # Por runtime
-synctl get resources --namespace default # Por namespace
+synctl get dns                           # Lista registros DNS
+synctl dns add <name> --server <ip>     # Agregar registro
+synctl dns delete <name>                # Eliminar registro
+synctl dns update <name> --server <ip>  # Actualizar registro
 ```
 
-**Flags:**
-- `-n, --name` - Filtrar por nombre
-- `-k, --kind` - Filtrar por tipo de recurso
-- `-r, --runtime` - Filtrar por runtime (docker, kubernetes)
-- `--namespace` - Filtrar por namespace
-
-### get nodes
-
-Lista nodos del sistema:
+### Gestión de Nodos
 
 ```bash
-synctl get nodes
+synctl get nodes                         # Lista nodos
+synctl node describe <name>             # Ver detalle de nodo
+synctl node add -f <file>              # Agregar nodo
+synctl node remove <name>               # Remover nodo
+synctl node cordon <name>               # Deshabilitar scheduling
+synctl node uncordon <name>             # Habilitar scheduling
 ```
 
-### inspect
-
-Inspecciona el estado actual de Syncloud:
+### Validación y Diagnóstico
 
 ```bash
-synctl inspect
+synctl validate -f <file>               # Validar recursos
+synctl diff -f <file>                   # Comparar con estado
+synctl apply --dry-run -f <file>       # Validar sin aplicar
+synctl apply --preview -f <file>       # Preview de cambios
 ```
 
-Muestra: versión, modo (Container/VPS), nodos y conteo de recursos.
-
-### install
-
-Instala Syncloud y sus dependencias:
+### Output
 
 ```bash
-synctl install
+synctl get resources --output json       # Formato JSON
+synctl get resources --output yaml      # Formato YAML
+synctl get resources --output table     # Formato tabla
 ```
 
-Instala automáticamente:
-- Runtime detectado (K3s/K3d o Docker)
-- DNS (dnsmasq)
-- Configuración de red
+### Utilidades
+
+```bash
+synctl version                           # Muestra versión
+```
 
 ## Modelo de Recursos
 
@@ -157,6 +160,29 @@ spec:
 - `Pod` - Pod individual
 - `K8sResource` - Recurso raw (passthrough)
 
+## syncloud-state.json
+
+El estado se guarda en: `helpers/syncloud-state.json`
+
+```json
+{
+  "version": "1.0.0",
+  "cluster": {
+    "id": "uuid",
+    "name": "syncloud",
+    "mode": "container|vps",
+    "dns": "syncloud.local"
+  },
+  "nodes": [...],
+  "resources": [...],
+  "dns": {
+    "records": [
+      {"name": "app", "server": "192.168.1.100"}
+    ]
+  }
+}
+```
+
 ## Modos de Ejecución
 
 | Modo | Descripción | Runtime |
@@ -165,10 +191,6 @@ spec:
 | **VPS** | Ejecutando en servidor | K3s |
 
 El modo se detecta automáticamente. Si es necesario sudo, se solicita la contraseña.
-
-## Estado
-
-El estado se guarda en: `helpers/syncloud-state.json`
 
 ## Ejemplos
 
@@ -180,6 +202,9 @@ synctl apply -f examples/resources.yaml
 
 # Ver recursos aplicados
 synctl get resources
+
+# Ver DNS
+synctl get dns
 
 # Inspeccionar estado
 synctl inspect
