@@ -1,163 +1,141 @@
-# AGENTS.md - Development Guide for AI Agents
+# Contexto de Proyecto: Syncloud Platform CLI (synctl)
 
-## Project Overview
-
-Go CLI (`synctl`) for managing Syncloud resources using kubernetes, docker, dnsmasq.
-- **Module**: `synctl`
-- **Go Version**: 1.25.0
-- **Dependencies**: `github.com/spf13/cobra`, `github.com/google/uuid`, `go.yaml.in/yaml/v3`
+**Propietario:** Syntrony Technologies Inc.
+**Lenguaje:** Go (Golang)
+**Objetivo del MVP:** Proveer comandos funcionales para la administración general de recursos en Docker y Kubernetes mediante un modelo unificado.
 
 ---
 
-## Build Commands
+## Contexto General
 
-```bash
-go build -o synctl .              # Build binary
-go run .                          # Run without building
-go run . install                  # Run install command
-go run . deploy                   # Run deploy command
-go run . get nodes                # Run get nodes command
-GOOS=linux GOARCH=amd64 go build -o synctl-linux-amd64 .  # Cross-compile
-go build -o /dev/null .           # Build check only
-```
+**Syncloud Platform (synctl)** es una herramienta CLI que abstrae la funcionalidad del runtime (Docker, Kubernetes) proporcionando una interfaz unificada para gestionar recursos de ambos ecosistemas. 
 
----
+La plataforma está diseñada para:
+- Simplificar la administración de infraestructura containerizada
+- Proporcionar un modelo declarativo de recursos (CRUD)
+- Gestionar múltiples runtimes desde una sola herramienta
+- Mantener un estado centralizado de la plataforma
 
-## Test Commands
+### Recursos Soportados
 
-```bash
-go test ./...                     # Run all tests
-go test -v ./...                  # Verbose output
-go test -v -run TestName ./...   # Run single test by name
-go test -v ./internal/domain/... # Run tests in specific package
-go test -cover ./...              # With coverage
-go test -race ./...               # Race detector
-```
+**Docker:** Container, Network, Image
 
----
+**Kubernetes:** Deployment, Service, Ingress, Namespace, Secret, ConfigMap, ServiceAccount, Role, RoleBinding, ClusterRole, Pod, Endpoints, K8sResource
 
-## Lint and Format
+### Estado de la Plataforma
 
-```bash
-go fmt ./...          # Format code
-go vet ./...          # Vet checks
-golangci-lint run ./...  # Full linting (if installed)
-```
+El archivo `helpers/syncloud-state.json` es el centro del sistema:
+- **Estado deseado**: Recursos declarados
+- **Estado actual**: Recursos observados
+- **Diff**: Diferencia para reconciliar
+- **DNS Records**: Registros para acceso
+- **Nodes**: Nodos del cluster
 
 ---
 
-## Code Style
-
-### Import Organization
-
-Three groups separated by blank lines: stdlib, external, internal.
-
-```go
-import (
-    "fmt"
-    "os"
-
-    "github.com/spf13/cobra"
-    "github.com/google/uuid"
-
-    "synctl/cmd/get"
-    "synctl/internal/domain"
-)
-```
-
-Use aliases for conflicts: `nodes "synctl/cmd/get/nodes"`
-
-### Naming Conventions
-
-- **Files**: snake_case (`install_service.go`)
-- **Packages**: lowercase (`install`, `dns`)
-- **Types/Interfaces**: PascalCase (`InstallService`)
-- **Functions**: PascalCase (`NewInstallService`)
-- **Variables**: camelCase (`nodeInspector`)
-- **Interfaces**: Suffix with `er` (`Installer`, `Inspector`)
-
-### Package Structure
+## Estructura del Código
 
 ```
-cmd/               # Cobra commands
-internal/
-  ├── application/ # Services & interfaces
-  │   ├── interfaces/
-  │   ├── services/
-  │   └── outputs/
-  ├── domain/     # Entities, DTOs
-  ├── infrastructure/  # Adapters (docker, k8s, dns, system)
-  └── logger/    # Logging
+syn-sycloud-cli/
+├── main.go                  # Punto de entrada de la aplicación
+├── cmd/                     # Comandos CLI (Cobra)
+│   ├── root.go              # Comando raíz
+│   ├── apply/               # Comando apply
+│   ├── daemon/              # Comando daemon
+│   ├── get/                 # Comando get (recursos, nodos)
+│   ├── inspect/             # Comando inspect
+│   ├── install/             # Comando install
+│   └── version/             # Comando version
+├── internal/                # Lógica de negocio
+│   ├── app/                 # Componentes de la aplicación
+│   ├── application/         # Capa de aplicación (servicios)
+│   │   ├── interfaces/      # Contratos y abstracciones
+│   │   ├── outputs/        # Formateador de salida
+│   │   └── services/        # Servicios de negocio
+│   ├── domain/              # Núcleo del negocio
+│   │   ├── dto/             # Objetos de transferencia
+│   │   ├── filters/         # Filtros de consulta
+│   │   ├── parser/          # Analizadores de recursos
+│   │   ├── persistence/     # Repositorios de estado
+│   │   ├── Resource/       # Definiciones de recursos
+│   │   ├── docker/          # Modelos Docker
+│   │   ├── k8s/            # Modelos Kubernetes
+│   │   └── dns/            # Modelos DNS
+│   ├── infrastructure/     # Implementaciones concretas
+│   │   ├── docker/         # Adaptador Docker
+│   │   ├── k8s/            # Adaptador Kubernetes
+│   │   ├── dns/            # Adaptador DNS
+│   │   └── system/         # Adaptador sistema
+│   ├── executor/           # Ejecución de comandos
+│   └── logger/             # Sistema de logging
+└── helpers/                 # Utilidades y archivos de estado
 ```
 
-### Interface Definition
+### Arquitectura
 
-Define in `internal/application/interfaces/`, implement in `internal/infrastructure/`:
+El proyecto sigue **Clean Architecture / Hexagonal Architecture**:
 
-```go
-type DnsInstaller interface {
-    InstallDns() error
-    ConfigureDns() error
-}
-```
+1. **cmd/**: Punto de entrada. Maneja los comandos de la CLI usando Cobra. No contiene lógica de negocio.
 
-### Error Handling
+2. **internal/application/**: Capa de orquestación. Define servicios y casos de uso. Depende de interfaces del dominio.
 
-Early returns with wrapped errors. Never log and return errors.
+3. **internal/domain/**: Núcleo del negocio. Contiene los modelos, contextos de reconciliación y definiciones de recursos.
 
-```go
-func (s *InstallService) Install() error {
-    for _, runtime := range s.runtimes {
-        if err := runtime.Install(); err != nil {
-            return fmt.Errorf("installing runtime: %w", err)
-        }
-    }
-    return s.repo.Save(state)
-}
-```
+4. **internal/infrastructure/**: Implementaciones concretas de interfaces (Docker, Kubernetes, DNS, sistema).
 
-### Constructor Functions
+5. **internal/executor/**: Abstracciones para la ejecución de comandos del sistema.
 
-```go
-func NewInstaller(runner interfaces.CommandRunner, logger interfaces.Logger) *Installer {
-    return &Installer{runner: runner, logger: logger}
-}
-```
+### Patrón de Reconciliación
 
-### Logging
-
-Use `synctl/internal/application/interfaces/logger.go`. Prefer `logger.Info()`, `logger.Error()`.
-
-### Cobra Commands
-
-```go
-var Cmd = &cobra.Command{...}
-func init() { RootCmd.AddCommand(Cmd) }
-```
-
-Keep business logic in services, not cmd packages.
+La lógica de reconciliación sigue un ciclo de:
+1. **Detección (Diffing)**: Identificar el estado deseado vs. estado actual
+2. **Planificación**: Generar un `ReconcileContext` con acciones (Create/Update/Delete)
+3. **Ejecución**: Aplicar las acciones a través de los adaptadores de infraestructura
 
 ---
 
-## Workflow
+## Listado de Comandos
 
-Before committing:
-```bash
-go fmt ./... && go vet ./... && go test ./... && go build -o /dev/null .
+| Comando | Descripción | Estado |
+|---------|-------------|--------|
+| `synctl install` | Instalación de runtime y servicios necesarios (Docker, K3s, dnsmasq) | ✅ Implementado |
+| `synctl deploy` | Despliegue inicial de la plataforma (pendiente) | ⏳ Pendiente |
+| `synctl apply -f <file>` | Creación/Actualización de recursos basados en YAML | ✅ Implementado |
+| `synctl get resources` | Listado de recursos del clúster | ✅ Implementado |
+| `synctl get nodes` | Listado de nodos del sistema | ✅ Implementado |
+| `synctl describe` | Detalle profundo de un recurso específico | ⏳ Pendiente |
+| `synctl delete` | Eliminación por nombre o por archivo YAML | ⏳ Pendiente |
+| `synctl status` | Estado de salud del clúster de la plataforma | ⏳ Pendiente |
+| `synctl version` | Información de versión de synctl y plataforma | ✅ Implementado |
+| `synctl inspect` | Diagnóstico profundo del clúster | ✅ Implementado |
+| `synctl daemon` | Gestión del proceso en segundo plano de la plataforma | ✅ Implementado |
+
+### Flujo General de Uso
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  synctl install → Configurar runtimes (Docker/K3s + DNS)           │
+│                         ↓                                           │
+│  synctl deploy  → Desplegar DB + Backend + WebApp                  │
+│                         ↓                                           │
+│  synctl apply -f <file> → Crear/actualizar recursos                 │
+│                         ↓                                           │
+│  synctl get resources/nodes → Gestionar plataforma                 │
+│                         ↓                                           │
+│  synctl daemon → Iniciar control plane en segundo plano            │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Adding New Commands
+## Reglas de Arquitectura
 
-1. Create `cmd/newcommand/command.go`
-2. Add `var Cmd = &cobra.Command{...}`
-3. Register in parent's `init()`: `ParentCmd.AddCommand(Cmd)`
-4. Keep logic in `internal/application/services/`
+1. **Idempotencia:** Los comandos `apply` y `deploy` deben ser seguros de ejecutar múltiples veces.
 
-## Adding New Services
+2. **Modelado Unificado:** Abstraer la complejidad de K8s/Docker bajo el modelo de Syncloud.
 
-1. Define interface in `internal/application/interfaces/`
-2. Implement in `internal/infrastructure/`
-3. Use `New*()` constructor returning `*Type`
-4. Inject dependencies through constructor
+3. **Logs:** Formato limpio para terminal (utilizar los estándares de Syntrony definidos en el código).
+
+4. **Principios SOLID:**
+   - **SRP:** Cada capa tiene una única responsabilidad.
+   - **DIP:** La capa de `application` depende de interfaces definidas en el `domain`.
