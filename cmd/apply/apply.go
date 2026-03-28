@@ -4,8 +4,7 @@ import (
 	"os"
 
 	"synctl/internal/app"
-	applyService "synctl/internal/application/services/apply"
-	applyMutation "synctl/internal/application/services/apply/mutation"
+	mutation "synctl/internal/application/services/apply"
 	commonParser "synctl/internal/application/services/common/parser"
 	commonValidator "synctl/internal/application/services/common/validator"
 	mutationSvc "synctl/internal/application/services/mutation"
@@ -38,7 +37,7 @@ var Cmd = &cobra.Command{
 		validator := commonValidator.NewValidator()
 		builder := state.NewStateBuilder()
 
-		applyMut := applyMutation.NewApplyMutation(components.Repo)
+		applyMutation := mutation.NewApplyMutation(components.Repo)
 		mutationService := mutationSvc.NewMutationService(
 			parser,
 			validator,
@@ -49,13 +48,11 @@ var Cmd = &cobra.Command{
 
 		components.Logger.Info("Apply resources...")
 
-		service := applyService.NewApplyService(
-			components.Logger,
-			mutationService,
-		)
+		if filePath != "" {
+			return mutationService.Execute(filePath, applyMutation)
+		}
 
 		components.Logger.Info("Apply single resource not yet implemented")
-
-		return service.Apply(filePath, applyMut)
+		return nil
 	},
 }

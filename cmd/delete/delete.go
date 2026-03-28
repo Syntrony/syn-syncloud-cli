@@ -4,7 +4,7 @@ import (
 	"synctl/internal/app"
 	commonParser "synctl/internal/application/services/common/parser"
 	commonValidator "synctl/internal/application/services/common/validator"
-	"synctl/internal/application/services/delete/mutation"
+	mutation "synctl/internal/application/services/delete"
 	mutationSvc "synctl/internal/application/services/mutation"
 	"synctl/internal/application/services/state"
 

@@ -3,10 +3,10 @@ package daemon
 import (
 	"context"
 	"synctl/internal/app"
-	"synctl/internal/application/services/apply"
-	"synctl/internal/application/services/apply/reconciler"
-	"synctl/internal/application/services/apply/reconciler/docker"
-	"synctl/internal/application/services/apply/reconciler/k8s"
+	"synctl/internal/application/services/daemon"
+	"synctl/internal/application/services/daemon/reconciler"
+	"synctl/internal/application/services/daemon/reconciler/docker"
+	"synctl/internal/application/services/daemon/reconciler/k8s"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -30,7 +30,7 @@ var Cmd = &cobra.Command{
 		runtimes := []iApply.RuntimeReconciler{dockerRecon, k8sRecon}
 
 		reconcile := reconciler.NewReconcileService(runtimes)
-		controller := apply.NewController(components.Repo, reconcile, 5*time.Second, components.Logger)
+		controller := daemon.NewController(components.Repo, reconcile, 5*time.Second, components.Logger)
 
 		controller.Start(ctx)
 		return nil

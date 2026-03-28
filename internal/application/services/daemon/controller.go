@@ -1,10 +1,10 @@
-package apply
+package daemon
 
 import (
 	"context"
 	"fmt"
 	"synctl/internal/application/interfaces"
-	"synctl/internal/application/services/apply/reconciler"
+	"synctl/internal/application/services/daemon/reconciler"
 	"time"
 )
 
