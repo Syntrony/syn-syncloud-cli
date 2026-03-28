@@ -5,7 +5,7 @@ import (
 	"synctl/internal/domain"
 )
 
-func (v *ResourceValidator) validateDuplicateNames(resources []*domain.Resource) error {
+func (v *resourceValidator) validateDuplicateNames(resources []*domain.Resource) error {
 	seen := make(map[string]bool)
 
 	for _, resource := range resources {
@@ -23,7 +23,7 @@ func (v *ResourceValidator) validateDuplicateNames(resources []*domain.Resource)
 	return nil
 }
 
-func (v *ResourceValidator) validateNamespaceRules(resources []*domain.Resource) error {
+func (v *resourceValidator) validateNamespaceRules(resources []*domain.Resource) error {
 
 	namespaces := map[string]bool{}
 
@@ -41,7 +41,6 @@ func (v *ResourceValidator) validateNamespaceRules(resources []*domain.Resource)
 		}
 
 		if !namespaces[ns] {
-			// todavía permitido (puede existir ya en cluster)
 			continue
 		}
 	}

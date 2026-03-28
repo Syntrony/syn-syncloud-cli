@@ -1,44 +1,44 @@
-package apply
+package delete
 
 import (
-	"os"
-
 	"synctl/internal/app"
-	applyService "synctl/internal/application/services/apply"
-	applyMutation "synctl/internal/application/services/apply/mutation"
 	commonParser "synctl/internal/application/services/common/parser"
 	commonValidator "synctl/internal/application/services/common/validator"
+	"synctl/internal/application/services/delete/mutation"
 	mutationSvc "synctl/internal/application/services/mutation"
 	"synctl/internal/application/services/state"
 
 	"github.com/spf13/cobra"
 )
 
-var filePath string
+var (
+	name     string
+	id       string
+	filePath string
+)
 
 func init() {
-	Cmd.Flags().StringVarP(&filePath, "file", "f", "", "Path to the resource file to apply")
+	Cmd.Flags().StringVarP(&filePath, "file", "f", "", "delete by resource file")
 	Cmd.MarkFlagRequired("file")
 }
 
 var Cmd = &cobra.Command{
-	Use:   "apply -f <file>",
-	Short: "Apply Syncloud resources from a YAML file",
+	Use:   "delete -f <file>",
+	Short: "Delete Syncloud resources from a YAML file",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		components := app.NewComponents()
 		components.Init()
 		components.WithDefaultRepo()
 
-		if _, err := os.Stat(filePath); err != nil {
-			return err
+		if name == "" && id == "" && filePath == "" {
+			return cmd.Help()
 		}
 
 		parser := commonParser.NewResourceParser()
 		validator := commonValidator.NewValidator()
 		builder := state.NewStateBuilder()
 
-		applyMut := applyMutation.NewApplyMutation(components.Repo)
+		deleteMutation := mutation.NewDeleteMutation(components.Repo)
 		mutationService := mutationSvc.NewMutationService(
 			parser,
 			validator,
@@ -47,15 +47,13 @@ var Cmd = &cobra.Command{
 			components.Logger,
 		)
 
-		components.Logger.Info("Apply resources...")
+		components.Logger.Info("Delete resources...")
 
-		service := applyService.NewApplyService(
-			components.Logger,
-			mutationService,
-		)
+		if filePath != "" {
+			return mutationService.Execute(filePath, deleteMutation)
+		}
 
-		components.Logger.Info("Apply single resource not yet implemented")
-
-		return service.Apply(filePath, applyMut)
+		components.Logger.Info("Delete by name/id not yet implemented")
+		return nil
 	},
 }

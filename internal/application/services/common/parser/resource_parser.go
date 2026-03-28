@@ -1,25 +1,28 @@
 package parser
 
 import (
-	"fmt"
 	"synctl/internal/domain"
 )
 
-type ResourceParser struct {
+type ResourceParser interface {
+	Parse(file string) ([]*domain.Resource, error)
+}
+
+type resourceParser struct {
 	loader   *YamlLoader
 	resolver *KindResolver
 	builder  *ResourceBuilder
 }
 
-func NewResourceParser() *ResourceParser {
-	return &ResourceParser{
+func NewResourceParser() ResourceParser {
+	return &resourceParser{
 		loader:   &YamlLoader{},
 		resolver: NewKindResolver(),
 		builder:  &ResourceBuilder{},
 	}
 }
 
-func (p *ResourceParser) Parse(path string) ([]*domain.Resource, error) {
+func (p *resourceParser) Parse(path string) ([]*domain.Resource, error) {
 	dtos, err := p.loader.LoadAll(path)
 
 	if err != nil {
@@ -30,11 +33,11 @@ func (p *ResourceParser) Parse(path string) ([]*domain.Resource, error) {
 
 	for _, dto := range dtos {
 		if dto.APIVersion == "" {
-			return nil, fmt.Errorf("apiVersion required")
+			return nil, err
 		}
 
 		if dto.Metadata.Name == "" {
-			return nil, fmt.Errorf("metadata.name required")
+			return nil, err
 		}
 
 		mapping, err := p.resolver.Resolve(dto.Kind)

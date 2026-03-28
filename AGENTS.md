@@ -42,6 +42,7 @@ syn-sycloud-cli/
 │   ├── root.go              # Comando raíz
 │   ├── apply/               # Comando apply
 │   ├── daemon/              # Comando daemon
+│   ├── delete/              # Comando delete
 │   ├── get/                 # Comando get (recursos, nodos)
 │   ├── inspect/             # Comando inspect
 │   ├── install/             # Comando install
@@ -92,6 +93,25 @@ La lógica de reconciliación sigue un ciclo de:
 2. **Planificación**: Generar un `ReconcileContext` con acciones (Create/Update/Delete)
 3. **Ejecución**: Aplicar las acciones a través de los adaptadores de infraestructura
 
+### Abstracción de Mutaciones
+
+El sistema utiliza una abstracción de mutaciones para compartir código entre comandos:
+
+- **MutationService**: Servicio genérico que maneja parser, validación y ejecución
+- **ApplyMutation**: Implementación específica para aplicar recursos (Upsert)
+- **DeleteMutation**: Implementación específica para eliminar recursos (Remove)
+
+Esta abstracción permite que apply y delete compartan la misma lógica de:
+- Parseo de archivos YAML
+- Validación de recursos
+- Construcción de estado
+- Persistencia
+
+Los componentes compartidos están en `services/common/`:
+- **parser/**: Parseo de recursos desde YAML
+- **validator/**: Validación de estructura y reglas de recursos
+- **diff/**: Comparación de estado deseado vs actual
+
 ---
 
 ## Listado de Comandos
@@ -104,7 +124,7 @@ La lógica de reconciliación sigue un ciclo de:
 | `synctl get resources` | Listado de recursos del clúster | ✅ Implementado |
 | `synctl get nodes` | Listado de nodos del sistema | ✅ Implementado |
 | `synctl describe` | Detalle profundo de un recurso específico | ⏳ Pendiente |
-| `synctl delete` | Eliminación por nombre o por archivo YAML | ⏳ Pendiente |
+| `synctl delete resource` | Eliminación por nombre, id o archivo YAML | ✅ Implementado |
 | `synctl status` | Estado de salud del clúster de la plataforma | ⏳ Pendiente |
 | `synctl version` | Información de versión de synctl y plataforma | ✅ Implementado |
 | `synctl inspect` | Diagnóstico profundo del clúster | ✅ Implementado |
@@ -120,7 +140,9 @@ La lógica de reconciliación sigue un ciclo de:
 │                         ↓                                           │
 │  synctl apply -f <file> → Crear/actualizar recursos                 │
 │                         ↓                                           │
-│  synctl get resources/nodes → Gestionar plataforma                 │
+│  synctl get resources/nodes → Consultar recursos                    │
+│                         ↓                                           │
+│  synctl delete resource → Eliminar recursos                         │
 │                         ↓                                           │
 │  synctl daemon → Iniciar control plane en segundo plano            │
 └─────────────────────────────────────────────────────────────────────┘

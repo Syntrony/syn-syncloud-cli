@@ -7,7 +7,7 @@ import (
 type KindMapping struct {
 	Runtime      string
 	Kind         string
-	Mode         string // "abstract" or "raw"
+	Mode         string
 	RequiredSpec []string
 }
 
@@ -18,7 +18,6 @@ type KindResolver struct {
 func NewKindResolver() *KindResolver {
 	return &KindResolver{
 		registry: map[string]KindMapping{
-			// Kubernetes resources
 			"Deployment": {
 				Runtime:      "kubernetes",
 				Kind:         "k8s.deployment",
@@ -91,14 +90,12 @@ func NewKindResolver() *KindResolver {
 				Mode:         "abstract",
 				RequiredSpec: []string{},
 			},
-			// Raw Kubernetes (passthrough)
 			"K8sResource": {
 				Runtime:      "kubernetes",
 				Kind:         "k8s.raw",
 				Mode:         "raw",
 				RequiredSpec: []string{"manifest"},
 			},
-			// Docker resources
 			"Container": {
 				Runtime:      "docker",
 				Kind:         "docker.container",

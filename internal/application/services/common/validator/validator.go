@@ -5,15 +5,20 @@ import (
 	"synctl/internal/domain"
 )
 
-type ResourceValidator struct {
+type Validator interface {
+	Validate(resource *domain.Resource) error
+	ValidateSet(resource []*domain.Resource) error
+}
+
+type resourceValidator struct {
 	logger interfaces.Logger
 }
 
-func NewValidator() *ResourceValidator {
-	return &ResourceValidator{}
+func NewValidator() Validator {
+	return &resourceValidator{}
 }
 
-func (v *ResourceValidator) Validate(resource *domain.Resource) error {
+func (v *resourceValidator) Validate(resource *domain.Resource) error {
 	if err := v.validateBasicFields(resource); err != nil {
 		return err
 	}
@@ -29,7 +34,7 @@ func (v *ResourceValidator) Validate(resource *domain.Resource) error {
 	return nil
 }
 
-func (v *ResourceValidator) ValidateSet(resources []*domain.Resource) error {
+func (v *resourceValidator) ValidateSet(resources []*domain.Resource) error {
 	if err := v.validateDuplicateNames(resources); err != nil {
 		return err
 	}

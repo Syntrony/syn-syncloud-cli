@@ -61,6 +61,8 @@ func (f *StateRepository) Upsert(desired []*domain.Resource) ([]domain.Resource,
 		merged[res.Key()] = res
 	}
 
+	var snapshot []domain.Resource
+
 	//Sobreescribir con desired
 	for _, res := range desired {
 		key := res.Key()
@@ -76,15 +78,34 @@ func (f *StateRepository) Upsert(desired []*domain.Resource) ([]domain.Resource,
 			res.Ownership = existing.Ownership
 			res.CreatedAt = existing.CreatedAt
 			res.UpdatedAt = existing.UpdatedAt
-
 		}
-		merged[res.Key()] = *res
+		snapshot = append(snapshot, *res)
+	}
+
+	return snapshot, nil
+}
+
+func (f *StateRepository) Remove(desired []*domain.Resource) ([]domain.Resource, error) {
+	state, err := f.Load()
+
+	if err != nil {
+		return nil, err
+	}
+
+	removeSet := make(map[string]struct{})
+
+	for _, res := range desired {
+		removeSet[res.Key()] = struct{}{}
 	}
 
 	var snapshot []domain.Resource
 
-	for _, v := range merged {
-		snapshot = append(snapshot, v)
+	for _, existing := range state.Resources {
+		if _, shouldDelete := removeSet[existing.Key()]; shouldDelete {
+			continue
+		}
+		snapshot = append(snapshot, existing)
 	}
+
 	return snapshot, nil
 }

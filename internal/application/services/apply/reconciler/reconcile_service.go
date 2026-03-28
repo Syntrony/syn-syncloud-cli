@@ -3,7 +3,7 @@ package reconciler
 import (
 	"fmt"
 	iApply "synctl/internal/application/interfaces/apply"
-	"synctl/internal/application/services/apply/diff"
+	"synctl/internal/application/services/common/diff"
 	"synctl/internal/domain"
 )
 

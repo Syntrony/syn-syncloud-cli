@@ -6,7 +6,7 @@ import (
 	"synctl/internal/domain"
 )
 
-func (v *ResourceValidator) validateBasicFields(resource *domain.Resource) error {
+func (v *resourceValidator) validateBasicFields(resource *domain.Resource) error {
 	if resource.Name == "" {
 		return fmt.Errorf("resource name is required")
 	}
@@ -22,7 +22,7 @@ func (v *ResourceValidator) validateBasicFields(resource *domain.Resource) error
 	return nil
 }
 
-func (v *ResourceValidator) validateRuntime(resource *domain.Resource) error {
+func (v *resourceValidator) validateRuntime(resource *domain.Resource) error {
 	switch resource.Runtime {
 	case "docker", "kubernetes":
 		return nil
@@ -31,7 +31,7 @@ func (v *ResourceValidator) validateRuntime(resource *domain.Resource) error {
 	}
 }
 
-func (v *ResourceValidator) validateSpec(resource *domain.Resource) error {
+func (v *resourceValidator) validateSpec(resource *domain.Resource) error {
 	if resource.Spec == nil {
 		return fmt.Errorf("spec cannot be empty for resource: %s", resource.Name)
 	}
@@ -50,22 +50,22 @@ func (v *ResourceValidator) validateSpec(resource *domain.Resource) error {
 	return nil
 }
 
-func (v *ResourceValidator) validateDockerContainerSpec(spec map[string]interface{}) error {
+func (v *resourceValidator) validateDockerContainerSpec(spec map[string]interface{}) error {
 	if _, ok := spec["image"]; !ok {
 		return fmt.Errorf("docker.container requires 'image' in spec")
 	}
 	return nil
 }
 
-func (v *ResourceValidator) validateDockerNetworkSpec(spec map[string]interface{}) error {
+func (v *resourceValidator) validateDockerNetworkSpec(spec map[string]interface{}) error {
 	return nil
 }
 
-func (v *ResourceValidator) validateDockerImageSpec(spec map[string]interface{}) error {
+func (v *resourceValidator) validateDockerImageSpec(spec map[string]interface{}) error {
 	return nil
 }
 
-func (v *ResourceValidator) validateK8sRawSpec(spec map[string]interface{}) error {
+func (v *resourceValidator) validateK8sRawSpec(spec map[string]interface{}) error {
 	if _, ok := spec["manifest"]; !ok {
 		return fmt.Errorf("k8s.raw requires 'manifest' in spec")
 	}

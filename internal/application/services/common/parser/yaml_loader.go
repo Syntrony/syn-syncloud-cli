@@ -8,8 +8,7 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-type YamlLoader struct {
-}
+type YamlLoader struct{}
 
 func (l *YamlLoader) LoadAll(path string) ([]parser.ResourceYAML, error) {
 	file, err := os.Open(path)
