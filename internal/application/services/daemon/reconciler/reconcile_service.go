@@ -2,16 +2,16 @@ package reconciler
 
 import (
 	"fmt"
-	iApply "synctl/internal/application/interfaces/apply"
+	"synctl/internal/application/interfaces/common"
 	"synctl/internal/application/services/common/diff"
 	"synctl/internal/domain"
 )
 
 type ReconcileService struct {
-	runtimes []iApply.RuntimeReconciler
+	runtimes []common.RuntimeReconciler
 }
 
-func NewReconcileService(runtimes []iApply.RuntimeReconciler) *ReconcileService {
+func NewReconcileService(runtimes []common.RuntimeReconciler) *ReconcileService {
 	return &ReconcileService{
 		runtimes: runtimes,
 	}

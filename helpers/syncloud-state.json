@@ -4,165 +4,24 @@
     "id": "cluster-01",
     "name": "syncloud-local",
     "mode": "single",
-    "createdAt": "2026-03-19T02:50:15Z"
+    "createdAt": "2026-03-29T21:31:13Z"
   },
-  "nodes": [
-    {
-      "id": "763c0b8a-e469-40cc-8484-983acbb32536",
-      "hostname": "94cdb2154d6a",
-      "role": "control-plane",
-      "ip": "172.17.0.3"
-    }
-  ],
+  "nodes": null,
   "resources": [
     {
-      "id": "fdaac729-a445-4c8a-bb7d-59cb43b828f8",
-      "name": "default",
-      "kind": "k8s.namespace",
-      "runtime": "kubernetes",
-      "nodeId": "84be8ec4-b838-4de3-aaa8-ee6ff90a5f5a",
+      "id": "4213722a-eda3-4392-9844-c77a0670ef86",
+      "name": "syncloud-internal",
+      "kind": "docker.network",
+      "runtime": "docker",
+      "nodeId": "",
       "spec": {
-        "finalizers": [
-          "kubernetes"
-        ]
+        "driver": "bridge"
       },
-      "status": {
-        "phase": "Active"
-      },
-      "ownership": {},
-      "createdAt": "2026-03-19T00:15:53Z",
-      "updatedAt": "2026-03-19T00:15:53Z"
-    },
-    {
-      "id": "fd3019c0-44db-4892-baa9-ca1fd15da353",
-      "name": "kube-node-lease",
-      "kind": "k8s.namespace",
-      "runtime": "kubernetes",
-      "nodeId": "89afe6e1-5092-48a2-987c-9b8623b5779b",
-      "spec": {
-        "finalizers": [
-          "kubernetes"
-        ]
-      },
-      "status": {
-        "phase": "Active"
-      },
-      "ownership": {},
-      "createdAt": "2026-03-19T00:15:53Z",
-      "updatedAt": "2026-03-19T00:15:53Z"
-    },
-    {
-      "id": "8e11f2e8-57b9-4565-9874-ca9ec998a15f",
-      "name": "kube-public",
-      "kind": "k8s.namespace",
-      "runtime": "kubernetes",
-      "nodeId": "0256a277-0c27-48e5-a9f1-0333a7ef4684",
-      "spec": {
-        "finalizers": [
-          "kubernetes"
-        ]
-      },
-      "status": {
-        "phase": "Active"
-      },
-      "ownership": {},
-      "createdAt": "2026-03-19T00:15:53Z",
-      "updatedAt": "2026-03-19T00:15:53Z"
-    },
-    {
-      "id": "977c8c81-65db-420a-8d9c-798ae61037c0",
-      "name": "kube-system",
-      "kind": "k8s.namespace",
-      "runtime": "kubernetes",
-      "nodeId": "51c706ef-bcc2-428b-8839-e50b704c567d",
-      "spec": {
-        "finalizers": [
-          "kubernetes"
-        ]
-      },
-      "status": {
-        "phase": "Active"
-      },
-      "ownership": {},
-      "createdAt": "2026-03-19T00:15:53Z",
-      "updatedAt": "2026-03-19T00:15:53Z"
-    },
-    {
-      "id": "0427944c-f444-4c85-aa2b-27df3a4b1bea",
-      "name": "clustercidrs-node",
-      "kind": "k8s.clusterrole",
-      "runtime": "kubernetes",
-      "nodeId": "ca386eb3-5c9c-4328-8542-6543208656c5",
-      "spec": null,
       "status": null,
-      "ownership": {},
-      "createdAt": "2026-03-19T00:15:57Z",
-      "updatedAt": "2026-03-19T00:15:57Z"
-    },
-    {
-      "id": "94cdb2154d6a",
-      "name": "stupefied_jepsen",
-      "kind": "docker.container",
-      "runtime": "docker",
-      "nodeId": "273b5b82-ea3a-49f5-9513-7cfe75a84b6a",
-      "spec": {
-        "command": "\"/bin/sh -c 'echo Co…\"",
-        "image": "vsc-syn-sycloud-cli-beb6f5b463e0eecd3255a709371cfe5f4c6c9153c8ef05df7925202bddd276eb",
-        "labels": "desktop.docker.io/binds/0/Source=/var/run/docker.sock,desktop.docker.io/binds/0/SourceKind=dockerSocketProxied,desktop.docker.io/binds/0/Target=/var/run/docker.sock,desktop.docker.io/mounts/0/Source=/Users/jahir1396/Projects/SyntronyRepos/syn-sycloud-cli,desktop.docker.io/mounts/0/SourceKind=hostFile,desktop.docker.io/mounts/0/Target=/workspaces/syn-sycloud-cli,devcontainer.config_file=/Users/jahir1396/Projects/SyntronyRepos/syn-sycloud-cli/.devcontainer/devcontainer.json,devcontainer.local_folder=/Users/jahir1396/Projects/SyntronyRepos/syn-sycloud-cli,devcontainer.metadata={\"customizations\":{\"vscode\":{\"extensions\":[\"golang.Go\"]}},\"remoteUser\":\"root\"},org.opencontainers.image.ref.name=ubuntu,org.opencontainers.image.version=22.04",
-        "ports": ""
-      },
-      "status": {
-        "state": "running"
-      },
-      "ownership": {},
-      "createdAt": "",
-      "updatedAt": ""
-    },
-    {
-      "id": "d5de3f65b68d",
-      "name": "postgres",
-      "kind": "docker.container",
-      "runtime": "docker",
-      "nodeId": "6280d1d8-8747-489f-8177-3211a804552a",
-      "spec": {
-        "command": "\"docker-entrypoint.s…\"",
-        "image": "postgres:latest",
-        "labels": "",
-        "ports": ""
-      },
-      "status": {
-        "state": "exited"
-      },
-      "ownership": {},
-      "createdAt": "",
-      "updatedAt": ""
-    },
-    {
-      "id": "bae29c42cca8",
-      "name": "sql-server",
-      "kind": "docker.container",
-      "runtime": "docker",
-      "nodeId": "f25f3338-01c2-402c-8590-20fe718a61c0",
-      "spec": {
-        "command": "\"/opt/mssql/bin/laun…\"",
-        "image": "mcr.microsoft.com/mssql/server:2022-latest",
-        "labels": "com.microsoft.product=Microsoft SQL Server,com.microsoft.version=16.0.4236.2,org.opencontainers.image.ref.name=ubuntu,org.opencontainers.image.version=22.04,vendor=Microsoft",
-        "ports": ""
-      },
-      "status": {
-        "state": "exited"
-      },
       "ownership": {},
       "createdAt": "",
       "updatedAt": ""
     }
   ],
-  "dns": {
-    "records": [
-      {
-        "server": "172.17.0.3",
-        "name": "stemmed.syncloud.local"
-      }
-    ]
-  }
+  "dns": {}
 }

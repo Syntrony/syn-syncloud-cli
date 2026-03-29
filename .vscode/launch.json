@@ -12,7 +12,7 @@
             ]
         },
         {
-            "name": "synctl apply",
+            "name": "synctl apply file",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -21,6 +21,36 @@
                 "apply",
                 "-f",
                 "helpers/template-docker.yaml"
+            ],
+            "env": {
+                "DEBUG": "1"
+            }
+        },
+        {
+            "name": "synctl delete file",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": [
+                "delete",
+                "-f",
+                "helpers/template-docker.yaml"
+            ],
+            "env": {
+                "DEBUG": "1"
+            }
+        },
+        {
+            "name": "synctl delete resource",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": [
+                "delete",
+                "-n",
+                "nginx"
             ],
             "env": {
                 "DEBUG": "1"

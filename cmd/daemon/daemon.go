@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	iApply "synctl/internal/application/interfaces/apply"
+	"synctl/internal/application/interfaces/common"
 )
 
 var Cmd = &cobra.Command{
@@ -27,7 +27,7 @@ var Cmd = &cobra.Command{
 		dockerRecon := docker.NewDockerReconciler(components.Runner, components.Logger)
 		k8sRecon := k8s.NewK8sReconciler(components.Runner, components.Logger)
 
-		runtimes := []iApply.RuntimeReconciler{dockerRecon, k8sRecon}
+		runtimes := []common.RuntimeReconciler{dockerRecon, k8sRecon}
 
 		reconcile := reconciler.NewReconcileService(runtimes)
 		controller := daemon.NewController(components.Repo, reconcile, 5*time.Second, components.Logger)

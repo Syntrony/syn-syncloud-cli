@@ -56,14 +56,10 @@ func (f *StateRepository) Upsert(desired []*domain.Resource) ([]domain.Resource,
 
 	merged := map[string]domain.Resource{}
 
-	//Cargar existentes
 	for _, res := range state.Resources {
 		merged[res.Key()] = res
 	}
 
-	var snapshot []domain.Resource
-
-	//Sobreescribir con desired
 	for _, res := range desired {
 		key := res.Key()
 
@@ -79,7 +75,12 @@ func (f *StateRepository) Upsert(desired []*domain.Resource) ([]domain.Resource,
 			res.CreatedAt = existing.CreatedAt
 			res.UpdatedAt = existing.UpdatedAt
 		}
-		snapshot = append(snapshot, *res)
+		merged[key] = *res
+	}
+
+	var snapshot []domain.Resource
+	for _, res := range merged {
+		snapshot = append(snapshot, res)
 	}
 
 	return snapshot, nil

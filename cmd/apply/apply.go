@@ -49,7 +49,7 @@ var Cmd = &cobra.Command{
 		components.Logger.Info("Apply resources...")
 
 		if filePath != "" {
-			return mutationService.Execute(filePath, applyMutation)
+			return mutationService.ExecuteFile(filePath, applyMutation)
 		}
 
 		components.Logger.Info("Apply single resource not yet implemented")

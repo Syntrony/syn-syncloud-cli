@@ -2,6 +2,7 @@ package services
 
 import (
 	interfaces "synctl/internal/application/interfaces"
+	"synctl/internal/domain"
 	dto "synctl/internal/domain/dto"
 	filters "synctl/internal/domain/filters"
 )
@@ -11,41 +12,17 @@ type GetResourceService struct {
 }
 
 func (s *GetResourceService) Execute(filter filters.GetResourceFilter) ([]dto.ResourceDto, error) {
-	exists, err := s.Repo.Exists()
+	resources, err := s.GetResourceBy(filter)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if !exists {
-		return []dto.ResourceDto{}, nil
-	}
+	var result []dto.ResourceDto
 
-	st, err := s.Repo.Load()
-	if err != nil {
-		return nil, err
-	}
+	for _, r := range resources {
 
-	var resources []dto.ResourceDto
-
-	for _, r := range st.Resources {
-		if filter.Name != "" && r.Name != filter.Name {
-			continue
-		}
-		if filter.Kind != "" && r.Kind != filter.Kind {
-			continue
-		}
-		if filter.Id != "" && r.Id != filter.Id {
-			continue
-		}
-		if filter.Runtime != "" && r.Runtime != filter.Runtime {
-			continue
-		}
-		if filter.NodeId != "" && r.NodeId != filter.NodeId {
-			continue
-		}
-
-		resources = append(resources, dto.ResourceDto{
+		result = append(result, dto.ResourceDto{
 			Id:        r.Id,
 			Name:      r.Name,
 			Runtime:   r.Runtime,
@@ -53,6 +30,37 @@ func (s *GetResourceService) Execute(filter filters.GetResourceFilter) ([]dto.Re
 		})
 	}
 
-	return resources, nil
+	return result, nil
 
+}
+
+func (s *GetResourceService) GetResourceBy(filter filters.GetResourceFilter) ([]*domain.Resource, error) {
+	exists, err := s.Repo.Exists()
+	var resources []*domain.Resource
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return resources, nil
+	}
+
+	st, err := s.Repo.Load()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, r := range st.Resources {
+		if (filter.Name == "" || r.Name == filter.Name) &&
+			(filter.Kind == "" || r.Kind == filter.Kind) &&
+			(filter.Id == "" || r.Id == filter.Id) &&
+			(filter.Runtime == "" || r.Runtime == filter.Runtime) &&
+			(filter.NodeId == "" || r.NodeId == filter.NodeId) {
+			resources = append(resources, &r)
+		}
+	}
+
+	return resources, nil
 }

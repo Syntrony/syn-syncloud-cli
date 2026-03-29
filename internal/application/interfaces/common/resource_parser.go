@@ -1,4 +1,4 @@
-package apply
+package common
 
 import "synctl/internal/domain"
 
