@@ -37,7 +37,7 @@ func (f *StateRepository) Load() (*domain.State, error) {
 }
 
 func (f *StateRepository) Save(st *domain.State) error {
-	os.MkdirAll(filepath.Dir(f.Path), 0755)
+	os.MkdirAll(filepath.Dir(f.Path), 0750)
 
 	data, err := json.MarshalIndent(st, "", "  ")
 
@@ -45,7 +45,7 @@ func (f *StateRepository) Save(st *domain.State) error {
 		return err
 	}
 
-	return os.WriteFile(f.Path, data, 0644)
+	return os.WriteFile(f.Path, data, 0600)
 }
 
 func (f *StateRepository) Upsert(desired []*domain.Resource) ([]domain.Resource, error) {

@@ -1,7 +1,10 @@
 package apply
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"synctl/internal/app"
 	mutation "synctl/internal/application/services/apply"
@@ -12,6 +15,29 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
+func isPathSafe(filePath string) error {
+	absPath, err := filepath.Abs(filePath)
+	if err != nil {
+		return fmt.Errorf("invalid path: %w", err)
+	}
+
+	cleanPath := filepath.Clean(absPath)
+	if strings.Contains(cleanPath, "..") {
+		return fmt.Errorf("path traversal not allowed: %s", filePath)
+	}
+
+	info, err := os.Stat(cleanPath)
+	if err != nil {
+		return err
+	}
+
+	if info.IsDir() {
+		return fmt.Errorf("path must be a file, not a directory: %s", filePath)
+	}
+
+	return nil
+}
 
 var filePath string
 
@@ -29,7 +55,7 @@ var Cmd = &cobra.Command{
 		components.Init()
 		components.WithDefaultRepo()
 
-		if _, err := os.Stat(filePath); err != nil {
+		if err := isPathSafe(filePath); err != nil {
 			return err
 		}
 

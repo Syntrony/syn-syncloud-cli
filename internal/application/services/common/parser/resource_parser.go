@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"errors"
+	"fmt"
 	"synctl/internal/domain"
 )
 
@@ -23,27 +25,31 @@ func NewResourceParser() ResourceParser {
 }
 
 func (p *resourceParser) Parse(path string) ([]*domain.Resource, error) {
+	if path == "" {
+		return nil, errors.New("path cannot be empty")
+	}
+
 	dtos, err := p.loader.LoadAll(path)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load YAML file: %w", err)
 	}
 
 	var resources []*domain.Resource
 
 	for _, dto := range dtos {
 		if dto.APIVersion == "" {
-			return nil, err
+			return nil, fmt.Errorf("invalid resource: APIVersion is required for kind %s", dto.Kind)
 		}
 
 		if dto.Metadata.Name == "" {
-			return nil, err
+			return nil, fmt.Errorf("invalid resource: metadata.name is required for kind %s", dto.Kind)
 		}
 
 		mapping, err := p.resolver.Resolve(dto.Kind)
 
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("unsupported resource kind %s: %w", dto.Kind, err)
 		}
 
 		resource := p.builder.Build(&dto, mapping)

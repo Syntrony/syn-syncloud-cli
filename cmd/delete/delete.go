@@ -2,6 +2,10 @@ package delete
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"synctl/internal/app"
 	commonParser "synctl/internal/application/services/common/parser"
 	commonValidator "synctl/internal/application/services/common/validator"
@@ -16,6 +20,29 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
+func isPathSafe(filePath string) error {
+	absPath, err := filepath.Abs(filePath)
+	if err != nil {
+		return fmt.Errorf("invalid path: %w", err)
+	}
+
+	cleanPath := filepath.Clean(absPath)
+	if strings.Contains(cleanPath, "..") {
+		return fmt.Errorf("path traversal not allowed: %s", filePath)
+	}
+
+	info, err := os.Stat(cleanPath)
+	if err != nil {
+		return err
+	}
+
+	if info.IsDir() {
+		return fmt.Errorf("path must be a file, not a directory: %s", filePath)
+	}
+
+	return nil
+}
 
 var (
 	name     string
@@ -59,6 +86,9 @@ var Cmd = &cobra.Command{
 		var resources []*domain.Resource
 
 		if filePath != "" {
+			if err := isPathSafe(filePath); err != nil {
+				return err
+			}
 			parsed, err := parser.Parse(filePath)
 			if err != nil {
 				return err
