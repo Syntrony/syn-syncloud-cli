@@ -47,6 +47,7 @@ var Cmd = &cobra.Command{
 			dockerDetector,
 			dockerInspector,
 			dockerInstaller,
+			components.Runner,
 		)
 
 		systemInspector := systeminfra.NewInspector(components.Runner)

@@ -55,6 +55,39 @@ func (d *DockerOperations) InspectContainer(name string) (string, error) {
 	return out.Stdout, nil
 }
 
+func (d *DockerOperations) RemoveContainer(name string) error {
+	d.logger.Info(fmt.Sprintf("Removing container: %s", name))
+	args := []string{"rm", "-f", name}
+	out, err := d.runner.Run("docker", args...)
+	if err != nil {
+		return fmt.Errorf("failed to remove container: %w - output: %s", err, out.Stderr)
+	}
+	d.logger.Info(fmt.Sprintf("Container %s removed", name))
+	return nil
+}
+
+func (d *DockerOperations) RemoveNetwork(name string) error {
+	d.logger.Info(fmt.Sprintf("Removing network: %s", name))
+	args := []string{"network", "rm", name}
+	out, err := d.runner.Run("docker", args...)
+	if err != nil {
+		return fmt.Errorf("failed to remove network: %w - output: %s", err, out.Stderr)
+	}
+	d.logger.Info(fmt.Sprintf("Network %s removed", name))
+	return nil
+}
+
+func (d *DockerOperations) RemoveImage(name string) error {
+	d.logger.Info(fmt.Sprintf("Removing image: %s", name))
+	args := []string{"rmi", name}
+	out, err := d.runner.Run("docker", args...)
+	if err != nil {
+		return fmt.Errorf("failed to remove image: %w - output: %s", err, out.Stderr)
+	}
+	d.logger.Info(fmt.Sprintf("Image %s removed", name))
+	return nil
+}
+
 func (d *DockerOperations) PullImage(name string) error {
 	d.logger.Info(fmt.Sprintf("Pulling image: %s", name))
 	args := []string{"pull", name}

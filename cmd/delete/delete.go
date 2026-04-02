@@ -5,10 +5,13 @@ import (
 	"synctl/internal/app"
 	commonParser "synctl/internal/application/services/common/parser"
 	commonValidator "synctl/internal/application/services/common/validator"
+	"synctl/internal/application/services/daemon/reconciler/docker"
+	"synctl/internal/application/services/daemon/reconciler/k8s"
 	mutation "synctl/internal/application/services/delete"
 	getSvc "synctl/internal/application/services/get"
 	mutationSvc "synctl/internal/application/services/mutation"
 	"synctl/internal/application/services/state"
+	"synctl/internal/domain"
 	filters "synctl/internal/domain/filters"
 
 	"github.com/spf13/cobra"
@@ -24,7 +27,6 @@ func init() {
 	Cmd.Flags().StringVarP(&filePath, "file", "f", "", "delete by resource file")
 	Cmd.Flags().StringVarP(&name, "name", "n", "", "delete by resource name")
 	Cmd.Flags().StringVarP(&id, "id", "I", "", "delete by resource id")
-
 }
 
 var Cmd = &cobra.Command{
@@ -50,29 +52,76 @@ var Cmd = &cobra.Command{
 			components.Repo,
 			builder,
 			components.Logger,
-		)
+		).WithInspector(components.Inspector)
 
 		components.Logger.Info("Delete resources...")
 
+		var resources []*domain.Resource
+
 		if filePath != "" {
-			return mutationService.ExecuteFile(filePath, deleteMutation)
+			parsed, err := parser.Parse(filePath)
+			if err != nil {
+				return err
+			}
+			resources = parsed
+		} else {
+			filter := filters.GetResourceFilter{
+				Name: name,
+				Id:   id,
+			}
+			getService := getSvc.GetResourceService{
+				Repo: components.Repo,
+			}
+			result, err := getService.GetResourceBy(filter)
+			if err != nil {
+				return err
+			}
+			resources = result
 		}
 
-		filter := filters.GetResourceFilter{
-			Name: name,
-			Id:   id,
+		if len(resources) == 0 {
+			components.Logger.Info("No resources found to delete")
+			return nil
 		}
 
-		getService := getSvc.GetResourceService{
-			Repo: components.Repo,
-		}
-
-		result, err := getService.GetResourceBy(filter)
-
-		if err != nil {
+		if err := mutationService.ExecuteResource(resources, deleteMutation); err != nil {
 			return err
 		}
 
-		return mutationService.ExecuteResource(result, deleteMutation)
+		dockerRecon := docker.NewDockerReconciler(components.Runner, components.Logger)
+		k8sRecon := k8s.NewK8sReconciler(components.Runner, components.Logger)
+
+		for _, rt := range []interface {
+			Runtime() string
+			Reconcile(domain.ReconcileContext) error
+		}{dockerRecon, k8sRecon} {
+			var rtResources []*domain.Resource
+			var rtActions []*domain.Action
+
+			for _, r := range resources {
+				if r.Runtime == rt.Runtime() {
+					rtResources = append(rtResources, r)
+					rtActions = append(rtActions, &domain.Action{
+						Type:     domain.ActionDelete,
+						Resource: r,
+					})
+				}
+			}
+
+			if len(rtResources) == 0 {
+				continue
+			}
+
+			subCtx := domain.ReconcileContext{
+				Resources: rtResources,
+				Actions:   rtActions,
+			}
+
+			if err := rt.Reconcile(subCtx); err != nil {
+				components.Logger.Error(fmt.Sprintf("infra reconcile error: %s", err))
+			}
+		}
+
+		return nil
 	},
 }

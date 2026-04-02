@@ -17,6 +17,7 @@ type Components struct {
 	Runner      interfaces.CommandRunner
 	Sudo        interfaces.PrivilegedRunner
 	EnvDetector *system.EnvironmentDetector
+	Inspector   *system.Inspector
 	RuntimeType domain.RuntimeType
 }
 
@@ -28,6 +29,7 @@ func (c *Components) Init() {
 	c.Logger = logger.NewConsoleLogger()
 	c.Runner = executor.NewExecRunner(c.Logger)
 	c.EnvDetector = system.NewEnvironmentDetector()
+	c.Inspector = system.NewInspector(c.Runner)
 	c.detectEnvironment()
 }
 

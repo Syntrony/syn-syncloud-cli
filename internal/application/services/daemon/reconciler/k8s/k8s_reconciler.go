@@ -1,7 +1,9 @@
 package k8s
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"synctl/internal/application/interfaces"
@@ -21,6 +23,27 @@ var supportedKinds = []string{
 	"configmap",
 	"endpoints",
 	"pod",
+	"raw",
+}
+
+var clusterScopedKinds = map[string]bool{
+	"namespace":   true,
+	"clusterrole": true,
+}
+
+var apiVersionMap = map[string]string{
+	"deployment":     "apps/v1",
+	"service":        "v1",
+	"namespace":      "v1",
+	"ingress":        "networking.k8s.io/v1",
+	"serviceaccount": "v1",
+	"role":           "rbac.authorization.k8s.io/v1",
+	"rolebinding":    "rbac.authorization.k8s.io/v1",
+	"clusterrole":    "rbac.authorization.k8s.io/v1",
+	"secret":         "v1",
+	"configmap":      "v1",
+	"endpoints":      "v1",
+	"pod":            "v1",
 }
 
 type K8sReconciler struct {
@@ -92,22 +115,73 @@ func (k *K8sReconciler) Reconcile(ctx domain.ReconcileContext) error {
 
 func (k *K8sReconciler) applyResource(resource *domain.Resource) error {
 	kind := extractKindName(resource.Kind)
-	namespace := extractNamespace(resource.Spec)
-
 	k.logger.Info(fmt.Sprintf("Applying %s: %s", kind, resource.Name))
 
-	args := []string{"apply", "-f", "-"}
-	if namespace != "" {
-		args = append(args, "-n", namespace)
+	manifest, err := k.buildManifest(resource, kind)
+	if err != nil {
+		return fmt.Errorf("failed to build manifest for %s %s: %w", kind, resource.Name, err)
 	}
 
-	out, err := k.runner.Run("kubectl", args...)
+	data, err := json.Marshal(manifest)
+	if err != nil {
+		return fmt.Errorf("failed to marshal manifest: %w", err)
+	}
+
+	tmpFile, err := os.CreateTemp("", "synctl-k8s-*.json")
+	if err != nil {
+		return fmt.Errorf("failed to create temp file: %w", err)
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.Write(data); err != nil {
+		tmpFile.Close()
+		return fmt.Errorf("failed to write manifest: %w", err)
+	}
+	tmpFile.Close()
+
+	out, err := k.runner.Run("kubectl", "apply", "-f", tmpFile.Name())
 	if err != nil {
 		return fmt.Errorf("kubectl apply failed: %w - output: %s", err, out.Stderr)
 	}
 
 	k.logger.Info(fmt.Sprintf("%s %s applied successfully", kind, resource.Name))
 	return nil
+}
+
+func (k *K8sReconciler) buildManifest(resource *domain.Resource, kind string) (map[string]interface{}, error) {
+	if kind == "raw" {
+		if m, ok := resource.Spec["manifest"]; ok {
+			if manifest, ok := m.(map[string]interface{}); ok {
+				return manifest, nil
+			}
+		}
+		return nil, fmt.Errorf("k8s.raw resource %s missing 'manifest' in spec", resource.Name)
+	}
+
+	apiVersion, ok := apiVersionMap[strings.ToLower(kind)]
+	if !ok {
+		apiVersion = "v1"
+	}
+
+	kindName := strings.ToUpper(kind[:1]) + kind[1:]
+
+	metadata := map[string]interface{}{
+		"name": resource.Name,
+	}
+
+	if !clusterScopedKinds[strings.ToLower(kind)] {
+		namespace := extractNamespace(resource.Spec)
+		if namespace != "" {
+			metadata["namespace"] = namespace
+		}
+	}
+
+	return map[string]interface{}{
+		"apiVersion": apiVersion,
+		"kind":       kindName,
+		"metadata":   metadata,
+		"spec":       resource.Spec,
+	}, nil
 }
 
 func (k *K8sReconciler) deleteResource(resource *domain.Resource) error {

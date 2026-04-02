@@ -161,3 +161,11 @@ Los componentes compartidos están en `services/common/`:
 4. **Principios SOLID:**
    - **SRP:** Cada capa tiene una única responsabilidad.
    - **DIP:** La capa de `application` depende de interfaces definidas en el `domain`.
+
+5. **Commands:**
+   - **Apply:** [APPLY_CMD](/docs/COMMAND_APPLY.md)
+   - **Daemon:** [DAEMON_CMD](/docs/COMMAND_DAEMON.md)
+   - **Get:** [GET_CMD](/docs/COMMAND_GET.md)
+   - **Inspect:** [INSPECT_CMD](/docs/COMMAND_INSPECT.md)
+   - **Install:** [INSTALL_CMD](/docs/COMMAND_INSTALL.md)
+   - **Version:** [VERSION_CMD](/docs/COMMAND_VERSION.md)

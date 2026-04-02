@@ -75,7 +75,7 @@ func (d *DockerReconciler) reconcileContainer(res *domain.Resource, actionType d
 		}
 		return d.ops.CreateContainer(res.Spec, image, res.Name)
 	case domain.ActionDelete:
-		return nil
+		return d.ops.RemoveContainer(res.Name)
 	case domain.ActionNoop:
 		return nil
 	}
@@ -97,7 +97,7 @@ func (d *DockerReconciler) reconcileNetwork(res *domain.Resource, actionType dom
 		labels := extractLabels(res.Spec)
 		return d.ops.CreateNetwork(res.Name, driver, labels)
 	case domain.ActionDelete:
-		return nil
+		return d.ops.RemoveNetwork(res.Name)
 	case domain.ActionNoop:
 		return nil
 	}
@@ -121,7 +121,11 @@ func (d *DockerReconciler) reconcileImage(res *domain.Resource, actionType domai
 		}
 		return d.ops.PullImage(imageName)
 	case domain.ActionDelete:
-		return nil
+		imageName := GetStringValue(res.Spec, "name")
+		if imageName == "" {
+			imageName = res.Name
+		}
+		return d.ops.RemoveImage(imageName)
 	case domain.ActionNoop:
 		return nil
 	}

@@ -44,7 +44,7 @@ var Cmd = &cobra.Command{
 			components.Repo,
 			builder,
 			components.Logger,
-		)
+		).WithInspector(components.Inspector)
 
 		components.Logger.Info("Apply resources...")
 

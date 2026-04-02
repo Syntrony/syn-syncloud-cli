@@ -19,9 +19,9 @@ func PrintNodes(nodes []dto.NodeDto) {
 
 func PrintResources(resources []dto.ResourceDto) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "ID\tNAME\tRUNTIME\tCREATED")
+	fmt.Fprintln(w, "ID\tNAME\tKIND\tRUNTIME\tCREATED")
 	for _, r := range resources {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", r.Id, r.Name, r.Runtime, r.CreatedAt)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", r.Id, r.Name, r.Kind, r.Runtime, r.CreatedAt)
 	}
 	w.Flush()
 }

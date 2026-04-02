@@ -52,7 +52,7 @@ func (s *InstallService) Install() error {
 		return err
 	}
 
-	state := s.builder.Build(snapshot, nodes)
+	state := s.builder.Build(snapshot, nil, nodes)
 
 	s.logger.Info("Syncloud Platform installed successfully!!!")
 

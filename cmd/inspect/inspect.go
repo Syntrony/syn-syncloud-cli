@@ -1,6 +1,7 @@
 package inspect
 
 import (
+	"fmt"
 	"synctl/internal/app"
 	services "synctl/internal/application/services"
 
@@ -32,8 +33,8 @@ var Cmd = &cobra.Command{
 		components.Logger.Info("Syncloud State: FOUND")
 		components.Logger.Info("Version: " + result.Version)
 		components.Logger.Info("Mode: " + result.Mode)
-		components.Logger.Info("Nodes: " + string(rune(result.NodeCount+'0')))
-		components.Logger.Info("Resources: " + string(rune(result.ResCount+'0')))
+		components.Logger.Info(fmt.Sprintf("Nodes: %d", result.NodeCount))
+		components.Logger.Info(fmt.Sprintf("Resources: %d", result.ResCount))
 
 		return nil
 	},

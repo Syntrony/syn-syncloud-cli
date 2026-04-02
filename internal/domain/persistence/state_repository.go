@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"synctl/internal/domain"
+	"time"
 )
 
 type StateRepository struct {
@@ -48,37 +49,42 @@ func (f *StateRepository) Save(st *domain.State) error {
 }
 
 func (f *StateRepository) Upsert(desired []*domain.Resource) ([]domain.Resource, error) {
-	state, err := f.Load()
+	merged := map[string]domain.Resource{}
 
+	exists, err := f.Exists()
 	if err != nil {
 		return nil, err
 	}
 
-	merged := map[string]domain.Resource{}
-
-	for _, res := range state.Resources {
-		merged[res.Key()] = res
+	if exists {
+		state, err := f.Load()
+		if err != nil {
+			return nil, err
+		}
+		for _, res := range state.Resources {
+			merged[res.Key()] = res
+		}
 	}
+
+	now := time.Now().UTC().Format(time.RFC3339)
 
 	for _, res := range desired {
 		key := res.Key()
 
-		if existing, ok := merged[key]; ok {
-			res.Id = existing.Id
-			res.Name = existing.Name
-			res.Kind = existing.Kind
-			res.Runtime = existing.Runtime
-			res.NodeId = existing.NodeId
-			res.Spec = existing.Spec
-			res.Status = existing.Status
-			res.Ownership = existing.Ownership
-			res.CreatedAt = existing.CreatedAt
-			res.UpdatedAt = existing.UpdatedAt
+		if prev, ok := merged[key]; ok {
+			res.Id = prev.Id
+			res.CreatedAt = prev.CreatedAt
+			res.Ownership = prev.Ownership
+			res.UpdatedAt = now
+		} else {
+			if res.CreatedAt == "" {
+				res.CreatedAt = now
+			}
 		}
 		merged[key] = *res
 	}
 
-	var snapshot []domain.Resource
+	snapshot := make([]domain.Resource, 0, len(merged))
 	for _, res := range merged {
 		snapshot = append(snapshot, res)
 	}

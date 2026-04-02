@@ -25,6 +25,7 @@ func (s *GetResourceService) Execute(filter filters.GetResourceFilter) ([]dto.Re
 		result = append(result, dto.ResourceDto{
 			Id:        r.Id,
 			Name:      r.Name,
+			Kind:      r.Kind,
 			Runtime:   r.Runtime,
 			CreatedAt: r.CreatedAt,
 		})
