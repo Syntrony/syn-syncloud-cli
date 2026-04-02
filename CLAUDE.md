@@ -16,11 +16,7 @@ La plataforma está diseñada para:
 - Gestionar múltiples runtimes desde una sola herramienta
 - Mantener un estado centralizado de la plataforma
 
-### Recursos Soportados
-
-**Docker:** Container, Network, Image
-
-**Kubernetes:** Deployment, Service, Ingress, Namespace, Secret, ConfigMap, ServiceAccount, Role, RoleBinding, ClusterRole, Pod, Endpoints, K8sResource
+---
 
 ### Estado de la Plataforma
 
@@ -32,59 +28,6 @@ El archivo `helpers/syncloud-state.json` es el centro del sistema:
 - **Nodes**: Nodos del cluster
 
 ---
-
-## Estructura del Código
-
-```
-syn-sycloud-cli/
-├── main.go                  # Punto de entrada de la aplicación
-├── cmd/                     # Comandos CLI (Cobra)
-│   ├── root.go              # Comando raíz
-│   ├── apply/               # Comando apply
-│   ├── daemon/              # Comando daemon
-│   ├── delete/              # Comando delete
-│   ├── get/                 # Comando get (recursos, nodos)
-│   ├── inspect/             # Comando inspect
-│   ├── install/             # Comando install
-│   └── version/             # Comando version
-├── internal/                # Lógica de negocio
-│   ├── app/                 # Componentes de la aplicación
-│   ├── application/         # Capa de aplicación (servicios)
-│   │   ├── interfaces/      # Contratos y abstracciones
-│   │   ├── outputs/        # Formateador de salida
-│   │   └── services/        # Servicios de negocio
-│   ├── domain/              # Núcleo del negocio
-│   │   ├── dto/             # Objetos de transferencia
-│   │   ├── filters/         # Filtros de consulta
-│   │   ├── parser/          # Analizadores de recursos
-│   │   ├── persistence/     # Repositorios de estado
-│   │   ├── Resource/       # Definiciones de recursos
-│   │   ├── docker/          # Modelos Docker
-│   │   ├── k8s/            # Modelos Kubernetes
-│   │   └── dns/            # Modelos DNS
-│   ├── infrastructure/     # Implementaciones concretas
-│   │   ├── docker/         # Adaptador Docker
-│   │   ├── k8s/            # Adaptador Kubernetes
-│   │   ├── dns/            # Adaptador DNS
-│   │   └── system/         # Adaptador sistema
-│   ├── executor/           # Ejecución de comandos
-│   └── logger/             # Sistema de logging
-└── helpers/                 # Utilidades y archivos de estado
-```
-
-### Arquitectura
-
-El proyecto sigue **Clean Architecture / Hexagonal Architecture**:
-
-1. **cmd/**: Punto de entrada. Maneja los comandos de la CLI usando Cobra. No contiene lógica de negocio.
-
-2. **internal/application/**: Capa de orquestación. Define servicios y casos de uso. Depende de interfaces del dominio.
-
-3. **internal/domain/**: Núcleo del negocio. Contiene los modelos, contextos de reconciliación y definiciones de recursos.
-
-4. **internal/infrastructure/**: Implementaciones concretas de interfaces (Docker, Kubernetes, DNS, sistema).
-
-5. **internal/executor/**: Abstracciones para la ejecución de comandos del sistema.
 
 ### Patrón de Reconciliación
 
@@ -107,7 +50,7 @@ Esta abstracción permite que apply y delete compartan la misma lógica de:
 - Construcción de estado
 - Persistencia
 
-Los componentes compartidos están en `services/common/`:
+Los componentes compartidos están en `internal/application/services/common/`:
 - **parser/**: Parseo de recursos desde YAML
 - **validator/**: Validación de estructura y reglas de recursos
 - **diff/**: Comparación de estado deseado vs actual
@@ -116,39 +59,19 @@ Los componentes compartidos están en `services/common/`:
 
 ## Listado de Comandos
 
-| Comando | Descripción | Estado |
-|---------|-------------|--------|
-| `synctl install` | Instalación de runtime y servicios necesarios (Docker, K3s, dnsmasq) | ✅ Implementado |
+| Comando | Descripción | Estado | |
+|---------|-------------|--------|-|
+| `synctl install` | Instalación de runtime y servicios necesarios (Docker, K3s, dnsmasq) | ✅ Implementado | [INSTALL_CMD](/docs/COMMAND_INSTALL.md)
 | `synctl deploy` | Despliegue inicial de la plataforma (pendiente) | ⏳ Pendiente |
-| `synctl apply -f <file>` | Creación/Actualización de recursos basados en YAML | ✅ Implementado |
-| `synctl get resources` | Listado de recursos del clúster | ✅ Implementado |
-| `synctl get nodes` | Listado de nodos del sistema | ✅ Implementado |
+| `synctl apply -f <file>` | Creación/Actualización de recursos basados en YAML | ✅ Implementado | [APPLY_CMD](/docs/COMMAND_APPLY.md)
+| `synctl get resources` | Listado de recursos del clúster | ✅ Implementado | [GET_CMD](/docs/COMMAND_GET.md)
+| `synctl get nodes` | Listado de nodos del sistema | ✅ Implementado | [GET_CMD](/docs/COMMAND_GET.md)
 | `synctl describe` | Detalle profundo de un recurso específico | ⏳ Pendiente |
-| `synctl delete resource` | Eliminación por nombre, id o archivo YAML | ✅ Implementado |
+| `synctl delete resource` | Eliminación por nombre, id o archivo YAML | ✅ Implementado | [DELETE_CMD](/docs/COMMAND_DELETE.md)
 | `synctl status` | Estado de salud del clúster de la plataforma | ⏳ Pendiente |
-| `synctl version` | Información de versión de synctl y plataforma | ✅ Implementado |
-| `synctl inspect` | Diagnóstico profundo del clúster | ✅ Implementado |
-| `synctl daemon` | Gestión del proceso en segundo plano de la plataforma | ✅ Implementado |
-
-### Flujo General de Uso
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  synctl install → Configurar runtimes (Docker/K3s + DNS)           │
-│                         ↓                                           │
-│  synctl deploy  → Desplegar DB + Backend + WebApp                  │
-│                         ↓                                           │
-│  synctl apply -f <file> → Crear/actualizar recursos                 │
-│                         ↓                                           │
-│  synctl get resources/nodes → Consultar recursos                    │
-│                         ↓                                           │
-│  synctl delete resource → Eliminar recursos                         │
-│                         ↓                                           │
-│  synctl daemon → Iniciar control plane en segundo plano            │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
----
+| `synctl version` | Información de versión de synctl y plataforma | ✅ Implementado | [VERSION_CMD](/docs/COMMAND_VERSION.md)
+| `synctl inspect` | Diagnóstico profundo del clúster | ✅ Implementado | [INSPECT_CMD](/docs/COMMAND_INSPECT.md)
+| `synctl daemon` | Gestión del proceso en segundo plano de la plataforma | ✅ Implementado | [DAEMON_CMD](/docs/COMMAND_DAEMON.md)
 
 ## Reglas de Arquitectura
 
@@ -161,11 +84,3 @@ Los componentes compartidos están en `services/common/`:
 4. **Principios SOLID:**
    - **SRP:** Cada capa tiene una única responsabilidad.
    - **DIP:** La capa de `application` depende de interfaces definidas en el `domain`.
-
-5. **Commands:**
-   - **Apply:** [APPLY_CMD](/docs/COMMAND_APPLY.md)
-   - **Daemon:** [DAEMON_CMD](/docs/COMMAND_DAEMON.md)
-   - **Get:** [GET_CMD](/docs/COMMAND_GET.md)
-   - **Inspect:** [INSPECT_CMD](/docs/COMMAND_INSPECT.md)
-   - **Install:** [INSTALL_CMD](/docs/COMMAND_INSTALL.md)
-   - **Version:** [VERSION_CMD](/docs/COMMAND_VERSION.md)
