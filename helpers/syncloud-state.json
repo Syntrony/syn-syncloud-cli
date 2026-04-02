@@ -16,30 +16,11 @@
   ],
   "resources": [
     {
-      "id": "bae29c42cca8",
-      "name": "sql-server",
-      "kind": "docker.container",
-      "runtime": "docker",
-      "nodeId": "929a1a65-f2d1-43a3-a84f-85324d964517",
-      "spec": {
-        "command": "\"/opt/mssql/bin/laun…\"",
-        "image": "mcr.microsoft.com/mssql/server:2022-latest",
-        "labels": "com.microsoft.product=Microsoft SQL Server,com.microsoft.version=16.0.4236.2,org.opencontainers.image.ref.name=ubuntu,org.opencontainers.image.version=22.04,vendor=Microsoft",
-        "ports": ""
-      },
-      "status": {
-        "state": "exited"
-      },
-      "ownership": {},
-      "createdAt": "",
-      "updatedAt": ""
-    },
-    {
-      "id": "4cc6ed29-f1d2-4826-b6e2-941fa866e586",
-      "name": "default",
+      "id": "7e982101-3e30-4f45-8ec4-64fe47c98642",
+      "name": "kube-system",
       "kind": "k8s.namespace",
       "runtime": "kubernetes",
-      "nodeId": "353467d4-98ac-4e34-ac07-a77c10a6d593",
+      "nodeId": "75090bf8-475e-483d-b214-270d1557bfd2",
       "spec": {
         "finalizers": [
           "kubernetes"
@@ -49,8 +30,8 @@
         "phase": "Active"
       },
       "ownership": {},
-      "createdAt": "2026-04-02T04:25:07Z",
-      "updatedAt": "2026-04-02T04:25:07Z"
+      "createdAt": "2026-04-02T04:25:06Z",
+      "updatedAt": "2026-04-02T04:25:06Z"
     },
     {
       "id": "36d4599e-dca1-4169-b0a7-aafbce8485aa",
@@ -69,24 +50,6 @@
       "ownership": {},
       "createdAt": "2026-04-02T04:25:07Z",
       "updatedAt": "2026-04-02T04:25:07Z"
-    },
-    {
-      "id": "7e982101-3e30-4f45-8ec4-64fe47c98642",
-      "name": "kube-system",
-      "kind": "k8s.namespace",
-      "runtime": "kubernetes",
-      "nodeId": "75090bf8-475e-483d-b214-270d1557bfd2",
-      "spec": {
-        "finalizers": [
-          "kubernetes"
-        ]
-      },
-      "status": {
-        "phase": "Active"
-      },
-      "ownership": {},
-      "createdAt": "2026-04-02T04:25:06Z",
-      "updatedAt": "2026-04-02T04:25:06Z"
     },
     {
       "id": "d5de3f65b68d",
@@ -136,6 +99,43 @@
       "ownership": {},
       "createdAt": "2026-04-02T04:25:10Z",
       "updatedAt": "2026-04-02T04:25:10Z"
+    },
+    {
+      "id": "bae29c42cca8",
+      "name": "sql-server",
+      "kind": "docker.container",
+      "runtime": "docker",
+      "nodeId": "929a1a65-f2d1-43a3-a84f-85324d964517",
+      "spec": {
+        "command": "\"/opt/mssql/bin/laun…\"",
+        "image": "mcr.microsoft.com/mssql/server:2022-latest",
+        "labels": "com.microsoft.product=Microsoft SQL Server,com.microsoft.version=16.0.4236.2,org.opencontainers.image.ref.name=ubuntu,org.opencontainers.image.version=22.04,vendor=Microsoft",
+        "ports": ""
+      },
+      "status": {
+        "state": "exited"
+      },
+      "ownership": {},
+      "createdAt": "",
+      "updatedAt": ""
+    },
+    {
+      "id": "4cc6ed29-f1d2-4826-b6e2-941fa866e586",
+      "name": "default",
+      "kind": "k8s.namespace",
+      "runtime": "kubernetes",
+      "nodeId": "353467d4-98ac-4e34-ac07-a77c10a6d593",
+      "spec": {
+        "finalizers": [
+          "kubernetes"
+        ]
+      },
+      "status": {
+        "phase": "Active"
+      },
+      "ownership": {},
+      "createdAt": "2026-04-02T04:25:07Z",
+      "updatedAt": "2026-04-02T04:25:07Z"
     },
     {
       "id": "a7f7ebebc914",
