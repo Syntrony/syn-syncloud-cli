@@ -8,13 +8,19 @@ import (
 )
 
 type ReconcileService struct {
-	runtimes []common.RuntimeReconciler
+	runtimes      []common.RuntimeReconciler
+	dnsReconciler common.DnsReconciler
 }
 
 func NewReconcileService(runtimes []common.RuntimeReconciler) *ReconcileService {
 	return &ReconcileService{
 		runtimes: runtimes,
 	}
+}
+
+func (r *ReconcileService) WithDnsReconciler(dns common.DnsReconciler) *ReconcileService {
+	r.dnsReconciler = dns
+	return r
 }
 
 func (r *ReconcileService) Reconcile(state *domain.State) error {
@@ -58,6 +64,13 @@ func (r *ReconcileService) Reconcile(state *domain.State) error {
 			return err
 		}
 	}
+
+	if r.dnsReconciler != nil && state.Dns != nil {
+		if err := r.dnsReconciler.ReconcileDns(state.Dns); err != nil {
+			return fmt.Errorf("dns reconciliation: %w", err)
+		}
+	}
+
 	return nil
 }
 

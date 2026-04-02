@@ -24,7 +24,7 @@ func (v *resourceValidator) validateBasicFields(resource *domain.Resource) error
 
 func (v *resourceValidator) validateRuntime(resource *domain.Resource) error {
 	switch resource.Runtime {
-	case "docker", "kubernetes":
+	case "docker", "kubernetes", "dns":
 		return nil
 	default:
 		return fmt.Errorf("unsupported runtime: %s", resource.Runtime)

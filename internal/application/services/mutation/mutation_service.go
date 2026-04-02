@@ -6,6 +6,7 @@ import (
 	"synctl/internal/application/interfaces/mutation"
 	"synctl/internal/application/services/state"
 	"synctl/internal/domain"
+	resource "synctl/internal/domain/Resource"
 	system "synctl/internal/infrastructure/system"
 )
 
@@ -57,6 +58,18 @@ func (m *MutationService) getExistingNodes() []domain.Node {
 	return st.Nodes
 }
 
+func (m *MutationService) getExistingDns() []resource.Record {
+	exists, err := m.repo.Exists()
+	if err != nil || !exists {
+		return nil
+	}
+	st, err := m.repo.Load()
+	if err != nil || st.Dns == nil {
+		return nil
+	}
+	return st.Dns.Records
+}
+
 func (m *MutationService) ExecuteResource(resources []*domain.Resource, mut mutation.StateMutation) error {
 	return m.Execute(resources, mut)
 }
@@ -82,7 +95,22 @@ func (m *MutationService) Execute(resources []*domain.Resource, mut mutation.Sta
 		return err
 	}
 
-	snapshot, err := mut.Mutate(resources)
+	// Separate DNS resources from regular runtime resources
+	var regularResources []*domain.Resource
+	var incomingRecords []resource.Record
+
+	for _, r := range resources {
+		if r.Runtime == "dns" {
+			incomingRecords = append(incomingRecords, resource.Record{
+				Name:   r.Name,
+				Server: specString(r.Spec, "server"),
+			})
+		} else {
+			regularResources = append(regularResources, r)
+		}
+	}
+
+	snapshot, err := mut.Mutate(regularResources)
 
 	if err != nil {
 		return err
@@ -90,6 +118,7 @@ func (m *MutationService) Execute(resources []*domain.Resource, mut mutation.Sta
 
 	var snap domain.Snapshot
 	snap.Resources = snapshot
+	snap.Records = mut.MutateDns(incomingRecords, m.getExistingDns())
 
 	cluster := m.getExistingCluster()
 	nodes := m.getExistingNodes()
@@ -104,4 +133,16 @@ func (m *MutationService) Execute(resources []*domain.Resource, mut mutation.Sta
 	state := m.builder.Build(&snap, cluster, nodes)
 
 	return m.repo.Save(state)
+}
+
+func specString(spec map[string]interface{}, key string) string {
+	if spec == nil {
+		return ""
+	}
+	if val, ok := spec[key]; ok {
+		if s, ok := val.(string); ok {
+			return s
+		}
+	}
+	return ""
 }

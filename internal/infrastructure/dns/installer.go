@@ -126,6 +126,44 @@ func (i *Installer) ConfigureDns() error {
 	return nil
 }
 
+// ApplyRecords writes the dnsmasq config with the given records and reloads the service.
+func (i *Installer) ApplyRecords(records []resource.Record, generalIp string) error {
+	content := i.SetupDnsFile(records, generalIp)
+
+	finalPath := "/etc/dnsmasq.d/syncloud.conf"
+	tmpPath := "/tmp/syncloud.conf.tmp"
+	backupPath := "/etc/dnsmasq.d/syncloud.conf.bak"
+
+	if err := i.sysfile.WriteFile(tmpPath, content); err != nil {
+		return fmt.Errorf("failed to write tmp config: %w", err)
+	}
+
+	if _, err := i.runner.Run("dnsmasq", "--test", "--conf-file="+tmpPath); err != nil {
+		return fmt.Errorf("invalid dnsmasq configuration: %w", err)
+	}
+
+	if i.runtime == domain.Container {
+		i.runner.Run("cp", finalPath, backupPath)
+		if _, err := i.runner.Run("mv", tmpPath, finalPath); err != nil {
+			return fmt.Errorf("failed to deploy config: %w", err)
+		}
+	} else {
+		i.sudo.Run("cp", finalPath, backupPath)
+		if _, err := i.sudo.Run("mv", tmpPath, finalPath); err != nil {
+			return fmt.Errorf("failed to deploy config: %w", err)
+		}
+		if _, err := i.sudo.Run("systemctl", "reload", "dnsmasq"); err != nil {
+			i.logger.Error("Reload failed, performing rollback...")
+			i.sudo.Run("cp", backupPath, finalPath)
+			i.sudo.Run("systemctl", "reload", "dnsmasq")
+			return fmt.Errorf("dnsmasq reload failed, rolled back: %w", err)
+		}
+	}
+
+	i.logger.Info(fmt.Sprintf("DNS config applied with %d record(s)", len(records)))
+	return nil
+}
+
 func (i *Installer) DisableSystemd() error {
 	i.logger.Info("Disabling systemd...")
 

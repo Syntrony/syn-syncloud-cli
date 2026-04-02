@@ -104,6 +104,15 @@ spec:
     password: c2VjcmV0
 
 ---
+# DNS Record Example
+apiVersion: syncloud/v1
+kind: DnsRecord
+metadata:
+  name: api.syncloud.local
+spec:
+  server: 192.168.1.100
+
+---
 # Kubernetes Raw Resource (passthrough)
 apiVersion: syncloud/v1
 kind: K8sResource

@@ -114,6 +114,12 @@ func NewKindResolver() *KindResolver {
 				Mode:         "abstract",
 				RequiredSpec: []string{},
 			},
+			"DnsRecord": {
+				Runtime:      "dns",
+				Kind:         "dns.record",
+				Mode:         "abstract",
+				RequiredSpec: []string{"server"},
+			},
 		},
 	}
 }
