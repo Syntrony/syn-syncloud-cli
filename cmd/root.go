@@ -4,6 +4,7 @@ import (
 	"synctl/cmd/apply"
 	"synctl/cmd/daemon"
 	"synctl/cmd/delete"
+	"synctl/cmd/describe"
 	"synctl/cmd/get"
 	"synctl/cmd/inspect"
 	"synctl/cmd/install"
@@ -44,6 +45,7 @@ func init() {
 	RootCmd.AddCommand(install.Cmd)
 	RootCmd.AddCommand(apply.Cmd)
 	RootCmd.AddCommand(delete.Cmd)
+	RootCmd.AddCommand(describe.Cmd)
 
 	RootCmd.AddCommand(daemon.Cmd)
 }

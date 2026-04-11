@@ -97,6 +97,38 @@
             ]
         },
         {
+            "name": "synctl describe k8s namespace",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": [
+                "describe",
+                "-n",
+                "default",
+                "-k",
+                "namespace",
+                "-r",
+                "kubernetes"
+            ]
+        },
+        {
+            "name": "synctl describe docker sql-server",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": [
+                "describe",
+                "-n",
+                "sql-server",
+                "-k",
+                "container",
+                "-r",
+                "docker"
+            ]
+        },
+        {
             "name": "synctl (manual args)",
             "type": "go",
             "request": "launch",
