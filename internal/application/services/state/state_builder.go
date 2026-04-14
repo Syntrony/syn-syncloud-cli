@@ -13,9 +13,13 @@ func NewStateBuilder() *StateBuilder {
 
 func (b *StateBuilder) Build(snapshot *domain.Snapshot, cluster *domain.Cluster, nodes []domain.Node) *domain.State {
 	if cluster == nil {
+		hostname := "syncloud-local"
+		if len(nodes) > 0 {
+			hostname = nodes[0].Hostname
+		}
 		cluster = &domain.Cluster{
-			Id:        "cluster-01",
-			Name:      "syncloud-local",
+			Id:        "cluster-" + hostname,
+			Name:      hostname,
 			Mode:      "single",
 			CreatedAt: time.Now().UTC().Format(time.RFC3339),
 		}

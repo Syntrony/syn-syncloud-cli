@@ -1,6 +1,8 @@
 package executor
 
 import (
+	"os"
+	"os/exec"
 	"time"
 
 	"synctl/internal/application/interfaces"
@@ -26,8 +28,13 @@ func (r *SudoRunner) EnsureAuth() error {
 		return nil
 	}
 
-	_, err := r.runner.Run("sudo", "-v")
-	if err != nil {
+	// Use exec directly with stdin so user can enter password interactively if needed
+	cmd := exec.Command("sudo", "-v")
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
 		return err
 	}
 

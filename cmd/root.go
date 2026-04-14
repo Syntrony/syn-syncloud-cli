@@ -8,6 +8,9 @@ import (
 	"synctl/cmd/get"
 	"synctl/cmd/inspect"
 	"synctl/cmd/install"
+	"synctl/cmd/logs"
+	"synctl/cmd/reconcile"
+	"synctl/cmd/status"
 	"synctl/cmd/version"
 	"synctl/internal/logger"
 
@@ -48,4 +51,7 @@ func init() {
 	RootCmd.AddCommand(describe.Cmd)
 
 	RootCmd.AddCommand(daemon.Cmd)
+	RootCmd.AddCommand(reconcile.Cmd)
+	RootCmd.AddCommand(logs.Cmd)
+	RootCmd.AddCommand(status.Cmd)
 }

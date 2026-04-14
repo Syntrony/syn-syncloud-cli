@@ -129,6 +129,66 @@
             ]
         },
         {
+            "name": "synctl reconcile",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "reconcile"
+            ]
+        },
+        {
+            "name": "synctl logs docker",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": [
+                "logs",
+                "-n",
+                "nginx",
+                "-r",
+                "docker",
+                "--tail",
+                "50"
+            ],
+            "env": {
+                "DEBUG": "1"
+            }
+        },
+        {
+            "name": "synctl logs kubernetes",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": [
+                "logs",
+                "-n",
+                "my-app",
+                "-r",
+                "kubernetes",
+                "--namespace",
+                "default",
+                "--tail",
+                "100"
+            ],
+            "env": {
+                "DEBUG": "1"
+            }
+        },
+        {
+            "name": "synctl status",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "status"
+            ]
+        },
+        {
             "name": "synctl (manual args)",
             "type": "go",
             "request": "launch",

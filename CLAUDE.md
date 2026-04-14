@@ -66,10 +66,11 @@ Los componentes compartidos están en `internal/application/services/common/`:
 | `synctl apply -f <file>` | Creación/Actualización de recursos basados en YAML | ✅ Implementado | [APPLY_CMD](/docs/COMMAND_APPLY.md)
 | `synctl get resources` | Listado de recursos del clúster | ✅ Implementado | [GET_CMD](/docs/COMMAND_GET.md)
 | `synctl get nodes` | Listado de nodos del sistema | ✅ Implementado | [GET_CMD](/docs/COMMAND_GET.md)
-| `synctl describe` | Detalle profundo de un recurso específico | ⏳ Pendiente |
-| `synctl reconcile` | Sincronización bidireccional estado ↔ runtime (importar recursos) | ⏳ Pendiente |
+| `synctl describe` | Detalle profundo de un recurso específico | ✅ Implementado | [COMMAND_DESCRIBE](/docs/COMMAND_DESCRIBE.md)
+| `synctl reconcile` | Sincronización bidireccional estado ↔ runtime (importar recursos) | ✅ Implementado |
+| `synctl logs` | Logs de algun recurso en especifico | ✅ Implementado |
 | `synctl delete resource` | Eliminación por nombre, id o archivo YAML | ✅ Implementado | [DELETE_CMD](/docs/COMMAND_DELETE.md)
-| `synctl status` | Estado de salud del clúster de la plataforma | ⏳ Pendiente |
+| `synctl status` | Estado de salud del clúster de la plataforma | ✅ Implementado |
 | `synctl version` | Información de versión de synctl y plataforma | ✅ Implementado | [VERSION_CMD](/docs/COMMAND_VERSION.md)
 | `synctl inspect` | Diagnóstico profundo del clúster | ✅ Implementado | [INSPECT_CMD](/docs/COMMAND_INSPECT.md)
 | `synctl daemon` | Gestión del proceso en segundo plano de la plataforma | ✅ Implementado | [DAEMON_CMD](/docs/COMMAND_DAEMON.md)

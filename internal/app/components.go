@@ -9,7 +9,10 @@ import (
 	"synctl/internal/logger"
 )
 
-const DefaultStatePath = "helpers/syncloud-state.json"
+const (
+	ContainerStatePath = "/helpers/syncloud-state.json"
+	VPSStatePath       = "/var/lib/synctl/syncloud-state.json"
+)
 
 type Components struct {
 	Repo        interfaces.Repository
@@ -48,7 +51,10 @@ func (c *Components) WithRepo(path string) *Components {
 }
 
 func (c *Components) WithDefaultRepo() *Components {
-	return c.WithRepo(DefaultStatePath)
+	if c.EnvDetector.IsContainer() {
+		return c.WithRepo(ContainerStatePath)
+	}
+	return c.WithRepo(VPSStatePath)
 }
 
 func (c *Components) WithSudo(sudo interfaces.PrivilegedRunner) *Components {

@@ -33,6 +33,8 @@ func (s *GetNodeService) Execute() ([]dto.NodeDto, error) {
 			Hostname: node.Hostname,
 			Ip:       node.Ip,
 			Role:     node.Role,
+			Os:       node.Os,
+			Arch:     node.Arch,
 		})
 	}
 
