@@ -5,7 +5,7 @@ import (
 
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
-	resource "synctl/internal/domain/Resource"
+	resource "synctl/internal/domain/resource"
 	dnsinfra "synctl/internal/infrastructure/dns"
 	sysinfra "synctl/internal/infrastructure/system"
 )

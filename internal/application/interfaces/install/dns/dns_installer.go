@@ -1,6 +1,6 @@
 package dns
 
-import resource "synctl/internal/domain/Resource"
+import resource "synctl/internal/domain/resource"
 
 type DnsInstaller interface {
 	InstallDns() error

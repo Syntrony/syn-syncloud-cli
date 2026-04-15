@@ -6,7 +6,7 @@ import (
 	"synctl/internal/application/interfaces"
 	system "synctl/internal/application/interfaces/system"
 	"synctl/internal/domain"
-	resource "synctl/internal/domain/Resource"
+	resource "synctl/internal/domain/resource"
 
 	"github.com/brianvoe/gofakeit/v6"
 )

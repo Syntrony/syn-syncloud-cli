@@ -6,7 +6,7 @@ import (
 	"synctl/internal/application/interfaces/mutation"
 	"synctl/internal/application/services/state"
 	"synctl/internal/domain"
-	resource "synctl/internal/domain/Resource"
+	resource "synctl/internal/domain/resource"
 	system "synctl/internal/infrastructure/system"
 )
 
