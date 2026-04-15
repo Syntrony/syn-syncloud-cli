@@ -2,7 +2,7 @@ package domain
 
 import (
 	"fmt"
-	resource "synctl/internal/domain/Resource"
+	resource "synctl/internal/domain/resource"
 )
 
 type Resource struct {

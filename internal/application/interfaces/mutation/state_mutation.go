@@ -2,7 +2,7 @@ package mutation
 
 import (
 	"synctl/internal/domain"
-	resource "synctl/internal/domain/Resource"
+	resource "synctl/internal/domain/resource"
 )
 
 type StateMutation interface {

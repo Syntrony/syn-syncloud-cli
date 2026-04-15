@@ -5,8 +5,8 @@ import (
 	"strings"
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
-	domainresource "synctl/internal/domain/Resource"
 	"synctl/internal/domain/k8s"
+	domainresource "synctl/internal/domain/resource"
 
 	"github.com/google/uuid"
 )

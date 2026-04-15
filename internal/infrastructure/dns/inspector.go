@@ -7,7 +7,7 @@ import (
 	"strings"
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
-	resource "synctl/internal/domain/Resource"
+	resource "synctl/internal/domain/resource"
 )
 
 type Inspector struct {
