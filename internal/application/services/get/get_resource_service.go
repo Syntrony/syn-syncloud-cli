@@ -2,6 +2,7 @@ package services
 
 import (
 	interfaces "synctl/internal/application/interfaces"
+	"synctl/internal/domain"
 	dto "synctl/internal/domain/dto"
 	filters "synctl/internal/domain/filters"
 )
@@ -11,48 +12,56 @@ type GetResourceService struct {
 }
 
 func (s *GetResourceService) Execute(filter filters.GetResourceFilter) ([]dto.ResourceDto, error) {
+	resources, err := s.GetResourceBy(filter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.ResourceDto
+
+	for _, r := range resources {
+
+		result = append(result, dto.ResourceDto{
+			Id:        r.Id,
+			Name:      r.Name,
+			Kind:      r.Kind,
+			Runtime:   r.Runtime,
+			CreatedAt: r.CreatedAt,
+		})
+	}
+
+	return result, nil
+
+}
+
+func (s *GetResourceService) GetResourceBy(filter filters.GetResourceFilter) ([]*domain.Resource, error) {
 	exists, err := s.Repo.Exists()
+	var resources []*domain.Resource
 
 	if err != nil {
 		return nil, err
 	}
 
 	if !exists {
-		return []dto.ResourceDto{}, nil
+		return resources, nil
 	}
 
 	st, err := s.Repo.Load()
+
 	if err != nil {
 		return nil, err
 	}
 
-	var resources []dto.ResourceDto
-
 	for _, r := range st.Resources {
-		if filter.Name != "" && r.Name != filter.Name {
-			continue
+		if (filter.Name == "" || r.Name == filter.Name) &&
+			(filter.Kind == "" || r.Kind == filter.Kind) &&
+			(filter.Id == "" || r.Id == filter.Id) &&
+			(filter.Runtime == "" || r.Runtime == filter.Runtime) &&
+			(filter.NodeId == "" || r.NodeId == filter.NodeId) {
+			resources = append(resources, &r)
 		}
-		if filter.Kind != "" && r.Kind != filter.Kind {
-			continue
-		}
-		if filter.Id != "" && r.Id != filter.Id {
-			continue
-		}
-		if filter.Runtime != "" && r.Runtime != filter.Runtime {
-			continue
-		}
-		if filter.NodeId != "" && r.NodeId != filter.NodeId {
-			continue
-		}
-
-		resources = append(resources, dto.ResourceDto{
-			Id:        r.Id,
-			Name:      r.Name,
-			Runtime:   r.Runtime,
-			CreatedAt: r.CreatedAt,
-		})
 	}
 
 	return resources, nil
-
 }

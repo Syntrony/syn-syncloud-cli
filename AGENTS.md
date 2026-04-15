@@ -1,162 +1,88 @@
-# AGENTS.md - Development Guide for AI Agents
+# Contexto de Proyecto: Syncloud Platform CLI (synctl)
 
-## Project Overview
-
-Go CLI (`synctl`) for managing Syncloud resources using kubernetes, docker, dnsmasq.
-- **Module**: `synctl`
-- **Go Version**: 1.25.0
-- **Dependencies**: `github.com/spf13/cobra`, `github.com/google/uuid`, `go.yaml.in/yaml/v3`
+**Propietario:** Syntrony Technologies Inc.
+**Lenguaje:** Go (Golang)
+**Objetivo del MVP:** Proveer comandos funcionales para la administración general de recursos en Docker y Kubernetes mediante un modelo unificado.
 
 ---
 
-## Build Commands
+## Contexto General
 
-```bash
-go build -o synctl .              # Build binary
-go run .                          # Run without building
-go run . install                  # Run install command
-go run . get nodes                # Run get nodes command
-GOOS=linux GOARCH=amd64 go build -o synctl-linux-amd64 .  # Cross-compile
-go build -o /dev/null .           # Build check only
-```
+**Syncloud Platform (synctl)** es una herramienta CLI que abstrae la funcionalidad del runtime (Docker, Kubernetes) proporcionando una interfaz unificada para gestionar recursos de ambos ecosistemas. 
 
----
-
-## Test Commands
-
-```bash
-go test ./...                     # Run all tests
-go test -v ./...                  # Verbose output
-go test -v -run TestName ./...   # Run single test by name
-go test -v ./internal/domain/... # Run tests in specific package
-go test -cover ./...              # With coverage
-go test -race ./...               # Race detector
-```
+La plataforma está diseñada para:
+- Simplificar la administración de infraestructura containerizada
+- Proporcionar un modelo declarativo de recursos (CRUD)
+- Gestionar múltiples runtimes desde una sola herramienta
+- Mantener un estado centralizado de la plataforma
 
 ---
 
-## Lint and Format
+### Estado de la Plataforma
 
-```bash
-go fmt ./...          # Format code
-go vet ./...          # Vet checks
-golangci-lint run ./...  # Full linting (if installed)
-```
-
----
-
-## Code Style
-
-### Import Organization
-
-Three groups separated by blank lines: stdlib, external, internal.
-
-```go
-import (
-    "fmt"
-    "os"
-
-    "github.com/spf13/cobra"
-    "github.com/google/uuid"
-
-    "synctl/cmd/get"
-    "synctl/internal/domain"
-)
-```
-
-Use aliases for conflicts: `nodes "synctl/cmd/get/nodes"`
-
-### Naming Conventions
-
-- **Files**: snake_case (`install_service.go`)
-- **Packages**: lowercase (`install`, `dns`)
-- **Types/Interfaces**: PascalCase (`InstallService`)
-- **Functions**: PascalCase (`NewInstallService`)
-- **Variables**: camelCase (`nodeInspector`)
-- **Interfaces**: Suffix with `er` (`Installer`, `Inspector`)
-
-### Package Structure
-
-```
-cmd/               # Cobra commands
-internal/
-  ├── application/ # Services & interfaces
-  │   ├── interfaces/
-  │   ├── services/
-  │   └── outputs/
-  ├── domain/     # Entities, DTOs
-  ├── infrastructure/  # Adapters (docker, k8s, dns, system)
-  └── logger/    # Logging
-```
-
-### Interface Definition
-
-Define in `internal/application/interfaces/`, implement in `internal/infrastructure/`:
-
-```go
-type DnsInstaller interface {
-    InstallDns() error
-    ConfigureDns() error
-}
-```
-
-### Error Handling
-
-Early returns with wrapped errors. Never log and return errors.
-
-```go
-func (s *InstallService) Install() error {
-    for _, runtime := range s.runtimes {
-        if err := runtime.Install(); err != nil {
-            return fmt.Errorf("installing runtime: %w", err)
-        }
-    }
-    return s.repo.Save(state)
-}
-```
-
-### Constructor Functions
-
-```go
-func NewInstaller(runner interfaces.CommandRunner, logger interfaces.Logger) *Installer {
-    return &Installer{runner: runner, logger: logger}
-}
-```
-
-### Logging
-
-Use `synctl/internal/application/interfaces/logger.go`. Prefer `logger.Info()`, `logger.Error()`.
-
-### Cobra Commands
-
-```go
-var Cmd = &cobra.Command{...}
-func init() { RootCmd.AddCommand(Cmd) }
-```
-
-Keep business logic in services, not cmd packages.
+El archivo `helpers/syncloud-state.json` es el centro del sistema:
+- **Estado deseado**: Recursos declarados
+- **Estado actual**: Recursos observados
+- **Diff**: Diferencia para reconciliar
+- **DNS Records**: Registros para acceso
+- **Nodes**: Nodos del cluster
 
 ---
 
-## Workflow
+### Patrón de Reconciliación
 
-Before committing:
-```bash
-go fmt ./... && go vet ./... && go test ./... && go build -o /dev/null .
-```
+La lógica de reconciliación sigue un ciclo de:
+1. **Detección (Diffing)**: Identificar el estado deseado vs. estado actual
+2. **Planificación**: Generar un `ReconcileContext` con acciones (Create/Update/Delete)
+3. **Ejecución**: Aplicar las acciones a través de los adaptadores de infraestructura
+
+### Abstracción de Mutaciones
+
+El sistema utiliza una abstracción de mutaciones para compartir código entre comandos:
+
+- **MutationService**: Servicio genérico que maneja parser, validación y ejecución
+- **ApplyMutation**: Implementación específica para aplicar recursos (Upsert)
+- **DeleteMutation**: Implementación específica para eliminar recursos (Remove)
+
+Esta abstracción permite que apply y delete compartan la misma lógica de:
+- Parseo de archivos YAML
+- Validación de recursos
+- Construcción de estado
+- Persistencia
+
+Los componentes compartidos están en `internal/application/services/common/`:
+- **parser/**: Parseo de recursos desde YAML
+- **validator/**: Validación de estructura y reglas de recursos
+- **diff/**: Comparación de estado deseado vs actual
 
 ---
 
-## Adding New Commands
+## Listado de Comandos
 
-1. Create `cmd/newcommand/command.go`
-2. Add `var Cmd = &cobra.Command{...}`
-3. Register in parent's `init()`: `ParentCmd.AddCommand(Cmd)`
-4. Keep logic in `internal/application/services/`
+| Comando | Descripción | Estado | |
+|---------|-------------|--------|-|
+| `synctl install` | Instalación de runtime y servicios necesarios (Docker, K3s, dnsmasq) | ✅ Implementado | [INSTALL_CMD](/docs/COMMAND_INSTALL.md)
+| `synctl deploy` | Despliegue inicial de la plataforma (pendiente) | ⏳ Pendiente |
+| `synctl apply -f <file>` | Creación/Actualización de recursos basados en YAML | ✅ Implementado | [APPLY_CMD](/docs/COMMAND_APPLY.md)
+| `synctl get resources` | Listado de recursos del clúster | ✅ Implementado | [GET_CMD](/docs/COMMAND_GET.md)
+| `synctl get nodes` | Listado de nodos del sistema | ✅ Implementado | [GET_CMD](/docs/COMMAND_GET.md)
+| `synctl describe` | Detalle profundo de un recurso específico | ✅ Implementado | [COMMAND_DESCRIBE](/docs/COMMAND_DESCRIBE.md)
+| `synctl reconcile` | Sincronización bidireccional estado ↔ runtime (importar recursos) | ⏳ Pendiente |
+| `synctl logs` | Logs de algun recurso en especifico | ⏳ Pendiente |
+| `synctl delete resource` | Eliminación por nombre, id o archivo YAML | ✅ Implementado | [DELETE_CMD](/docs/COMMAND_DELETE.md)
+| `synctl status` | Estado de salud del clúster de la plataforma | ⏳ Pendiente |
+| `synctl version` | Información de versión de synctl y plataforma | ✅ Implementado | [VERSION_CMD](/docs/COMMAND_VERSION.md)
+| `synctl inspect` | Diagnóstico profundo del clúster | ✅ Implementado | [INSPECT_CMD](/docs/COMMAND_INSPECT.md)
+| `synctl daemon` | Gestión del proceso en segundo plano de la plataforma | ✅ Implementado | [DAEMON_CMD](/docs/COMMAND_DAEMON.md)
 
-## Adding New Services
+## Reglas de Arquitectura
 
-1. Define interface in `internal/application/interfaces/`
-2. Implement in `internal/infrastructure/`
-3. Use `New*()` constructor returning `*Type`
-4. Inject dependencies through constructor
+1. **Idempotencia:** Los comandos `apply` y `deploy` deben ser seguros de ejecutar múltiples veces.
+
+2. **Modelado Unificado:** Abstraer la complejidad de K8s/Docker bajo el modelo de Syncloud.
+
+3. **Logs:** Formato limpio para terminal (utilizar los estándares de Syntrony definidos en el código).
+
+4. **Principios SOLID:**
+   - **SRP:** Cada capa tiene una única responsabilidad.
+   - **DIP:** La capa de `application` depende de interfaces definidas en el `domain`.

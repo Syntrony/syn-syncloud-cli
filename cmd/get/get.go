@@ -9,7 +9,7 @@ import (
 
 var Cmd = &cobra.Command{
 	Use:   "get",
-	Short: "",
+	Short: "List specific resources / nobes given filters",
 }
 
 func init() {

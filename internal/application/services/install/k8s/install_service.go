@@ -26,7 +26,6 @@ func NewInstallService(
 
 func (s *InstallService) Install() (*domain.Snapshot, error) {
 	status, err := s.detector.Detect()
-
 	if err != nil {
 		return nil, err
 	}
@@ -37,12 +36,22 @@ func (s *InstallService) Install() (*domain.Snapshot, error) {
 		}
 	}
 
-	if !status.ClusterReachable {
-		if err := s.installer.InstallCluster(); err != nil {
-			return nil, err
+	if status.K3sInstalled {
+		// K3s ya existe en el sistema — solo configurar KUBECONFIG si falta
+		if !status.KubeconfigConfigured {
+			if err := s.installer.ConfigureKubeconfig(); err != nil {
+				return nil, err
+			}
 		}
-		if err := s.installer.ConfigureCluster(); err != nil {
-			return nil, err
+	} else {
+		// K3s no existe — instalación completa
+		if !status.ClusterReachable {
+			if err := s.installer.InstallCluster(); err != nil {
+				return nil, err
+			}
+			if err := s.installer.ConfigureCluster(); err != nil {
+				return nil, err
+			}
 		}
 	}
 

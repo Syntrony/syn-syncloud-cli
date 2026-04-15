@@ -24,27 +24,22 @@ func (d *Detector) Detect() (*dto.Status, error) {
 	status := &dto.Status{}
 
 	_, err := d.runner.Run("docker", "--version")
+	status.DockerInstalled = err == nil
 
-	if err != nil {
-		status.DockerInstalled = false
-		return status, nil
+	if status.DockerInstalled {
+		_, err = d.runner.Run("docker", "info")
+		status.DockerRunning = err == nil
+
+		status.DockerPermissionsOk = d.UserHasDockerAccess()
+
+		if !status.DockerPermissionsOk {
+			d.logger.Info("Docker installed but user lacks socket permissions (not in docker group)")
+		}
 	}
 
-	status.DockerInstalled = true
-
-	_, err = d.runner.Run("docker", "info")
-
-	if err != nil {
-		status.DockerRunning = false
-		return status, nil
-	}
-
-	status.DockerRunning = true
-
-	if !d.UserHasDockerAccess() {
-		status.DockerRunning = false
-		d.logger.Info("Docker installed but user lacks permissions (not in docker group)")
-	}
+	d.logger.Info("docker: installed=" + boolStr(status.DockerInstalled) +
+		" running=" + boolStr(status.DockerRunning) +
+		" permissions=" + boolStr(status.DockerPermissionsOk))
 
 	return status, nil
 }
@@ -54,11 +49,16 @@ func (d *Detector) UserHasDockerAccess() bool {
 	if err != nil || user == "" {
 		return false
 	}
-
 	output, err := d.runner.Run("groups", user)
 	if err != nil {
 		return false
 	}
+	return strings.Contains(output.Stdout, "docker")
+}
 
-	return strings.Contains(string(output.Stdout), "docker")
+func boolStr(v bool) string {
+	if v {
+		return "true"
+	}
+	return "false"
 }

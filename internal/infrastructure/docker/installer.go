@@ -71,6 +71,16 @@ func (i *Installer) StartDocker() error {
 	return nil
 }
 
+func (i *Installer) ConfigureDockerPermissions(user string) error {
+	if err := i.ConfigureDocker(user); err != nil {
+		return err
+	}
+	i.logger.Info("User '" + user + "' added to docker group.")
+	i.logger.Info("IMPORTANT: The current session does not reflect this change.")
+	i.logger.Info("Run 'newgrp docker' or start a new SSH session to use Docker without sudo.")
+	return nil
+}
+
 func (i *Installer) ConfigureDocker(user string) error {
 
 	if i.runtime == domain.Container {

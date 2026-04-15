@@ -3,6 +3,7 @@ package install
 import (
 	"synctl/internal/app"
 	"synctl/internal/application/interfaces/install"
+	"synctl/internal/application/services/common/banner"
 	installservice "synctl/internal/application/services/install"
 	dnsservice "synctl/internal/application/services/install/dns"
 	dockerservice "synctl/internal/application/services/install/docker"
@@ -47,6 +48,7 @@ var Cmd = &cobra.Command{
 			dockerDetector,
 			dockerInspector,
 			dockerInstaller,
+			components.Runner,
 		)
 
 		systemInspector := systeminfra.NewInspector(components.Runner)
@@ -72,6 +74,14 @@ var Cmd = &cobra.Command{
 			components.Logger,
 		)
 
-		return service.Install()
+		err := service.Install()
+
+		if err != nil {
+			return err
+		}
+
+		banner.PrintBanner()
+
+		return nil
 	},
 }

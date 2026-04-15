@@ -94,7 +94,7 @@ func (i *Installer) ConfigureCluster() error {
 	switch i.runtime {
 
 	case domain.VPS:
-		return i.ConfigureK3s()
+		return i.ConfigureKubeconfig()
 
 	case domain.Container:
 		return i.ConfigureK3d()
@@ -158,7 +158,7 @@ func (i *Installer) InstallK3d() error {
 	return nil
 }
 
-func (i *Installer) ConfigureK3s() error {
+func (i *Installer) ConfigureKubeconfig() error {
 
 	i.logger.Info("Configuring kubectl for k3s...")
 
@@ -197,7 +197,7 @@ func (i *Installer) ConfigureK3s() error {
 		return fmt.Errorf("chown kubeconfig failed: %w", err)
 	}
 
-	i.logger.Info("kubectl configured")
+	i.logger.Info("kubectl configured successfully")
 
 	return nil
 }

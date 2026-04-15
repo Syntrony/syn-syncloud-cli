@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"synctl/internal/domain"
+	"time"
 )
 
 type StateRepository struct {
@@ -36,7 +37,7 @@ func (f *StateRepository) Load() (*domain.State, error) {
 }
 
 func (f *StateRepository) Save(st *domain.State) error {
-	os.MkdirAll(filepath.Dir(f.Path), 0755)
+	os.MkdirAll(filepath.Dir(f.Path), 0750)
 
 	data, err := json.MarshalIndent(st, "", "  ")
 
@@ -44,47 +45,74 @@ func (f *StateRepository) Save(st *domain.State) error {
 		return err
 	}
 
-	return os.WriteFile(f.Path, data, 0644)
+	return os.WriteFile(f.Path, data, 0600)
 }
 
 func (f *StateRepository) Upsert(desired []*domain.Resource) ([]domain.Resource, error) {
+	merged := map[string]domain.Resource{}
+
+	exists, err := f.Exists()
+	if err != nil {
+		return nil, err
+	}
+
+	if exists {
+		state, err := f.Load()
+		if err != nil {
+			return nil, err
+		}
+		for _, res := range state.Resources {
+			merged[res.Key()] = res
+		}
+	}
+
+	now := time.Now().UTC().Format(time.RFC3339)
+
+	for _, res := range desired {
+		key := res.Key()
+
+		if prev, ok := merged[key]; ok {
+			res.Id = prev.Id
+			res.CreatedAt = prev.CreatedAt
+			res.Ownership = prev.Ownership
+			res.UpdatedAt = now
+		} else {
+			if res.CreatedAt == "" {
+				res.CreatedAt = now
+			}
+		}
+		merged[key] = *res
+	}
+
+	snapshot := make([]domain.Resource, 0, len(merged))
+	for _, res := range merged {
+		snapshot = append(snapshot, res)
+	}
+
+	return snapshot, nil
+}
+
+func (f *StateRepository) Remove(desired []*domain.Resource) ([]domain.Resource, error) {
 	state, err := f.Load()
 
 	if err != nil {
 		return nil, err
 	}
 
-	merged := map[string]domain.Resource{}
+	removeSet := make(map[string]struct{})
 
-	//Cargar existentes
-	for _, res := range state.Resources {
-		merged[res.Key()] = res
-	}
-
-	//Sobreescribir con desired
 	for _, res := range desired {
-		key := res.Key()
-
-		if existing, ok := merged[key]; ok {
-			res.Id = existing.Id
-			res.Name = existing.Name
-			res.Kind = existing.Kind
-			res.Runtime = existing.Runtime
-			res.NodeId = existing.NodeId
-			res.Spec = existing.Spec
-			res.Status = existing.Status
-			res.Ownership = existing.Ownership
-			res.CreatedAt = existing.CreatedAt
-			res.UpdatedAt = existing.UpdatedAt
-
-		}
-		merged[res.Key()] = *res
+		removeSet[res.Key()] = struct{}{}
 	}
 
 	var snapshot []domain.Resource
 
-	for _, v := range merged {
-		snapshot = append(snapshot, v)
+	for _, existing := range state.Resources {
+		if _, shouldDelete := removeSet[existing.Key()]; shouldDelete {
+			continue
+		}
+		snapshot = append(snapshot, existing)
 	}
+
 	return snapshot, nil
 }

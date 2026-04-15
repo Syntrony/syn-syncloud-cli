@@ -1,16 +1,43 @@
 package apply
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"synctl/internal/app"
-	applyService "synctl/internal/application/services/apply"
-	"synctl/internal/application/services/apply/parser"
-	validatorsvc "synctl/internal/application/services/apply/validator"
+	mutation "synctl/internal/application/services/apply"
+	commonParser "synctl/internal/application/services/common/parser"
+	commonValidator "synctl/internal/application/services/common/validator"
+	mutationSvc "synctl/internal/application/services/mutation"
 	"synctl/internal/application/services/state"
 
 	"github.com/spf13/cobra"
 )
+
+func isPathSafe(filePath string) error {
+	absPath, err := filepath.Abs(filePath)
+	if err != nil {
+		return fmt.Errorf("invalid path: %w", err)
+	}
+
+	cleanPath := filepath.Clean(absPath)
+	if strings.Contains(cleanPath, "..") {
+		return fmt.Errorf("path traversal not allowed: %s", filePath)
+	}
+
+	info, err := os.Stat(cleanPath)
+	if err != nil {
+		return err
+	}
+
+	if info.IsDir() {
+		return fmt.Errorf("path must be a file, not a directory: %s", filePath)
+	}
+
+	return nil
+}
 
 var filePath string
 
@@ -28,22 +55,30 @@ var Cmd = &cobra.Command{
 		components.Init()
 		components.WithDefaultRepo()
 
-		if _, err := os.Stat(filePath); err != nil {
+		if err := isPathSafe(filePath); err != nil {
 			return err
 		}
 
-		parser := parser.NewResourceParser()
-		validator := validatorsvc.NewValidator()
+		parser := commonParser.NewResourceParser()
+		validator := commonValidator.NewValidator()
 		builder := state.NewStateBuilder()
 
-		service := applyService.NewApplyService(
-			components.Repo,
-			builder,
+		applyMutation := mutation.NewApplyMutation(components.Repo)
+		mutationService := mutationSvc.NewMutationService(
 			parser,
 			validator,
+			components.Repo,
+			builder,
 			components.Logger,
-		)
+		).WithInspector(components.Inspector)
 
-		return service.Apply(filePath)
+		components.Logger.Info("Apply resources...")
+
+		if filePath != "" {
+			return mutationService.ExecuteFile(filePath, applyMutation)
+		}
+
+		components.Logger.Info("Apply single resource not yet implemented")
+		return nil
 	},
 }

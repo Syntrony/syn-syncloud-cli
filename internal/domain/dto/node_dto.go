@@ -5,4 +5,6 @@ type NodeDto struct {
 	Hostname string
 	Role     string
 	Ip       string
+	Os       string
+	Arch     string
 }
