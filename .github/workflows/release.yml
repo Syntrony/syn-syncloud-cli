@@ -28,7 +28,7 @@ jobs:
         id: next_version
         uses: mathieudutour/github-tag-action@v6.1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.SYNCLOUD_GITHUB_TK }}
           release_branches: master
           pre_release_branches: qa
 
@@ -44,4 +44,4 @@ jobs:
           version: latest
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SYNCLOUD_GITHUB_TK }}
