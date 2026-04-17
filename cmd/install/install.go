@@ -30,6 +30,11 @@ var Cmd = &cobra.Command{
 			return err
 		}
 
+		// Ensure state directory exists and is writable by the current user
+		if err := components.EnsureStateDir(); err != nil {
+			return err
+		}
+
 		k8sDetector := k8sinfra.NewDetector(components.Runner, components.Logger)
 		k8sInspector := k8sinfra.NewInspector(components.Runner, components.Logger)
 		k8sInstaller := k8sinfra.NewInstaller(components.Runner, components.Sudo, components.RuntimeType, components.Logger)
@@ -41,7 +46,7 @@ var Cmd = &cobra.Command{
 		)
 
 		dockerDetector := dockerinfra.NewDetector(components.Runner, components.Logger)
-		dockerInspector := dockerinfra.NewInspector(components.Runner, components.Logger)
+		dockerInspector := dockerinfra.NewInspector(components.Runner, components.Sudo, components.Logger)
 		dockerInstaller := dockerinfra.NewInstaller(components.Runner, components.Sudo, components.RuntimeType, components.Logger)
 
 		dockerRuntime := dockerservice.NewInstallService(
@@ -49,6 +54,7 @@ var Cmd = &cobra.Command{
 			dockerInspector,
 			dockerInstaller,
 			components.Runner,
+			components.Logger,
 		)
 
 		systemInspector := systeminfra.NewInspector(components.Runner)

@@ -2,6 +2,7 @@ package docker
 
 import (
 	"fmt"
+	"time"
 
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
@@ -42,7 +43,9 @@ func (i *Installer) InstallDocker() error {
 		return fmt.Errorf("failed to get current user: %w", err)
 	}
 
-	_, err = i.sudo.Run("apt-get", "install", "-y", "docker.io")
+	// Use official Docker install script — supports all major Linux distros
+	// and avoids the 'docker.io' package availability issue on some systems.
+	_, err = i.sudo.Run("sh", "-c", "curl -fsSL https://get.docker.com | sh")
 	if err != nil {
 		return fmt.Errorf("docker install failed: %w", err)
 	}
@@ -50,6 +53,15 @@ func (i *Installer) InstallDocker() error {
 	_, err = i.sudo.Run("systemctl", "enable", "docker")
 	if err != nil {
 		return fmt.Errorf("docker enable failed: %w", err)
+	}
+
+	_, err = i.sudo.Run("systemctl", "start", "docker")
+	if err != nil {
+		return fmt.Errorf("docker start failed: %w", err)
+	}
+
+	if err := i.waitForDocker(); err != nil {
+		i.logger.Info("Docker daemon not ready after install, continuing: " + err.Error())
 	}
 
 	return i.ConfigureDocker(user)
@@ -68,7 +80,23 @@ func (i *Installer) StartDocker() error {
 		return fmt.Errorf("docker initializing failed: %w", err)
 	}
 
+	if err := i.waitForDocker(); err != nil {
+		i.logger.Info("Docker daemon not ready, continuing: " + err.Error())
+	}
+
 	return nil
+}
+
+// waitForDocker polls sudo docker info until the daemon is ready or times out.
+func (i *Installer) waitForDocker() error {
+	i.logger.Info("Waiting for docker daemon to be ready...")
+	for attempt := 0; attempt < 15; attempt++ {
+		if _, err := i.sudo.Run("docker", "info"); err == nil {
+			return nil
+		}
+		time.Sleep(2 * time.Second)
+	}
+	return fmt.Errorf("docker daemon did not become ready in time")
 }
 
 func (i *Installer) ConfigureDockerPermissions(user string) error {
@@ -76,8 +104,6 @@ func (i *Installer) ConfigureDockerPermissions(user string) error {
 		return err
 	}
 	i.logger.Info("User '" + user + "' added to docker group.")
-	i.logger.Info("IMPORTANT: The current session does not reflect this change.")
-	i.logger.Info("Run 'newgrp docker' or start a new SSH session to use Docker without sudo.")
 	return nil
 }
 

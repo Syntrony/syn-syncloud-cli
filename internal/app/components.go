@@ -1,6 +1,9 @@
 package app
 
 import (
+	"fmt"
+	"path/filepath"
+
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
 	"synctl/internal/domain/persistence"
@@ -60,6 +63,27 @@ func (c *Components) WithDefaultRepo() *Components {
 func (c *Components) WithSudo(sudo interfaces.PrivilegedRunner) *Components {
 	c.Sudo = sudo
 	return c
+}
+
+// EnsureStateDir creates the VPS state directory via sudo and transfers ownership
+// to the current user, so the process can write the state file without root.
+func (c *Components) EnsureStateDir() error {
+	if c.RuntimeType != domain.VPS {
+		return nil
+	}
+	dir := filepath.Dir(VPSStatePath)
+	if _, err := c.Sudo.Run("mkdir", "-p", dir); err != nil {
+		return fmt.Errorf("failed to create state directory %s: %w", dir, err)
+	}
+	user, err := c.Runner.Whoami()
+	if err != nil {
+		return fmt.Errorf("failed to determine current user: %w", err)
+	}
+	if _, err := c.Sudo.Run("chown", user+":"+user, dir); err != nil {
+		// Non-fatal: directory may already be owned correctly
+		c.Logger.Info("chown state dir skipped: " + err.Error())
+	}
+	return nil
 }
 
 func (c *Components) DetectSudo() error {
