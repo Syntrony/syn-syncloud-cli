@@ -46,7 +46,7 @@ changelog:
       - "^chore:"
 
 release:
-  prerelease: auto
+  make_latest: true
   footer: >-
 
     ---
