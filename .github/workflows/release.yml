@@ -29,11 +29,20 @@ jobs:
       - name: Verify dependencies
         run: go mod tidy && git diff --exit-code go.sum
 
-      - name: Build check
+      - name: Build
         run: go build ./...
 
-      - name: Run tests
+      - name: Test
         run: go test ./... -count=1 -timeout 120s
+
+      - name: Validate GoReleaser config
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: "~> 2"
+          args: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.SYNCLOUD_GITHUB_TK }}
 
       - name: Determine next version
         id: next_version
@@ -48,15 +57,6 @@ jobs:
           git tag ${{ steps.next_version.outputs.new_tag }}
           git push origin ${{ steps.next_version.outputs.new_tag }}
 
-      - name: Validate GoReleaser config
-        uses: goreleaser/goreleaser-action@v5
-        with:
-          distribution: goreleaser
-          version: "~> 2"
-          args: check
-        env:
-          GITHUB_TOKEN: ${{ secrets.SYNCLOUD_GITHUB_TK }}
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
@@ -65,4 +65,3 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.SYNCLOUD_GITHUB_TK }}
-          GORELEASER_MAKE_LATEST: "true"

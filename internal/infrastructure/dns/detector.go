@@ -30,10 +30,9 @@ func (d *Detector) Detect() (*dto.Status, error) {
 
 	status.DnsInstalled = true
 
-	_, err = d.runner.Run(
-		"cat",
-		"/etc/dnsmasq.d/*.conf",
-	)
+	// Use sh to expand the glob — exec.Command does not invoke a shell,
+	// so passing "*.conf" directly would look for a file literally named "*.conf".
+	_, err = d.runner.Run("sh", "-c", "ls /etc/dnsmasq.d/*.conf")
 
 	if err != nil {
 		status.DnsConfigured = false
