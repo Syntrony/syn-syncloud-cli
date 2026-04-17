@@ -39,6 +39,11 @@ func (f *StateRepository) Load() (*domain.State, error) {
 func (f *StateRepository) Save(st *domain.State) error {
 	os.MkdirAll(filepath.Dir(f.Path), 0750)
 
+	// Backup existing state before overwriting
+	if current, err := os.ReadFile(f.Path); err == nil {
+		_ = os.WriteFile(f.Path+".bak", current, 0600)
+	}
+
 	data, err := json.MarshalIndent(st, "", "  ")
 
 	if err != nil {

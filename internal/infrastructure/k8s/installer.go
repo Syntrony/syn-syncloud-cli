@@ -89,6 +89,33 @@ func (i *Installer) InstallCluster() error {
 	}
 }
 
+func (i *Installer) StartCluster() error {
+
+	i.logger.Info("Starting cluster...")
+
+	switch i.runtime {
+
+	case domain.VPS:
+		_, err := i.sudo.Run("systemctl", "start", "k3s")
+		if err != nil {
+			return fmt.Errorf("failed to start k3s service: %w", err)
+		}
+		i.logger.Info("k3s service started")
+		return nil
+
+	case domain.Container:
+		_, err := i.runner.Run("k3d", "cluster", "start", "syncloud")
+		if err != nil {
+			return fmt.Errorf("failed to start k3d cluster: %w", err)
+		}
+		i.logger.Info("k3d cluster started")
+		return nil
+
+	default:
+		return fmt.Errorf("unknown runtime: %s", i.runtime)
+	}
+}
+
 func (i *Installer) ConfigureCluster() error {
 
 	switch i.runtime {

@@ -2,6 +2,7 @@ package reconciler
 
 import (
 	"fmt"
+	"synctl/internal/application/interfaces"
 	"synctl/internal/application/interfaces/common"
 	"synctl/internal/application/services/common/diff"
 	"synctl/internal/domain"
@@ -10,6 +11,8 @@ import (
 type ReconcileService struct {
 	runtimes      []common.RuntimeReconciler
 	dnsReconciler common.DnsReconciler
+	dryRun        bool
+	logger        interfaces.Logger
 }
 
 func NewReconcileService(runtimes []common.RuntimeReconciler) *ReconcileService {
@@ -20,6 +23,12 @@ func NewReconcileService(runtimes []common.RuntimeReconciler) *ReconcileService 
 
 func (r *ReconcileService) WithDnsReconciler(dns common.DnsReconciler) *ReconcileService {
 	r.dnsReconciler = dns
+	return r
+}
+
+func (r *ReconcileService) WithDryRun(logger interfaces.Logger) *ReconcileService {
+	r.dryRun = true
+	r.logger = logger
 	return r
 }
 
@@ -60,13 +69,22 @@ func (r *ReconcileService) Reconcile(state *domain.State) error {
 			Actions:   planned,
 		}
 
+		if r.dryRun {
+			for _, action := range planned {
+				r.logger.Info(fmt.Sprintf("[dry-run] %s → %s %s", runtime.Runtime(), action.Type, action.Resource.Name))
+			}
+			continue
+		}
+
 		if err := runtime.Reconcile(subCtx); err != nil {
 			return err
 		}
 	}
 
 	if r.dnsReconciler != nil && state.Dns != nil {
-		if err := r.dnsReconciler.ReconcileDns(state.Dns); err != nil {
+		if r.dryRun {
+			r.logger.Info("[dry-run] dns reconciliation skipped — no changes applied")
+		} else if err := r.dnsReconciler.ReconcileDns(state.Dns); err != nil {
 			return fmt.Errorf("dns reconciliation: %w", err)
 		}
 	}

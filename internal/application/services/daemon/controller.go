@@ -43,7 +43,7 @@ func (c *Controller) Start(ctx context.Context) {
 			}
 
 			if err := c.reconciler.Reconcile(state); err != nil {
-				c.logger.Error(fmt.Sprintf("Error reconcile: %w", err))
+				c.logger.Error(fmt.Sprintf("Error reconcile: %s", err))
 				continue
 			}
 		case <-ctx.Done():

@@ -48,12 +48,14 @@ var (
 	name     string
 	id       string
 	filePath string
+	dryRun   bool
 )
 
 func init() {
 	Cmd.Flags().StringVarP(&filePath, "file", "f", "", "delete by resource file")
 	Cmd.Flags().StringVarP(&name, "name", "n", "", "delete by resource name")
 	Cmd.Flags().StringVarP(&id, "id", "I", "", "delete by resource id")
+	Cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Preview deletions without applying them")
 }
 
 var Cmd = &cobra.Command{
@@ -80,6 +82,10 @@ var Cmd = &cobra.Command{
 			builder,
 			components.Logger,
 		).WithInspector(components.Inspector)
+
+		if dryRun {
+			mutationService.AsDryRun()
+		}
 
 		components.Logger.Info("Delete resources...")
 
@@ -116,6 +122,10 @@ var Cmd = &cobra.Command{
 
 		if err := mutationService.ExecuteResource(resources, deleteMutation); err != nil {
 			return err
+		}
+
+		if dryRun {
+			return nil
 		}
 
 		dockerRecon := docker.NewDockerReconciler(components.Runner, components.Logger)

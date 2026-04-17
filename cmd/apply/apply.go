@@ -39,10 +39,14 @@ func isPathSafe(filePath string) error {
 	return nil
 }
 
-var filePath string
+var (
+	filePath string
+	dryRun   bool
+)
 
 func init() {
 	Cmd.Flags().StringVarP(&filePath, "file", "f", "", "Path to the resource file to apply")
+	Cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Preview changes without applying them")
 	Cmd.MarkFlagRequired("file")
 }
 
@@ -71,6 +75,10 @@ var Cmd = &cobra.Command{
 			builder,
 			components.Logger,
 		).WithInspector(components.Inspector)
+
+		if dryRun {
+			mutationService.AsDryRun()
+		}
 
 		components.Logger.Info("Apply resources...")
 

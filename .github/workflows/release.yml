@@ -6,25 +6,36 @@ on:
     branches:
       - qa
       - master
-    
+
 jobs:
   release:
-    if: github.event.pull_request.merged
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25.0'
+          go-version-file: go.mod
+          cache: true
 
-      - name: Determine next Version env
+      - name: Verify dependencies
+        run: go mod tidy && git diff --exit-code go.sum
+
+      - name: Build check
+        run: go build ./...
+
+      - name: Run tests
+        run: go test ./... -count=1 -timeout 120s
+
+      - name: Determine next version
         id: next_version
         uses: mathieudutour/github-tag-action@v6.1
         with:
@@ -36,6 +47,15 @@ jobs:
         run: |
           git tag ${{ steps.next_version.outputs.new_tag }}
           git push origin ${{ steps.next_version.outputs.new_tag }}
+
+      - name: Validate GoReleaser config
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: "~> 2"
+          args: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.SYNCLOUD_GITHUB_TK }}
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
