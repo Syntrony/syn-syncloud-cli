@@ -23,7 +23,7 @@ builds:
 
 archives:
   - id: synctl
-    builds: [synctl]
+    ids: [synctl]
     formats: [tar.gz]
     name_template: >-
       {{ .ProjectName }}_
