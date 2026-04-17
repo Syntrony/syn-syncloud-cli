@@ -8,12 +8,12 @@ GITHUB_OWNER="Syntrony"
 GITHUB_REPO="syn-syncloud-cli"
 
 # --- Lógica de detección ---
-OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+OS=$(uname -s)
 ARCH=$(uname -m)
 
-# Normalizar arquitecturas para GoReleaser
+# Normalizar arquitecturas (solo para el formato del archivo)
 case $ARCH in
-    x86_64) ARCH="amd64" ;;
+    x86_64) ;;
     arm64|aarch64) ARCH="arm64" ;;
     *) echo "Arquitectura no soportada: $ARCH"; exit 1 ;;
 esac
@@ -21,7 +21,7 @@ esac
 # Obtener la URL de la última versión usando la API de GitHub
 # Esto evita que tengas que actualizar el script cada vez que saques una versión
 LATEST_RELEASE_URL="https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest"
-DOWNLOAD_URL=$(curl -s $LATEST_RELEASE_URL | grep "browser_download_url" | grep "${OS}_${ARCH}" | cut -d '"' -f 4)
+DOWNLOAD_URL=$(curl -s $LATEST_RELEASE_URL | grep "browser_download_url" | grep "${OS}_${ARCH}\.tar\.gz" | cut -d '"' -f 4)
 
 if [ -z "$DOWNLOAD_URL" ]; then
     echo "No se encontró un binario para ${OS} y ${ARCH}."
