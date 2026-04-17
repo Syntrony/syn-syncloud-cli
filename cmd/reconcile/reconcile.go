@@ -14,6 +14,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var dryRun bool
+
+func init() {
+	Cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Preview reconciliation plan without applying changes")
+}
+
 var Cmd = &cobra.Command{
 	Use:   "reconcile",
 	Short: "Run a one-shot reconciliation of desired vs actual state",
@@ -46,11 +52,22 @@ var Cmd = &cobra.Command{
 
 		svc := reconciler.NewReconcileService(runtimes).WithDnsReconciler(dnsRecon)
 
-		components.Logger.Info("Reconciling platform state...")
+		if dryRun {
+			svc.WithDryRun(components.Logger)
+			components.Logger.Info("[dry-run] Generating reconciliation plan...")
+		} else {
+			components.Logger.Info("Reconciling platform state...")
+		}
+
 		if err := svc.Reconcile(state); err != nil {
 			return err
 		}
-		components.Logger.Info("Reconciliation completed successfully")
+
+		if dryRun {
+			components.Logger.Info("[dry-run] Plan generated — no changes applied")
+		} else {
+			components.Logger.Info("Reconciliation completed successfully")
+		}
 		return nil
 	},
 }

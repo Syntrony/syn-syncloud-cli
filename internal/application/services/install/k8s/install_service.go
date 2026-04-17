@@ -1,6 +1,8 @@
 package k8s
 
 import (
+	"fmt"
+
 	install "synctl/internal/application/interfaces/install"
 	install_k8s "synctl/internal/application/interfaces/install/k8s"
 	"synctl/internal/domain"
@@ -37,10 +39,16 @@ func (s *InstallService) Install() (*domain.Snapshot, error) {
 	}
 
 	if status.K3sInstalled {
-		// K3s ya existe en el sistema — solo configurar KUBECONFIG si falta
+		// K3s ya existe — asegurar kubeconfig y que el servicio esté activo
 		if !status.KubeconfigConfigured {
 			if err := s.installer.ConfigureKubeconfig(); err != nil {
 				return nil, err
+			}
+		}
+
+		if !status.ClusterReachable {
+			if err := s.installer.StartCluster(); err != nil {
+				return nil, fmt.Errorf("k3s is installed but cluster is unreachable and could not be started: %w", err)
 			}
 		}
 	} else {

@@ -1,6 +1,7 @@
 package mutation
 
 import (
+	"fmt"
 	"synctl/internal/application/interfaces"
 	apply "synctl/internal/application/interfaces/common"
 	"synctl/internal/application/interfaces/mutation"
@@ -17,6 +18,7 @@ type MutationService struct {
 	builder   *state.StateBuilder
 	logger    interfaces.Logger
 	inspector *system.Inspector
+	dryRun    bool
 }
 
 func NewMutationService(parser apply.ResourceParser, validator apply.Validator, repo interfaces.Repository, builder *state.StateBuilder, logger interfaces.Logger) *MutationService {
@@ -27,6 +29,11 @@ func NewMutationService(parser apply.ResourceParser, validator apply.Validator, 
 		builder:   builder,
 		logger:    logger,
 	}
+}
+
+func (m *MutationService) AsDryRun() *MutationService {
+	m.dryRun = true
+	return m
 }
 
 func (m *MutationService) WithInspector(inspector *system.Inspector) *MutationService {
@@ -131,6 +138,11 @@ func (m *MutationService) Execute(resources []*domain.Resource, mut mutation.Sta
 	}
 
 	state := m.builder.Build(&snap, cluster, nodes)
+
+	if m.dryRun {
+		m.logger.Info(fmt.Sprintf("[dry-run] would write %d resource(s) to state — no changes applied", len(state.Resources)))
+		return nil
+	}
 
 	return m.repo.Save(state)
 }

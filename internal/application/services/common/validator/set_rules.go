@@ -13,8 +13,8 @@ func (v *resourceValidator) validateDuplicateNames(resources []*domain.Resource)
 
 		if seen[key] {
 			errMsg := "duplicate resource: " + key
-			v.logger.Error(fmt.Sprintf(errMsg))
-			return fmt.Errorf(errMsg)
+			v.logger.Error(errMsg)
+			return fmt.Errorf("%s", errMsg)
 		}
 
 		seen[key] = true
