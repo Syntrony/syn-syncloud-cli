@@ -42,7 +42,8 @@ func (i *Installer) InstallDns() error {
 
 	i.logger.Info("Installing dnsmasq...")
 
-	_, err := i.sudo.Run("apt-get", "install", "-y", "dnsmasq")
+	// DEBIAN_FRONTEND=noninteractive prevents apt-get from hanging on prompts
+	_, err := i.sudo.Run("sh", "-c", "DEBIAN_FRONTEND=noninteractive apt-get install -y dnsmasq")
 
 	if err != nil {
 		return fmt.Errorf("dnsmasq install failed: %w", err)
@@ -53,9 +54,13 @@ func (i *Installer) InstallDns() error {
 	}
 
 	_, err = i.sudo.Run("systemctl", "enable", "dnsmasq")
-
 	if err != nil {
 		return err
+	}
+
+	// Start the service so it is running before ConfigureDns tries to reload it
+	if _, err = i.sudo.Run("systemctl", "start", "dnsmasq"); err != nil {
+		i.logger.Info("dnsmasq start failed (may already be running): " + err.Error())
 	}
 
 	return nil
@@ -112,13 +117,13 @@ func (i *Installer) ConfigureDns() error {
 			return fmt.Errorf("Failed to deploy config: %w", err)
 		}
 
-		_, err = i.sudo.Run("systemctl", "reload", "dnsmasq")
+		_, err = i.sudo.Run("systemctl", "restart", "dnsmasq")
 
 		if err != nil {
-			i.logger.Error("Reload failed, performing rollback...")
+			i.logger.Error("Restart failed, performing rollback...")
 			i.sudo.Run("cp", backupPath, finalPath)
-			i.sudo.Run("systemctl", "reload", "dnsmasq")
-			return fmt.Errorf("dnsmasq reload failed, rolled back: %w", err)
+			i.sudo.Run("systemctl", "restart", "dnsmasq")
+			return fmt.Errorf("dnsmasq restart failed, rolled back: %w", err)
 		}
 	}
 
@@ -152,11 +157,11 @@ func (i *Installer) ApplyRecords(records []resource.Record, generalIp string) er
 		if _, err := i.sudo.Run("mv", tmpPath, finalPath); err != nil {
 			return fmt.Errorf("failed to deploy config: %w", err)
 		}
-		if _, err := i.sudo.Run("systemctl", "reload", "dnsmasq"); err != nil {
-			i.logger.Error("Reload failed, performing rollback...")
+		if _, err := i.sudo.Run("systemctl", "restart", "dnsmasq"); err != nil {
+			i.logger.Error("Restart failed, performing rollback...")
 			i.sudo.Run("cp", backupPath, finalPath)
-			i.sudo.Run("systemctl", "reload", "dnsmasq")
-			return fmt.Errorf("dnsmasq reload failed, rolled back: %w", err)
+			i.sudo.Run("systemctl", "restart", "dnsmasq")
+			return fmt.Errorf("dnsmasq restart failed, rolled back: %w", err)
 		}
 	}
 
@@ -165,12 +170,11 @@ func (i *Installer) ApplyRecords(records []resource.Record, generalIp string) er
 }
 
 func (i *Installer) DisableSystemd() error {
-	i.logger.Info("Disabling systemd...")
+	i.logger.Info("Disabling systemd-resolved...")
 
-	_, err := i.sudo.Run("systemctl", "disable", "systemd-resolved")
-
-	if err != nil {
-		return fmt.Errorf("systemd-resolved disable failed: %w", err)
+	if _, err := i.sudo.Run("systemctl", "disable", "--now", "systemd-resolved"); err != nil {
+		// May already be disabled or not present — log and continue
+		i.logger.Info("systemd-resolved disable skipped (may not be active): " + err.Error())
 	}
 
 	return nil

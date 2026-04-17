@@ -70,7 +70,5 @@ func (s *InstallService) Install() error {
 
 	state := s.builder.Build(snapshot, existingCluster, nodes)
 
-	s.logger.Info("Syncloud Platform installed successfully!!!")
-
 	return s.repo.Save(state)
 }

@@ -13,12 +13,14 @@ import (
 
 type Inspector struct {
 	runner interfaces.CommandRunner
+	sudo   interfaces.PrivilegedRunner
 	logger interfaces.Logger
 }
 
-func NewInspector(runner interfaces.CommandRunner, logger interfaces.Logger) *Inspector {
+func NewInspector(runner interfaces.CommandRunner, sudo interfaces.PrivilegedRunner, logger interfaces.Logger) *Inspector {
 	return &Inspector{
 		runner: runner,
+		sudo:   sudo,
 		logger: logger,
 	}
 }
@@ -29,16 +31,14 @@ func (i *Inspector) Snapshot() (*domain.Snapshot, error) {
 
 	snapshot := &domain.Snapshot{}
 
-	out, err := i.runner.Run(
-		"docker",
-		"ps",
-		"-a",
-		"--format",
-		"{{json .}}",
-	)
-
+	out, err := i.runner.Run("docker", "ps", "-a", "--format", "{{json .}}")
 	if err != nil {
-		return nil, err
+		// Session may not reflect docker group membership yet — fallback to sudo
+		i.logger.Info("docker ps failed without sudo, retrying with sudo...")
+		out, err = i.sudo.Run("docker", "ps", "-a", "--format", "{{json .}}")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	scanner := bufio.NewScanner(strings.NewReader(out.Stdout))
