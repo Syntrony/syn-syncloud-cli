@@ -163,15 +163,16 @@ func (i *Installer) ConfigureDns() error {
 	}
 
 	if i.runtime == domain.Container {
-		// Backup del archivo
-		i.runner.Run("cp", finalPath, backupPath)
+		// Backup only if the file already exists (first run has no prior config)
+		i.runner.Run("sh", "-c", fmt.Sprintf("test -f %s && cp %s %s", finalPath, finalPath, backupPath))
 
 		if _, err := i.runner.Run("mv", tmpPath, finalPath); err != nil {
 			return fmt.Errorf("Failed to deploy config: %w", err)
 		}
 
 	} else {
-		i.sudo.Run("cp", finalPath, backupPath)
+		// Backup only if the file already exists (first run has no prior config)
+		i.sudo.Run("sh", "-c", fmt.Sprintf("test -f %s && cp %s %s", finalPath, finalPath, backupPath))
 
 		if _, err := i.sudo.Run("mv", tmpPath, finalPath); err != nil {
 			return fmt.Errorf("Failed to deploy config: %w", err)
@@ -212,12 +213,12 @@ func (i *Installer) ApplyRecords(records []resource.Record, generalIp string) er
 	}
 
 	if i.runtime == domain.Container {
-		i.runner.Run("cp", finalPath, backupPath)
+		i.runner.Run("sh", "-c", fmt.Sprintf("test -f %s && cp %s %s", finalPath, finalPath, backupPath))
 		if _, err := i.runner.Run("mv", tmpPath, finalPath); err != nil {
 			return fmt.Errorf("failed to deploy config: %w", err)
 		}
 	} else {
-		i.sudo.Run("cp", finalPath, backupPath)
+		i.sudo.Run("sh", "-c", fmt.Sprintf("test -f %s && cp %s %s", finalPath, finalPath, backupPath))
 		if _, err := i.sudo.Run("mv", tmpPath, finalPath); err != nil {
 			return fmt.Errorf("failed to deploy config: %w", err)
 		}
