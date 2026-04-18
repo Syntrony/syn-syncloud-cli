@@ -65,6 +65,7 @@ func (i *Inspector) Snapshot() (*domain.Snapshot, error) {
 			Kind:    "docker.container",
 			Runtime: "docker",
 			NodeId:  uuid.NewString(),
+			Source:  domain.SourceObserved,
 			Spec: map[string]interface{}{
 				"image":   c.Image,
 				"command": c.Command,

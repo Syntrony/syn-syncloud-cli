@@ -43,6 +43,9 @@ func (r *ReconcileService) Reconcile(state *domain.State) error {
 
 		for _, resource := range ctx.Resources {
 			if resource.Runtime == runtime.Runtime() {
+				if resource.Source == domain.SourceObserved {
+					continue
+				}
 				runtimeResources = append(runtimeResources, resource)
 			}
 		}

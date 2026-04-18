@@ -53,6 +53,20 @@ func (i *Installer) syncloudBackupPath() string {
 	return filepath.Join(i.confDir, "syncloud.conf.bak")
 }
 
+// ensureConfDir creates the conf directory if it does not exist.
+func (i *Installer) ensureConfDir() error {
+	if i.runtime == domain.Container {
+		if _, err := i.runner.Run("mkdir", "-p", i.confDir); err != nil {
+			return fmt.Errorf("failed to create conf dir %s: %w", i.confDir, err)
+		}
+	} else {
+		if _, err := i.sudo.Run("mkdir", "-p", i.confDir); err != nil {
+			return fmt.Errorf("failed to create conf dir %s: %w", i.confDir, err)
+		}
+	}
+	return nil
+}
+
 func (i *Installer) InstallDns() error {
 
 	if i.runtime == domain.Container {
@@ -89,6 +103,10 @@ func (i *Installer) InstallDns() error {
 // Revisar pipeline del repositorio de Networking
 func (i *Installer) ConfigureDns() error {
 	i.logger.Info("Configuring dnsmasq file...")
+
+	if err := i.ensureConfDir(); err != nil {
+		return err
+	}
 
 	randomWord := gofakeit.Word()
 
@@ -153,6 +171,10 @@ func (i *Installer) ConfigureDns() error {
 
 // ApplyRecords writes the dnsmasq config with the given records and reloads the service.
 func (i *Installer) ApplyRecords(records []resource.Record, generalIp string) error {
+	if err := i.ensureConfDir(); err != nil {
+		return err
+	}
+
 	content := i.SetupDnsFile(records, generalIp)
 
 	finalPath := i.syncloudConfPath()
