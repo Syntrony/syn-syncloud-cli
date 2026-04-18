@@ -53,7 +53,8 @@ func (i *Installer) syncloudBackupPath() string {
 	return filepath.Join(i.confDir, "syncloud.conf.bak")
 }
 
-// ensureConfDir creates the conf directory if it does not exist.
+// ensureConfDir creates the conf directory if it does not exist, and ensures
+// /etc/dnsmasq.conf has a conf-dir= directive pointing to it so dnsmasq reads the files.
 func (i *Installer) ensureConfDir() error {
 	if i.runtime == domain.Container {
 		if _, err := i.runner.Run("mkdir", "-p", i.confDir); err != nil {
@@ -63,8 +64,29 @@ func (i *Installer) ensureConfDir() error {
 		if _, err := i.sudo.Run("mkdir", "-p", i.confDir); err != nil {
 			return fmt.Errorf("failed to create conf dir %s: %w", i.confDir, err)
 		}
+		// Ensure /etc/dnsmasq.conf includes the conf-dir directive so dnsmasq reads syncloud.conf
+		if err := i.ensureConfDirDirective(); err != nil {
+			i.logger.Info("Warning: could not update /etc/dnsmasq.conf with conf-dir: " + err.Error())
+		}
 	}
 	return nil
+}
+
+// ensureConfDirDirective appends conf-dir=<confDir> to /etc/dnsmasq.conf if not already present.
+func (i *Installer) ensureConfDirDirective() error {
+	const mainConf = "/etc/dnsmasq.conf"
+	directive := "conf-dir=" + i.confDir
+
+	// Check if the directive already exists (active, not commented out)
+	out, _ := i.runner.Run("grep", "-E", "^conf-dir="+i.confDir, mainConf)
+	if out != nil && strings.TrimSpace(out.Stdout) != "" {
+		return nil // already present
+	}
+
+	i.logger.Info("Adding conf-dir directive to " + mainConf + "...")
+	line := "\n# Added by syncloud\n" + directive + "\n"
+	_, err := i.sudo.Run("sh", "-c", fmt.Sprintf("echo '%s' >> %s", line, mainConf))
+	return err
 }
 
 func (i *Installer) InstallDns() error {
