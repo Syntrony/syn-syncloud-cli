@@ -83,7 +83,14 @@ var Cmd = &cobra.Command{
 		components.Logger.Info("Apply resources...")
 
 		if filePath != "" {
-			return mutationService.ExecuteFile(filePath, applyMutation)
+			if err := mutationService.ExecuteFile(filePath, applyMutation); err != nil {
+				return err
+			}
+			if !dryRun {
+				components.Logger.Info("Triggering background reconcile...")
+				app.TriggerReconcile()
+			}
+			return nil
 		}
 
 		components.Logger.Info("Apply single resource not yet implemented")
