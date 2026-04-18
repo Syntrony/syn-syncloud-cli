@@ -24,3 +24,12 @@ func PrintResources(resources []dto.ResourceDto) {
 	}
 	w.Flush()
 }
+
+func PrintDnsRecords(records []dto.DnsRecordDto) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, "NAME\tSERVER")
+	for _, r := range records {
+		fmt.Fprintf(w, "%s\t%s\n", r.Name, r.Server)
+	}
+	w.Flush()
+}

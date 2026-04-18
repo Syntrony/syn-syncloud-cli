@@ -1,6 +1,7 @@
 package get
 
 import (
+	dns "synctl/cmd/get/dns"
 	nodes "synctl/cmd/get/nodes"
 	resources "synctl/cmd/get/resources"
 
@@ -15,4 +16,5 @@ var Cmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(resources.Cmd)
 	Cmd.AddCommand(nodes.Cmd)
+	Cmd.AddCommand(dns.Cmd)
 }
