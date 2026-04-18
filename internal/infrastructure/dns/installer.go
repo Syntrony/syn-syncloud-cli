@@ -72,20 +72,22 @@ func (i *Installer) ensureConfDir() error {
 	return nil
 }
 
-// ensureConfDirDirective appends conf-dir=<confDir> to /etc/dnsmasq.conf if not already present.
+// ensureConfDirDirective appends a conf-file= directive pointing directly to syncloud.conf
+// into /etc/dnsmasq.conf if not already present. Using conf-file= is more explicit and reliable
+// than relying solely on conf-dir= glob expansion, which may be filtered or ignored on some systems.
 func (i *Installer) ensureConfDirDirective() error {
 	const mainConf = "/etc/dnsmasq.conf"
-	directive := "conf-dir=" + i.confDir
+	syncloudConf := i.syncloudConfPath()
+	directive := "conf-file=" + syncloudConf
 
-	// Check if the directive already exists (active, not commented out)
-	out, _ := i.runner.Run("grep", "-E", "^conf-dir="+i.confDir, mainConf)
+	// Check if a conf-file= pointing to syncloud.conf already exists
+	out, _ := i.runner.Run("grep", "-F", directive, mainConf)
 	if out != nil && strings.TrimSpace(out.Stdout) != "" {
 		return nil // already present
 	}
 
-	i.logger.Info("Adding conf-dir directive to " + mainConf + "...")
-	line := "\n# Added by syncloud\n" + directive + "\n"
-	_, err := i.sudo.Run("sh", "-c", fmt.Sprintf("echo '%s' >> %s", line, mainConf))
+	i.logger.Info("Adding conf-file directive for syncloud.conf to " + mainConf + "...")
+	_, err := i.sudo.Run("sh", "-c", fmt.Sprintf("printf '\\n# Added by syncloud\\n%s\\n' >> %s", directive, mainConf))
 	return err
 }
 
