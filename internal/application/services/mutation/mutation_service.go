@@ -107,6 +107,7 @@ func (m *MutationService) Execute(resources []*domain.Resource, mut mutation.Sta
 	var incomingRecords []resource.Record
 
 	for _, r := range resources {
+		r.Source = domain.SourceManaged
 		if r.Runtime == "dns" {
 			incomingRecords = append(incomingRecords, resource.Record{
 				Name:   r.Name,

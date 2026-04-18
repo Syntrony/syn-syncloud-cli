@@ -109,6 +109,7 @@ func (i *Inspector) Collect(
 			Kind:      "k8s." + k8sKind,
 			Runtime:   "kubernetes",
 			NodeId:    uuid.NewString(), // Nota: Considera usar item.Metadata.Uid para persistencia
+			Source:    domain.SourceObserved,
 			Spec:      item.Spec,
 			Status:    item.Status,
 			CreatedAt: item.Metadata.CreationTimestamp,
