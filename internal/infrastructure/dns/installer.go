@@ -2,6 +2,7 @@ package dns
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 	"synctl/internal/application/interfaces"
 	system "synctl/internal/application/interfaces/system"
@@ -11,6 +12,8 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 )
 
+const defaultConfDir = "/etc/dnsmasq.d"
+
 type Installer struct {
 	runner       interfaces.CommandRunner
 	sudo         interfaces.PrivilegedRunner
@@ -18,6 +21,7 @@ type Installer struct {
 	logger       interfaces.Logger
 	sysinspector system.Inspector
 	sysfile      system.FileSystem
+	confDir      string
 }
 
 func NewInstaller(runner interfaces.CommandRunner,
@@ -30,7 +34,23 @@ func NewInstaller(runner interfaces.CommandRunner,
 		logger:       logger,
 		sysinspector: sysinspector,
 		sysfile:      sysfile,
+		confDir:      defaultConfDir,
 	}
+}
+
+// WithConfDir overrides the directory where syncloud writes its dnsmasq config file.
+func (i *Installer) WithConfDir(dir string) {
+	i.confDir = dir
+}
+
+// syncloudConfPath returns the absolute path of the syncloud dnsmasq config file.
+func (i *Installer) syncloudConfPath() string {
+	return filepath.Join(i.confDir, "syncloud.conf")
+}
+
+// syncloudBackupPath returns the absolute path of the syncloud dnsmasq config backup.
+func (i *Installer) syncloudBackupPath() string {
+	return filepath.Join(i.confDir, "syncloud.conf.bak")
 }
 
 func (i *Installer) InstallDns() error {
@@ -86,9 +106,9 @@ func (i *Installer) ConfigureDns() error {
 	content := i.SetupDnsFile([]resource.Record{record}, host[0].Ip)
 
 	// Definir rutas
-	finalPath := "/etc/dnsmasq.d/syncloud.conf"
+	finalPath := i.syncloudConfPath()
 	tmpPath := "/tmp/syncloud.conf.tmp"
-	backupPath := fmt.Sprintf("/etc/dnsmasq.d/syncloud.conf.bak")
+	backupPath := i.syncloudBackupPath()
 
 	// Escribir archivo temporal
 	if err := i.sysfile.WriteFile(tmpPath, content); err != nil {
@@ -135,9 +155,9 @@ func (i *Installer) ConfigureDns() error {
 func (i *Installer) ApplyRecords(records []resource.Record, generalIp string) error {
 	content := i.SetupDnsFile(records, generalIp)
 
-	finalPath := "/etc/dnsmasq.d/syncloud.conf"
+	finalPath := i.syncloudConfPath()
 	tmpPath := "/tmp/syncloud.conf.tmp"
-	backupPath := "/etc/dnsmasq.d/syncloud.conf.bak"
+	backupPath := i.syncloudBackupPath()
 
 	if err := i.sysfile.WriteFile(tmpPath, content); err != nil {
 		return fmt.Errorf("failed to write tmp config: %w", err)
