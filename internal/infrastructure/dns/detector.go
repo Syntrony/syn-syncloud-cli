@@ -30,9 +30,10 @@ func (d *Detector) Detect() (*dto.Status, error) {
 
 	status.DnsInstalled = true
 
-	// Use sh to expand the glob — exec.Command does not invoke a shell,
-	// so passing "*.conf" directly would look for a file literally named "*.conf".
-	_, err = d.runner.Run("sh", "-c", "ls /etc/dnsmasq.d/*.conf")
+	// DnsConfigured means syncloud's own config file is present.
+	// Checking for any *.conf is wrong — the server may already have other .conf files
+	// (e.g. dnsmasq.conf) causing a false positive and skipping ConfigureDns entirely.
+	_, err = d.runner.Run("sh", "-c", "test -f /etc/dnsmasq.d/syncloud.conf")
 
 	if err != nil {
 		status.DnsConfigured = false
