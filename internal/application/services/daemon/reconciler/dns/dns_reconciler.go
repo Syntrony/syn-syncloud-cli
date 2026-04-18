@@ -1,8 +1,6 @@
 package dns
 
 import (
-	"sort"
-
 	"synctl/internal/application/interfaces"
 	"synctl/internal/domain"
 	resource "synctl/internal/domain/resource"
@@ -42,7 +40,9 @@ func (d *DnsReconciler) ReconcileDns(dns *domain.Dns) error {
 		return err
 	}
 
-	if recordsEqual(snap.Records, dns.Records) {
+	// Use subset check: all desired records must exist in actual.
+	// External records managed outside syncloud are intentionally ignored.
+	if desiredSubsetOfActual(dns.Records, snap.Records) {
 		return nil
 	}
 
@@ -57,22 +57,18 @@ func (d *DnsReconciler) ReconcileDns(dns *domain.Dns) error {
 	return d.installer.ApplyRecords(dns.Records, hosts[0].Ip)
 }
 
-func recordsEqual(a, b []resource.Record) bool {
-	if len(a) != len(b) {
-		return false
+// desiredSubsetOfActual returns true when every record in desired exists in actual
+// with the same server value. Extra records in actual (e.g. managed by external
+// tools in /etc/dnsmasq.conf) are intentionally ignored to avoid phantom drift.
+func desiredSubsetOfActual(desired, actual []resource.Record) bool {
+	index := make(map[string]string, len(actual))
+	for _, r := range actual {
+		index[r.Name] = r.Server
 	}
-	sortRecords(a)
-	sortRecords(b)
-	for i := range a {
-		if a[i].Name != b[i].Name || a[i].Server != b[i].Server {
+	for _, r := range desired {
+		if server, ok := index[r.Name]; !ok || server != r.Server {
 			return false
 		}
 	}
 	return true
-}
-
-func sortRecords(records []resource.Record) {
-	sort.Slice(records, func(i, j int) bool {
-		return records[i].Name < records[j].Name
-	})
 }
