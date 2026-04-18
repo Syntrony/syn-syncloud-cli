@@ -67,6 +67,16 @@
             ]
         },
         {
+            "name": "synctl get dns records",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "get dns"
+            ]
+        },
+        {
             "name": "synctl get nodes",
             "type": "go",
             "request": "launch",

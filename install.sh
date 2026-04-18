@@ -21,6 +21,16 @@ esac
 # Obtener la URL de la última versión usando la API de GitHub
 # Esto evita que tengas que actualizar el script cada vez que saques una versión
 LATEST_RELEASE_URL="https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest"
+
+CURRENT_VERSION=$($BINARY_NAME version --short 2>/dev/null || echo "none")
+
+LATEST_TAG=$(curl -s $LATEST_RELEASE_URL | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+
+if [ "$CURRENT_VERSION" == "$LATEST_TAG" ]; then
+    echo "You have the latest version installed. Skipping download"
+    exit 0
+fi
+
 DOWNLOAD_URL=$(curl -s $LATEST_RELEASE_URL | grep "browser_download_url" | grep "${OS}_${ARCH}\.tar\.gz" | cut -d '"' -f 4)
 
 if [ -z "$DOWNLOAD_URL" ]; then
