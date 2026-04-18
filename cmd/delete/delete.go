@@ -162,6 +162,9 @@ var Cmd = &cobra.Command{
 			}
 		}
 
+		components.Logger.Info("Triggering background reconcile...")
+		app.TriggerReconcile()
+
 		return nil
 	},
 }

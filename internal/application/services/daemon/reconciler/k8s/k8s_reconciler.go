@@ -66,11 +66,13 @@ func (k *K8sReconciler) Observe(resource *domain.Resource) (*domain.RuntimeResou
 	kind := extractKindName(resource.Kind)
 	namespace := extractNamespace(resource.Spec)
 
+	// --ignore-not-found makes kubectl exit 0 with empty stdout when the resource
+	// is absent, avoiding spurious [ERROR] log entries for expected missing resources.
 	var cmd []string
 	if namespace != "" {
-		cmd = []string{"get", kind, resource.Name, "-n", namespace, "-o", "json"}
+		cmd = []string{"get", kind, resource.Name, "--ignore-not-found", "-n", namespace, "-o", "json"}
 	} else {
-		cmd = []string{"get", kind, resource.Name, "-o", "json"}
+		cmd = []string{"get", kind, resource.Name, "--ignore-not-found", "-o", "json"}
 	}
 
 	out, err := k.runner.Run("kubectl", cmd...)
